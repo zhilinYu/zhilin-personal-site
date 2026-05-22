@@ -1,0 +1,29 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 106.75.250.138
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "index.html"
+          target: "/usr/share/nginx/html/"
+          strip_components: 0
+
+      - name: Reload Nginx
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: 106.75.250.138
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: systemctl reload nginx
