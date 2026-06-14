@@ -452,18 +452,60 @@
     .step h3 { margin: 56px 0 12px; font-size: 21px; }
     .step p { margin: 0; color: var(--muted); font-size: 14px; }
 
-    .about-layout { display: grid; grid-template-columns: 1.1fr .9fr; gap: 90px; align-items: center; }
+    .about-layout { display: grid; grid-template-columns: 1.25fr .75fr; gap: 110px; align-items: center; }
     .about-copy h2 { margin-top: 12px; }
     .about-copy p { max-width: 690px; color: #aeb4c0; font-size: 18px; }
     .about-links { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 12px; }
     .portrait-frame {
       position: relative;
-      min-height: 540px;
-      overflow: hidden;
-      background: #397ec3;
+      justify-self: end;
+      width: min(100%, 390px);
+      aspect-ratio: .82;
+      padding: 1px;
+      border-radius: 26px;
+      background: linear-gradient(145deg, rgba(134,168,255,.52), rgba(255,255,255,.08) 42%, rgba(134,168,255,.12));
+      box-shadow: 0 35px 90px rgba(0,0,0,.38), 0 0 70px rgba(95,134,245,.08);
+      transform: rotate(1.2deg);
+      transition: transform .45s cubic-bezier(.2,.8,.2,1), box-shadow .45s ease;
     }
-    .portrait-frame img { width: 100%; height: 100%; position: absolute; inset: 0; object-fit: cover; object-position: 50% 38%; filter: grayscale(.15) contrast(1.05); }
-    .portrait-frame::after { content: "10+ YEARS / BUILDING SYSTEMS"; position: absolute; right: 18px; bottom: 18px; padding: 8px 10px; color: #fff; background: rgba(9,11,16,.72); font: 11px var(--mono); letter-spacing: .08em; }
+    .portrait-frame:hover { transform: rotate(0) translateY(-7px); box-shadow: 0 44px 110px rgba(0,0,0,.48), 0 0 90px rgba(95,134,245,.12); }
+    .portrait-frame::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 12% -8% -7% 14%;
+      border: 1px solid rgba(134,168,255,.15);
+      border-radius: 28px;
+      transform: rotate(-4deg);
+    }
+    .portrait-frame img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: 50% 38%;
+      border-radius: 25px;
+      filter: saturate(.82) contrast(1.04) brightness(.92);
+    }
+    .portrait-signature {
+      position: absolute;
+      right: -22px;
+      bottom: 24px;
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: #dce5fb;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 11px;
+      background: rgba(13,17,26,.82);
+      box-shadow: 0 14px 36px rgba(0,0,0,.35);
+      backdrop-filter: blur(16px);
+      font: 10px var(--mono);
+      letter-spacing: .07em;
+      transform: rotate(-1.2deg);
+    }
+    .portrait-signature i { width: 7px; height: 7px; border-radius: 50%; background: #79ddb0; box-shadow: 0 0 12px rgba(121,221,176,.8); }
 
     .contact-section { position: relative; overflow: hidden; padding-top: 150px; padding-bottom: 150px; }
     .contact-section::before {
@@ -523,7 +565,7 @@
       .proof-sticky { position: static; }
       .process-line { grid-template-columns: repeat(2, 1fr); }
       .step:nth-child(3) { border-left: 0; }
-      .portrait-frame { min-height: 460px; order: -1; }
+      .portrait-frame { width: min(72vw, 370px); justify-self: center; order: -1; }
     }
 
     @media (max-width: 600px) {
@@ -544,7 +586,8 @@
       .process-line { grid-template-columns: 1fr; }
       .step, .step + .step { min-height: 0; padding: 28px 0; border-left: 0; }
       .step h3 { margin-top: 28px; }
-      .portrait-frame { min-height: 400px; }
+      .portrait-frame { width: min(78vw, 320px); }
+      .portrait-signature { right: -12px; bottom: 18px; }
       .contact-detail { flex-direction: column; gap: 10px; }
       .footer-inner { flex-direction: column; }
     }
@@ -736,7 +779,10 @@
             <a class="button" href="https://github.com/zhilinYu" target="_blank" rel="noreferrer">GitHub</a>
           </div>
         </div>
-        <div class="portrait-frame reveal"><img src="photo.png" alt="喻志林个人照片" loading="lazy"></div>
+        <div class="portrait-frame reveal">
+          <img src="photo.png" alt="喻志林个人照片" loading="lazy">
+          <div class="portrait-signature"><i></i>10+ YEARS / BUILDING SYSTEMS</div>
+        </div>
       </div>
     </section>
 
