@@ -16,7 +16,7 @@ jobs:
           host: 106.75.250.138
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "index.html"
+          source: "index.html,photo.png,resume"
           target: "/usr/share/nginx/html/"
           strip_components: 0
 
