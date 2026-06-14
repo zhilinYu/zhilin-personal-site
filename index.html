@@ -38,6 +38,21 @@
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
+    body::before {
+      content: "";
+      position: fixed;
+      z-index: 120;
+      left: var(--cursor-x, -200px);
+      top: var(--cursor-y, -200px);
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(94,143,255,.1), transparent 66%);
+      mix-blend-mode: screen;
+      transition: opacity .2s ease;
+    }
     a { color: inherit; }
     button, input, textarea { font: inherit; }
     ::selection { color: #07101f; background: var(--accent); }
@@ -136,31 +151,147 @@
       inset: 0;
       pointer-events: none;
       background:
-        linear-gradient(90deg, rgba(9,11,16,.99) 0%, rgba(9,11,16,.95) 46%, rgba(9,11,16,.45) 74%, rgba(9,11,16,.2) 100%),
-        radial-gradient(circle at 75% 42%, rgba(95,134,245,.25), transparent 32%);
+        linear-gradient(90deg, rgba(9,11,16,.99) 0%, rgba(9,11,16,.96) 43%, rgba(9,11,16,.48) 68%, rgba(9,11,16,.12) 100%),
+        radial-gradient(circle at 79% 42%, rgba(95,134,245,.22), transparent 36%);
       z-index: 2;
     }
-    .hero-photo {
+    .hero-visual {
       position: absolute;
-      inset: 0 0 0 auto;
-      width: min(52vw, 760px);
+      inset: 0 -3vw 0 auto;
+      z-index: 1;
+      width: min(59vw, 920px);
       height: 100%;
-      object-fit: cover;
-      object-position: 50% 42%;
-      filter: grayscale(1) contrast(1.1) brightness(.78);
-      transform: scale(1.04);
-      animation: photoSettle 1.4s cubic-bezier(.2,.75,.2,1) forwards;
+      display: grid;
+      place-items: center;
+      perspective: 1500px;
+      opacity: 0;
+      animation: visualEnter 1.2s .18s cubic-bezier(.2,.75,.2,1) forwards;
+    }
+    .product-stage {
+      --rx: -3deg;
+      --ry: -7deg;
+      position: relative;
+      width: min(760px, 88%);
+      aspect-ratio: 1.18;
+      transform-style: preserve-3d;
+      transform: rotateX(var(--rx)) rotateY(var(--ry));
+      transition: transform .16s ease-out;
+    }
+    .product-stage::before {
+      content: "";
+      position: absolute;
+      inset: 9% 2% 2% 9%;
+      transform: translateZ(-80px);
+      border-radius: 50%;
+      background: rgba(79,118,255,.35);
+      filter: blur(100px);
+    }
+    .product-shell {
+      position: absolute;
+      inset: 7% 4% 5% 5%;
+      overflow: hidden;
+      border: 1px solid rgba(174,198,255,.24);
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(23,30,47,.96), rgba(8,12,21,.94));
+      box-shadow: -30px 40px 90px rgba(0,0,0,.5), 0 0 0 1px rgba(113,153,255,.06) inset;
+      transform: translateZ(24px);
+      backdrop-filter: blur(26px);
+    }
+    .product-shell::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,.08) 42%, transparent 55%);
+      transform: translateX(-110%);
+      animation: shellScan 7s 1.2s ease-in-out infinite;
+    }
+    .product-topbar {
+      height: 56px;
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .window-dots { display: flex; gap: 7px; }
+    .window-dots i { width: 7px; height: 7px; border-radius: 50%; background: #33405c; }
+    .window-dots i:first-child { background: #7e9fff; box-shadow: 0 0 12px #668cff; }
+    .product-title { color: #dfe7ff; font: 600 11px var(--mono); letter-spacing: .08em; }
+    .live-chip { padding: 5px 9px; color: #7ce2b2; background: rgba(79,211,151,.09); border: 1px solid rgba(79,211,151,.2); border-radius: 999px; font: 10px var(--mono); }
+    .product-body { height: calc(100% - 56px); display: grid; grid-template-columns: 68px 1fr; }
+    .product-sidebar { padding: 18px 0; display: flex; flex-direction: column; align-items: center; gap: 16px; border-right: 1px solid rgba(255,255,255,.07); }
+    .side-logo { width: 30px; height: 30px; display: grid; place-items: center; color: #08101f; background: var(--accent); border-radius: 9px; font: 900 12px var(--mono); }
+    .side-icon { width: 31px; height: 31px; display: grid; place-items: center; color: #65718b; border-radius: 8px; font: 14px var(--mono); }
+    .side-icon.active { color: #bdd0ff; background: rgba(109,149,255,.12); box-shadow: 0 0 0 1px rgba(123,160,255,.14) inset; }
+    .product-main { padding: 20px; display: grid; grid-template-rows: auto 1fr auto; gap: 15px; }
+    .workspace-head { display: flex; align-items: end; justify-content: space-between; }
+    .workspace-kicker { color: #71809f; font: 9px var(--mono); letter-spacing: .14em; }
+    .workspace-head h3 { margin: 3px 0 0; font-size: 19px; letter-spacing: -.03em; }
+    .workspace-meta { color: #63708b; font: 9px var(--mono); }
+    .agent-grid { display: grid; grid-template-columns: 1.23fr .77fr; gap: 12px; min-height: 0; }
+    .agent-panel, .metric-panel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 13px;
+      background: rgba(255,255,255,.025);
+    }
+    .agent-panel { padding: 16px; }
+    .panel-label { margin-bottom: 14px; color: #697894; font: 9px var(--mono); letter-spacing: .12em; }
+    .flow-step { position: relative; min-height: 47px; padding: 0 0 12px 28px; color: #8c98af; font-size: 10px; }
+    .flow-step::before { content: ""; position: absolute; left: 7px; top: 5px; bottom: -4px; width: 1px; background: linear-gradient(#6088f6, rgba(96,136,246,.08)); }
+    .flow-step:last-child::before { display: none; }
+    .flow-dot { position: absolute; left: 2px; top: 2px; width: 11px; height: 11px; border-radius: 50%; border: 2px solid #151d30; background: #628cf9; box-shadow: 0 0 13px rgba(98,140,249,.75); }
+    .flow-step strong { display: block; margin-bottom: 3px; color: #e2e8f7; font-size: 11px; }
+    .flow-step.running .flow-dot { animation: flowPulse 1.6s ease-in-out infinite; background: #7ee2b4; }
+    .metric-panel { padding: 15px 13px; display: flex; flex-direction: column; }
+    .metric-number { margin-top: 4px; color: #e8edfa; font-size: 28px; font-weight: 750; letter-spacing: -.05em; }
+    .metric-number small { color: #7e8aa3; font: 9px var(--mono); }
+    .wave-chart { flex: 1; min-height: 82px; margin: 10px -4px 5px; }
+    .wave-chart svg { width: 100%; height: 100%; overflow: visible; }
+    .wave-line { fill: none; stroke: #79a0ff; stroke-width: 2; stroke-dasharray: 380; stroke-dashoffset: 380; filter: drop-shadow(0 0 6px #547ffc); animation: drawWave 2.4s .8s ease forwards; }
+    .wave-area { fill: url(#waveGradient); opacity: .35; }
+    .metric-foot { display: flex; justify-content: space-between; color: #65718a; font: 8px var(--mono); }
+    .prompt-bar { min-height: 46px; padding: 0 13px; display: flex; align-items: center; gap: 10px; color: #7e8ba5; border: 1px solid rgba(128,161,255,.16); border-radius: 11px; background: rgba(94,132,237,.055); font-size: 10px; }
+    .prompt-spark { color: #8eacff; font-size: 15px; animation: spark 2s ease-in-out infinite; }
+    .prompt-send { margin-left: auto; width: 27px; height: 27px; display: grid; place-items: center; color: #09111f; background: var(--accent); border-radius: 7px; }
+    .float-card {
+      position: absolute;
+      z-index: 4;
+      padding: 12px 14px;
+      border: 1px solid rgba(174,198,255,.22);
+      border-radius: 12px;
+      background: rgba(17,23,36,.84);
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+      backdrop-filter: blur(18px);
+      transform-style: preserve-3d;
+    }
+    .float-card strong { display: block; color: #e8edfa; font-size: 12px; }
+    .float-card span { color: #71809d; font: 9px var(--mono); }
+    .float-a { right: -1%; top: 13%; transform: translateZ(75px); animation: floatA 5s ease-in-out infinite; }
+    .float-b { left: 0; bottom: 3%; transform: translateZ(100px); animation: floatB 6s .4s ease-in-out infinite; }
+    .float-b strong { color: #7ee2b4; }
+    .orbit {
+      position: absolute;
+      inset: 4%;
+      border: 1px solid rgba(109,149,255,.12);
+      border-radius: 50%;
+      transform: translateZ(-35px) rotate(18deg);
+      animation: orbitSpin 18s linear infinite;
+    }
+    .orbit::before { content: ""; position: absolute; top: 18%; left: 2%; width: 7px; height: 7px; border-radius: 50%; background: #86a8ff; box-shadow: 0 0 20px #6f97ff; }
     }
     .hero-grid {
       position: absolute;
       inset: 0;
       z-index: 1;
-      opacity: .2;
+      opacity: .15;
       background-image:
         linear-gradient(rgba(134,168,255,.16) 1px, transparent 1px),
         linear-gradient(90deg, rgba(134,168,255,.16) 1px, transparent 1px);
       background-size: 70px 70px;
-      mask-image: linear-gradient(to right, transparent 28%, #000 78%);
+      mask-image: linear-gradient(to right, transparent 25%, #000 72%);
     }
     .hero-inner {
       position: relative;
@@ -278,7 +409,9 @@
       gap: 34px;
       align-items: start;
       border-bottom: 1px solid var(--line);
-      transition: background .25s ease, padding .25s ease;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: background .25s ease, padding .25s ease, transform .18s ease-out;
     }
     .service-row:hover { padding-left: 18px; padding-right: 18px; background: linear-gradient(90deg, var(--accent-soft), transparent 78%); }
     .service-no { color: var(--accent); font-family: var(--mono); font-size: 14px; }
@@ -302,13 +435,18 @@
       grid-template-columns: 110px 1fr;
       gap: 28px;
       border-bottom: 1px solid var(--line);
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: transform .18s ease-out, background .2s ease;
     }
+    .proof-item:hover { background: linear-gradient(90deg, rgba(134,168,255,.055), transparent); }
     .proof-value { color: var(--accent); font-size: 31px; font-weight: 800; letter-spacing: -.04em; }
     .proof-item h3 { margin: 2px 0 8px; font-size: 20px; }
     .proof-item p { margin: 0; color: var(--muted); }
 
     .process-line { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); }
-    .step { min-height: 260px; padding: 32px 28px 30px 0; border-bottom: 1px solid var(--line); }
+    .step { min-height: 260px; padding: 32px 28px 30px 0; border-bottom: 1px solid var(--line); transform-style: preserve-3d; will-change: transform; transition: transform .18s ease-out, background .2s ease; }
+    .step:hover { background: linear-gradient(180deg, rgba(134,168,255,.05), transparent); }
     .step + .step { padding-left: 28px; border-left: 1px solid var(--line); }
     .step-no { color: var(--accent); font-family: var(--mono); font-size: 12px; }
     .step h3 { margin: 56px 0 12px; font-size: 21px; }
@@ -351,7 +489,14 @@
     .reveal.visible { opacity: 1; transform: translateY(0); }
 
     @keyframes rise { to { opacity: 1; transform: translateY(0); } }
-    @keyframes photoSettle { to { transform: scale(1); } }
+    @keyframes visualEnter { from { opacity: 0; transform: translate3d(50px,20px,0) scale(.95); } to { opacity: 1; transform: none; } }
+    @keyframes shellScan { 0%,70% { transform: translateX(-110%); } 88%,100% { transform: translateX(120%); } }
+    @keyframes drawWave { to { stroke-dashoffset: 0; } }
+    @keyframes flowPulse { 50% { transform: scale(1.25); box-shadow: 0 0 22px rgba(126,226,180,.85); } }
+    @keyframes spark { 50% { opacity: .45; transform: rotate(12deg) scale(.86); } }
+    @keyframes floatA { 0%,100% { translate: 0 0; rotate: -1deg; } 50% { translate: 0 -13px; rotate: 1deg; } }
+    @keyframes floatB { 0%,100% { translate: 0 0; rotate: 1deg; } 50% { translate: 8px 12px; rotate: -1deg; } }
+    @keyframes orbitSpin { to { transform: translateZ(-35px) rotate(378deg); } }
 
     @media (max-width: 900px) {
       .nav-links {
@@ -371,7 +516,7 @@
       .nav-links .nav-cta { margin-top: 8px; text-align: center; }
       .menu-button { display: block; }
       .hero::before { background: linear-gradient(90deg, rgba(9,11,16,.98), rgba(9,11,16,.82) 65%, rgba(9,11,16,.58)); }
-      .hero-photo { width: 66vw; opacity: .5; }
+      .hero-visual { width: 68vw; opacity: .52; right: -10vw; }
       .section-head, .proof-layout, .about-layout { grid-template-columns: 1fr; gap: 36px; }
       .service-row { grid-template-columns: 60px 1fr; gap: 18px; }
       .service-desc, .service-meta { grid-column: 2; text-align: left; }
@@ -385,7 +530,7 @@
       .nav { padding: 0 20px; }
       .brand span:last-child { font-size: 14px; }
       .hero-inner { padding: 112px 20px 48px; justify-content: flex-end; }
-      .hero-photo { inset: 0 -22% auto auto; width: 108vw; height: 58%; object-position: 50% 34%; opacity: .6; }
+      .hero-visual { inset: 40px -38% auto auto; width: 118vw; height: 48%; opacity: .44; transform: scale(.85); transform-origin: top right; }
       .hero::before { background: linear-gradient(0deg, var(--bg) 26%, rgba(9,11,16,.74) 65%, rgba(9,11,16,.35)); }
       h1 { font-size: clamp(43px, 14vw, 62px); }
       .hero-copy { font-size: 16px; }
@@ -407,6 +552,7 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
       .reveal { opacity: 1; transform: none; }
+      .product-stage { transform: none !important; }
     }
   </style>
 </head>
@@ -431,7 +577,57 @@
 
   <main id="top">
     <section class="hero" aria-labelledby="hero-title">
-      <img class="hero-photo" src="photo.png" alt="喻志林">
+      <div class="hero-visual" aria-hidden="true">
+        <div class="product-stage" id="productStage">
+          <div class="orbit"></div>
+          <div class="product-shell">
+            <div class="product-topbar">
+              <div class="window-dots"><i></i><i></i><i></i></div>
+              <div class="product-title">NEXUS / AGENT WORKSPACE</div>
+              <div class="live-chip">● LIVE</div>
+            </div>
+            <div class="product-body">
+              <aside class="product-sidebar">
+                <div class="side-logo">N</div>
+                <div class="side-icon active">◇</div>
+                <div class="side-icon">⌁</div>
+                <div class="side-icon">⌘</div>
+                <div class="side-icon">◎</div>
+              </aside>
+              <div class="product-main">
+                <div class="workspace-head">
+                  <div><div class="workspace-kicker">ACTIVE WORKFLOW</div><h3>产品策略智能体</h3></div>
+                  <div class="workspace-meta">SESSION 07A2</div>
+                </div>
+                <div class="agent-grid">
+                  <div class="agent-panel">
+                    <div class="panel-label">AGENT EXECUTION TRACE</div>
+                    <div class="flow-step"><i class="flow-dot"></i><strong>需求上下文解析</strong>已提取目标用户与核心约束</div>
+                    <div class="flow-step"><i class="flow-dot"></i><strong>知识库检索</strong>命中 18 条高相关业务资料</div>
+                    <div class="flow-step running"><i class="flow-dot"></i><strong>工具调用 / 市场分析</strong>正在生成结构化竞争矩阵</div>
+                    <div class="flow-step"><i class="flow-dot"></i><strong>结果交付</strong>等待上游任务完成</div>
+                  </div>
+                  <div class="metric-panel">
+                    <div class="panel-label">RESPONSE QUALITY</div>
+                    <div class="metric-number">94.8<small> / 100</small></div>
+                    <div class="wave-chart">
+                      <svg viewBox="0 0 220 100" preserveAspectRatio="none">
+                        <defs><linearGradient id="waveGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7199ff"/><stop offset="1" stop-color="#7199ff" stop-opacity="0"/></linearGradient></defs>
+                        <path class="wave-area" d="M0 80 C25 74,30 60,48 67 S76 83,94 48 S122 60,142 35 S176 52,220 18 L220 100 L0 100Z"/>
+                        <path class="wave-line" d="M0 80 C25 74,30 60,48 67 S76 83,94 48 S122 60,142 35 S176 52,220 18"/>
+                      </svg>
+                    </div>
+                    <div class="metric-foot"><span>CONTEXT</span><span>+12.4%</span></div>
+                  </div>
+                </div>
+                <div class="prompt-bar"><span class="prompt-spark">✦</span>继续优化交付方案，并生成可执行的里程碑计划…<span class="prompt-send">↑</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="float-card float-a"><strong>8 tools connected</strong><span>MCP / RAG / SEARCH</span></div>
+          <div class="float-card float-b"><strong>✓ Workflow completed</strong><span>1.8s / 6 stages</span></div>
+        </div>
+      </div>
       <div class="hero-grid" aria-hidden="true"></div>
       <div class="hero-inner">
         <p class="eyebrow">Enterprise AI Delivery / Chengdu & Remote</p>
@@ -573,6 +769,8 @@
     const progress = document.getElementById('progress');
     const menuButton = document.getElementById('menuButton');
     const navLinks = document.getElementById('navLinks');
+    const productStage = document.getElementById('productStage');
+    const finePointer = window.matchMedia('(pointer: fine)').matches;
 
     function updateScroll() {
       const top = window.scrollY || document.documentElement.scrollTop;
@@ -601,6 +799,36 @@
     }, { threshold: .12 });
 
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    if (finePointer) {
+      window.addEventListener('pointermove', event => {
+        document.body.style.setProperty('--cursor-x', event.clientX + 'px');
+        document.body.style.setProperty('--cursor-y', event.clientY + 'px');
+      }, { passive: true });
+
+      const hero = document.querySelector('.hero');
+      hero.addEventListener('pointermove', event => {
+        const rect = hero.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width - .5;
+        const y = (event.clientY - rect.top) / rect.height - .5;
+        productStage.style.setProperty('--rx', (-3 - y * 11) + 'deg');
+        productStage.style.setProperty('--ry', (-7 + x * 15) + 'deg');
+      }, { passive: true });
+      hero.addEventListener('pointerleave', () => {
+        productStage.style.setProperty('--rx', '-3deg');
+        productStage.style.setProperty('--ry', '-7deg');
+      });
+
+      document.querySelectorAll('.service-row, .proof-item, .step').forEach(card => {
+        card.addEventListener('pointermove', event => {
+          const rect = card.getBoundingClientRect();
+          const x = (event.clientX - rect.left) / rect.width - .5;
+          const y = (event.clientY - rect.top) / rect.height - .5;
+          card.style.transform = `perspective(900px) rotateX(${-y * 4}deg) rotateY(${x * 4}deg) translateZ(5px)`;
+        });
+        card.addEventListener('pointerleave', () => { card.style.transform = ''; });
+      });
+    }
     window.addEventListener('scroll', updateScroll, { passive: true });
     updateScroll();
   </script>
