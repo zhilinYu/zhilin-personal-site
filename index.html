@@ -1,922 +1,176 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="喻志林，企业级 AI 应用交付顾问。提供 AI 应用 MVP、复杂前端架构治理和兼职技术负责人服务。">
-  <meta name="theme-color" content="#090b10">
-  <meta property="og:title" content="喻志林 | 企业级 AI 应用交付顾问">
-  <meta property="og:description" content="把 AI 想法做成真正能交付、能维护、能扩展的产品。">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fbf9f7">
+  <meta name="description" content="喻志林，独立 AI 应用顾问。提供 AI 应用 MVP、前端架构诊断和兼职技术负责人服务；选股研究提示词电子版即将开放购买。">
+  <meta property="og:title" content="喻志林｜独立 AI 应用顾问">
+  <meta property="og:description" content="把 AI 想法做成真正能用的产品。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://zhilin.club/">
-  <title>喻志林 | 企业级 AI 应用交付顾问</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23090b10%22/><path d=%22M16 18h32v7L27 43h21v7H16v-7l21-18H16z%22 fill=%22%2386a8ff%22/></svg>">
-  <style>
-    :root {
-      --bg: #090b10;
-      --surface: #10131a;
-      --surface-2: #151923;
-      --text: #f3f5fa;
-      --muted: #949baa;
-      --line: rgba(255,255,255,.12);
-      --accent: #86a8ff;
-      --accent-strong: #5f86f5;
-      --accent-soft: rgba(134,168,255,.14);
-      --max: 1180px;
-      --sans: Inter, "SF Pro Display", "PingFang SC", "Microsoft YaHei", sans-serif;
-      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; scroll-padding-top: 88px; }
-    body {
-      margin: 0;
-      color: var(--text);
-      background: var(--bg);
-      font-family: var(--sans);
-      line-height: 1.65;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-    body::before {
-      content: "";
-      position: fixed;
-      z-index: 120;
-      left: var(--cursor-x, -200px);
-      top: var(--cursor-y, -200px);
-      width: 420px;
-      height: 420px;
-      border-radius: 50%;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(94,143,255,.1), transparent 66%);
-      mix-blend-mode: screen;
-      transition: opacity .2s ease;
-    }
-    a { color: inherit; }
-    button, input, textarea { font: inherit; }
-    ::selection { color: #07101f; background: var(--accent); }
-
-    .progress {
-      position: fixed;
-      inset: 0 auto auto 0;
-      z-index: 100;
-      width: 0;
-      height: 2px;
-      background: var(--accent);
-      box-shadow: 0 0 18px rgba(134,168,255,.8);
-    }
-
-    .site-header {
-      position: fixed;
-      inset: 0 0 auto;
-      z-index: 90;
-      height: 72px;
-      border-bottom: 1px solid transparent;
-      transition: background .25s ease, border-color .25s ease;
-    }
-    .site-header.scrolled {
-      border-color: var(--line);
-      background: rgba(9,11,16,.82);
-      backdrop-filter: blur(18px);
-    }
-    .nav {
-      max-width: var(--max);
-      height: 100%;
-      margin: 0 auto;
-      padding: 0 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      font-weight: 750;
-      letter-spacing: -.02em;
-    }
-    .brand-mark {
-      width: 31px;
-      height: 31px;
-      display: grid;
-      place-items: center;
-      color: #08101f;
-      background: var(--accent);
-      border-radius: 8px;
-      font-family: var(--mono);
-      font-size: 15px;
-      font-weight: 900;
-    }
-    .nav-links { display: flex; align-items: center; gap: 30px; }
-    .nav-links a {
-      color: #c7ccd6;
-      text-decoration: none;
-      font-size: 14px;
-      transition: color .2s ease;
-    }
-    .nav-links a:hover { color: #fff; }
-    .nav-links .nav-cta {
-      padding: 9px 15px;
-      color: #08101f;
-      background: var(--accent);
-      border-radius: 8px;
-      font-weight: 700;
-    }
-    .menu-button {
-      display: none;
-      width: 52px;
-      height: 40px;
-      padding: 0;
-      color: #fff;
-      background: transparent;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-
-    .hero {
-      min-height: 100svh;
-      position: relative;
-      display: grid;
-      align-items: stretch;
-      overflow: hidden;
-      border-bottom: 1px solid var(--line);
-    }
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background:
-        linear-gradient(90deg, rgba(9,11,16,.99) 0%, rgba(9,11,16,.96) 43%, rgba(9,11,16,.48) 68%, rgba(9,11,16,.12) 100%),
-        radial-gradient(circle at 79% 42%, rgba(95,134,245,.22), transparent 36%);
-      z-index: 2;
-    }
-    .hero-visual {
-      position: absolute;
-      inset: 0 -3vw 0 auto;
-      z-index: 1;
-      width: min(59vw, 920px);
-      height: 100%;
-      display: grid;
-      place-items: center;
-      perspective: 1500px;
-      opacity: 0;
-      animation: visualEnter 1.2s .18s cubic-bezier(.2,.75,.2,1) forwards;
-    }
-    .product-stage {
-      --rx: -3deg;
-      --ry: -7deg;
-      position: relative;
-      width: min(760px, 88%);
-      aspect-ratio: 1.18;
-      transform-style: preserve-3d;
-      transform: rotateX(var(--rx)) rotateY(var(--ry));
-      transition: transform .16s ease-out;
-    }
-    .product-stage::before {
-      content: "";
-      position: absolute;
-      inset: 9% 2% 2% 9%;
-      transform: translateZ(-80px);
-      border-radius: 50%;
-      background: rgba(79,118,255,.35);
-      filter: blur(100px);
-    }
-    .product-shell {
-      position: absolute;
-      inset: 7% 4% 5% 5%;
-      overflow: hidden;
-      border: 1px solid rgba(174,198,255,.24);
-      border-radius: 22px;
-      background: linear-gradient(145deg, rgba(23,30,47,.96), rgba(8,12,21,.94));
-      box-shadow: -30px 40px 90px rgba(0,0,0,.5), 0 0 0 1px rgba(113,153,255,.06) inset;
-      transform: translateZ(24px);
-      backdrop-filter: blur(26px);
-    }
-    .product-shell::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,.08) 42%, transparent 55%);
-      transform: translateX(-110%);
-      animation: shellScan 7s 1.2s ease-in-out infinite;
-    }
-    .product-topbar {
-      height: 56px;
-      padding: 0 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
-    .window-dots { display: flex; gap: 7px; }
-    .window-dots i { width: 7px; height: 7px; border-radius: 50%; background: #33405c; }
-    .window-dots i:first-child { background: #7e9fff; box-shadow: 0 0 12px #668cff; }
-    .product-title { color: #dfe7ff; font: 600 11px var(--mono); letter-spacing: .08em; }
-    .live-chip { padding: 5px 9px; color: #7ce2b2; background: rgba(79,211,151,.09); border: 1px solid rgba(79,211,151,.2); border-radius: 999px; font: 10px var(--mono); }
-    .product-body { height: calc(100% - 56px); display: grid; grid-template-columns: 68px 1fr; }
-    .product-sidebar { padding: 18px 0; display: flex; flex-direction: column; align-items: center; gap: 16px; border-right: 1px solid rgba(255,255,255,.07); }
-    .side-logo { width: 30px; height: 30px; display: grid; place-items: center; color: #08101f; background: var(--accent); border-radius: 9px; font: 900 12px var(--mono); }
-    .side-icon { width: 31px; height: 31px; display: grid; place-items: center; color: #65718b; border-radius: 8px; font: 14px var(--mono); }
-    .side-icon.active { color: #bdd0ff; background: rgba(109,149,255,.12); box-shadow: 0 0 0 1px rgba(123,160,255,.14) inset; }
-    .product-main { padding: 20px; display: grid; grid-template-rows: auto 1fr auto; gap: 15px; }
-    .workspace-head { display: flex; align-items: end; justify-content: space-between; }
-    .workspace-kicker { color: #71809f; font: 9px var(--mono); letter-spacing: .14em; }
-    .workspace-head h3 { margin: 3px 0 0; font-size: 19px; letter-spacing: -.03em; }
-    .workspace-meta { color: #63708b; font: 9px var(--mono); }
-    .agent-grid { display: grid; grid-template-columns: 1.23fr .77fr; gap: 12px; min-height: 0; }
-    .agent-panel, .metric-panel {
-      position: relative;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 13px;
-      background: rgba(255,255,255,.025);
-    }
-    .agent-panel { padding: 16px; }
-    .panel-label { margin-bottom: 14px; color: #697894; font: 9px var(--mono); letter-spacing: .12em; }
-    .flow-step { position: relative; min-height: 47px; padding: 0 0 12px 28px; color: #8c98af; font-size: 10px; }
-    .flow-step::before { content: ""; position: absolute; left: 7px; top: 5px; bottom: -4px; width: 1px; background: linear-gradient(#6088f6, rgba(96,136,246,.08)); }
-    .flow-step:last-child::before { display: none; }
-    .flow-dot { position: absolute; left: 2px; top: 2px; width: 11px; height: 11px; border-radius: 50%; border: 2px solid #151d30; background: #628cf9; box-shadow: 0 0 13px rgba(98,140,249,.75); }
-    .flow-step strong { display: block; margin-bottom: 3px; color: #e2e8f7; font-size: 11px; }
-    .flow-step.running .flow-dot { animation: flowPulse 1.6s ease-in-out infinite; background: #7ee2b4; }
-    .metric-panel { padding: 15px 13px; display: flex; flex-direction: column; }
-    .metric-number { margin-top: 4px; color: #e8edfa; font-size: 28px; font-weight: 750; letter-spacing: -.05em; }
-    .metric-number small { color: #7e8aa3; font: 9px var(--mono); }
-    .wave-chart { flex: 1; min-height: 82px; margin: 10px -4px 5px; }
-    .wave-chart svg { width: 100%; height: 100%; overflow: visible; }
-    .wave-line { fill: none; stroke: #79a0ff; stroke-width: 2; stroke-dasharray: 380; stroke-dashoffset: 380; filter: drop-shadow(0 0 6px #547ffc); animation: drawWave 2.4s .8s ease forwards; }
-    .wave-area { fill: url(#waveGradient); opacity: .35; }
-    .metric-foot { display: flex; justify-content: space-between; color: #65718a; font: 8px var(--mono); }
-    .prompt-bar { min-height: 46px; padding: 0 13px; display: flex; align-items: center; gap: 10px; color: #7e8ba5; border: 1px solid rgba(128,161,255,.16); border-radius: 11px; background: rgba(94,132,237,.055); font-size: 10px; }
-    .prompt-spark { color: #8eacff; font-size: 15px; animation: spark 2s ease-in-out infinite; }
-    .prompt-send { margin-left: auto; width: 27px; height: 27px; display: grid; place-items: center; color: #09111f; background: var(--accent); border-radius: 7px; }
-    .float-card {
-      position: absolute;
-      z-index: 4;
-      padding: 12px 14px;
-      border: 1px solid rgba(174,198,255,.22);
-      border-radius: 12px;
-      background: rgba(17,23,36,.84);
-      box-shadow: 0 18px 50px rgba(0,0,0,.35);
-      backdrop-filter: blur(18px);
-      transform-style: preserve-3d;
-    }
-    .float-card strong { display: block; color: #e8edfa; font-size: 12px; }
-    .float-card span { color: #71809d; font: 9px var(--mono); }
-    .float-a { right: -1%; top: 13%; transform: translateZ(75px); animation: floatA 5s ease-in-out infinite; }
-    .float-b { left: 0; bottom: 3%; transform: translateZ(100px); animation: floatB 6s .4s ease-in-out infinite; }
-    .float-b strong { color: #7ee2b4; }
-    .orbit {
-      position: absolute;
-      inset: 4%;
-      border: 1px solid rgba(109,149,255,.12);
-      border-radius: 50%;
-      transform: translateZ(-35px) rotate(18deg);
-      animation: orbitSpin 18s linear infinite;
-    }
-    .orbit::before { content: ""; position: absolute; top: 18%; left: 2%; width: 7px; height: 7px; border-radius: 50%; background: #86a8ff; box-shadow: 0 0 20px #6f97ff; }
-    }
-    .hero-grid {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      opacity: .15;
-      background-image:
-        linear-gradient(rgba(134,168,255,.16) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(134,168,255,.16) 1px, transparent 1px);
-      background-size: 70px 70px;
-      mask-image: linear-gradient(to right, transparent 25%, #000 72%);
-    }
-    .hero-inner {
-      position: relative;
-      z-index: 3;
-      width: 100%;
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 132px 28px 66px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-start;
-    }
-    .eyebrow {
-      margin: 0 0 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: var(--accent);
-      font-family: var(--mono);
-      font-size: 13px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      opacity: 0;
-      animation: rise .7s .12s ease forwards;
-    }
-    .eyebrow::before { content: ""; width: 38px; height: 1px; background: currentColor; }
-    h1 {
-      max-width: 760px;
-      margin: 0;
-      font-size: clamp(46px, 6.3vw, 88px);
-      line-height: 1.04;
-      letter-spacing: -.065em;
-      font-weight: 780;
-    }
-    h1 span { display: block; opacity: 0; transform: translateY(24px); animation: rise .8s ease forwards; }
-    h1 span:nth-child(1) { animation-delay: .22s; }
-    h1 span:nth-child(2) { animation-delay: .34s; color: var(--accent); }
-    h1 span:nth-child(3) { animation-delay: .46s; }
-    .hero-copy {
-      max-width: 620px;
-      margin: 30px 0 0;
-      color: #b7bdc9;
-      font-size: clamp(17px, 1.8vw, 21px);
-      opacity: 0;
-      animation: rise .7s .6s ease forwards;
-    }
-    .hero-actions {
-      margin-top: 38px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      opacity: 0;
-      animation: rise .7s .72s ease forwards;
-    }
-    .button {
-      min-height: 50px;
-      padding: 0 22px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      border: 1px solid var(--line);
-      border-radius: 9px;
-      text-decoration: none;
-      font-weight: 700;
-      transition: transform .2s ease, background .2s ease, border-color .2s ease;
-    }
-    .button:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.3); }
-    .button.primary { color: #07101f; background: var(--accent); border-color: var(--accent); }
-    .button.primary:hover { background: #9bb8ff; }
-    .hero-note {
-      margin-top: 28px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #8d95a4;
-      font-size: 13px;
-      opacity: 0;
-      animation: rise .7s .84s ease forwards;
-    }
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #71e5b0;
-      box-shadow: 0 0 0 6px rgba(113,229,176,.1);
-    }
-
-    .section { padding: 120px 28px; border-bottom: 1px solid var(--line); }
-    .section-inner { max-width: var(--max); margin: 0 auto; }
-    .section-head {
-      margin-bottom: 68px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: end;
-    }
-    .section-index { color: var(--accent); font-family: var(--mono); font-size: 12px; letter-spacing: .14em; }
-    h2 {
-      margin: 10px 0 0;
-      max-width: 720px;
-      font-size: clamp(34px, 4.5vw, 60px);
-      line-height: 1.12;
-      letter-spacing: -.045em;
-    }
-    .section-intro { margin: 0; color: var(--muted); font-size: 17px; }
-
-    .services { border-top: 1px solid var(--line); }
-    .service-row {
-      min-height: 210px;
-      padding: 36px 0;
-      display: grid;
-      grid-template-columns: 90px minmax(240px, .85fr) 1.35fr 150px;
-      gap: 34px;
-      align-items: start;
-      border-bottom: 1px solid var(--line);
-      transform-style: preserve-3d;
-      will-change: transform;
-      transition: background .25s ease, padding .25s ease, transform .18s ease-out;
-    }
-    .service-row:hover { padding-left: 18px; padding-right: 18px; background: linear-gradient(90deg, var(--accent-soft), transparent 78%); }
-    .service-no { color: var(--accent); font-family: var(--mono); font-size: 14px; }
-    .service-row h3 { margin: -5px 0 0; font-size: 25px; line-height: 1.3; letter-spacing: -.025em; }
-    .service-desc { margin: 0; color: #a6adba; }
-    .service-meta { text-align: right; color: #d8dce4; font-family: var(--mono); font-size: 12px; line-height: 1.8; }
-    .service-meta strong { display: block; color: var(--accent); font-size: 14px; }
-
-    .proof-layout {
-      display: grid;
-      grid-template-columns: .8fr 1.2fr;
-      gap: 84px;
-      align-items: start;
-    }
-    .proof-sticky { position: sticky; top: 112px; }
-    .proof-sticky p { color: var(--muted); }
-    .proof-list { border-top: 1px solid var(--line); }
-    .proof-item {
-      padding: 34px 0;
-      display: grid;
-      grid-template-columns: 110px 1fr;
-      gap: 28px;
-      border-bottom: 1px solid var(--line);
-      transform-style: preserve-3d;
-      will-change: transform;
-      transition: transform .18s ease-out, background .2s ease;
-    }
-    .proof-item:hover { background: linear-gradient(90deg, rgba(134,168,255,.055), transparent); }
-    .proof-value { color: var(--accent); font-size: 31px; font-weight: 800; letter-spacing: -.04em; }
-    .proof-item h3 { margin: 2px 0 8px; font-size: 20px; }
-    .proof-item p { margin: 0; color: var(--muted); }
-
-    .process-line { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); }
-    .step { min-height: 260px; padding: 32px 28px 30px 0; border-bottom: 1px solid var(--line); transform-style: preserve-3d; will-change: transform; transition: transform .18s ease-out, background .2s ease; }
-    .step:hover { background: linear-gradient(180deg, rgba(134,168,255,.05), transparent); }
-    .step + .step { padding-left: 28px; border-left: 1px solid var(--line); }
-    .step-no { color: var(--accent); font-family: var(--mono); font-size: 12px; }
-    .step h3 { margin: 56px 0 12px; font-size: 21px; }
-    .step p { margin: 0; color: var(--muted); font-size: 14px; }
-
-    .about-layout { display: grid; grid-template-columns: 1.25fr .75fr; gap: 110px; align-items: center; }
-    .about-copy h2 { margin-top: 12px; }
-    .about-copy p { max-width: 690px; color: #aeb4c0; font-size: 18px; }
-    .about-links { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 12px; }
-    .portrait-frame {
-      position: relative;
-      justify-self: end;
-      width: min(100%, 390px);
-      aspect-ratio: .82;
-      padding: 1px;
-      border-radius: 26px;
-      background: linear-gradient(145deg, rgba(134,168,255,.52), rgba(255,255,255,.08) 42%, rgba(134,168,255,.12));
-      box-shadow: 0 35px 90px rgba(0,0,0,.38), 0 0 70px rgba(95,134,245,.08);
-      transform: rotate(1.2deg);
-      transition: transform .45s cubic-bezier(.2,.8,.2,1), box-shadow .45s ease;
-    }
-    .portrait-frame:hover { transform: rotate(0) translateY(-7px); box-shadow: 0 44px 110px rgba(0,0,0,.48), 0 0 90px rgba(95,134,245,.12); }
-    .portrait-frame::before {
-      content: "";
-      position: absolute;
-      z-index: -1;
-      inset: 12% -8% -7% 14%;
-      border: 1px solid rgba(134,168,255,.15);
-      border-radius: 28px;
-      transform: rotate(-4deg);
-    }
-    .portrait-frame img {
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: cover;
-      object-position: 50% 38%;
-      border-radius: 25px;
-      filter: saturate(.82) contrast(1.04) brightness(.92);
-    }
-    .portrait-signature {
-      position: absolute;
-      right: -22px;
-      bottom: 24px;
-      padding: 11px 14px;
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      color: #dce5fb;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 11px;
-      background: rgba(13,17,26,.82);
-      box-shadow: 0 14px 36px rgba(0,0,0,.35);
-      backdrop-filter: blur(16px);
-      font: 10px var(--mono);
-      letter-spacing: .07em;
-      transform: rotate(-1.2deg);
-    }
-    .portrait-signature i { width: 7px; height: 7px; border-radius: 50%; background: #79ddb0; box-shadow: 0 0 12px rgba(121,221,176,.8); }
-
-    .contact-section { position: relative; overflow: hidden; padding-top: 150px; padding-bottom: 150px; }
-    .contact-section::before {
-      content: "";
-      position: absolute;
-      width: 720px;
-      height: 720px;
-      right: -280px;
-      bottom: -420px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(95,134,245,.32), transparent 68%);
-      pointer-events: none;
-    }
-    .contact-title { max-width: 900px; }
-    .contact-title h2 { max-width: 900px; font-size: clamp(43px, 6vw, 78px); }
-    .contact-actions { margin-top: 44px; display: flex; flex-wrap: wrap; gap: 12px; }
-    .contact-detail { margin-top: 44px; display: flex; flex-wrap: wrap; gap: 28px; color: var(--muted); font-family: var(--mono); font-size: 13px; }
-
-    footer { padding: 28px; color: #777f8e; font-size: 12px; }
-    .footer-inner { max-width: var(--max); margin: 0 auto; display: flex; justify-content: space-between; gap: 20px; }
-
-    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .75s ease, transform .75s cubic-bezier(.2,.7,.2,1); }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    @keyframes rise { to { opacity: 1; transform: translateY(0); } }
-    @keyframes visualEnter { from { opacity: 0; transform: translate3d(50px,20px,0) scale(.95); } to { opacity: 1; transform: none; } }
-    @keyframes shellScan { 0%,70% { transform: translateX(-110%); } 88%,100% { transform: translateX(120%); } }
-    @keyframes drawWave { to { stroke-dashoffset: 0; } }
-    @keyframes flowPulse { 50% { transform: scale(1.25); box-shadow: 0 0 22px rgba(126,226,180,.85); } }
-    @keyframes spark { 50% { opacity: .45; transform: rotate(12deg) scale(.86); } }
-    @keyframes floatA { 0%,100% { translate: 0 0; rotate: -1deg; } 50% { translate: 0 -13px; rotate: 1deg; } }
-    @keyframes floatB { 0%,100% { translate: 0 0; rotate: 1deg; } 50% { translate: 8px 12px; rotate: -1deg; } }
-    @keyframes orbitSpin { to { transform: translateZ(-35px) rotate(378deg); } }
-
-    @media (max-width: 900px) {
-      .nav-links {
-        position: fixed;
-        inset: 72px 16px auto;
-        padding: 18px;
-        display: none;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0;
-        background: rgba(16,19,26,.98);
-        border: 1px solid var(--line);
-        border-radius: 12px;
-      }
-      .nav-links.open { display: flex; }
-      .nav-links a { padding: 13px 10px; }
-      .nav-links .nav-cta { margin-top: 8px; text-align: center; }
-      .menu-button { display: block; }
-      .hero::before { background: linear-gradient(90deg, rgba(9,11,16,.98), rgba(9,11,16,.82) 65%, rgba(9,11,16,.58)); }
-      .hero-visual { width: 68vw; opacity: .52; right: -10vw; }
-      .section-head, .proof-layout, .about-layout { grid-template-columns: 1fr; gap: 36px; }
-      .service-row { grid-template-columns: 60px 1fr; gap: 18px; }
-      .service-desc, .service-meta { grid-column: 2; text-align: left; }
-      .proof-sticky { position: static; }
-      .process-line { grid-template-columns: repeat(2, 1fr); }
-      .step:nth-child(3) { border-left: 0; }
-      .portrait-frame { width: min(72vw, 370px); justify-self: center; order: -1; }
-    }
-
-    @media (max-width: 600px) {
-      .site-header { height: 68px; }
-      .nav { padding: 0 18px; }
-      .brand { gap: 10px; }
-      .brand-mark { width: 30px; height: 30px; }
-      .brand span:last-child { font-size: 13px; }
-      .menu-button { width: 50px; height: 38px; }
-      .nav-links { inset: 68px 12px auto; }
-      .hero { min-height: 100svh; }
-      .hero-inner {
-        min-width: 0;
-        padding: 116px 20px 58px;
-        justify-content: center;
-      }
-      .hero-visual {
-        inset: 82px -52% auto auto;
-        width: 124vw;
-        height: 390px;
-        opacity: .28;
-        transform: scale(.78);
-        transform-origin: top right;
-        mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.28) 24%, #000 58%, rgba(0,0,0,.4) 88%, transparent 100%);
-      }
-      .hero::before {
-        background:
-          linear-gradient(90deg, rgba(9,11,16,.98) 0%, rgba(9,11,16,.9) 48%, rgba(9,11,16,.54) 100%),
-          linear-gradient(0deg, var(--bg) 8%, rgba(9,11,16,.92) 30%, rgba(9,11,16,.22) 76%, rgba(9,11,16,.56) 100%);
-      }
-      .hero-grid { opacity: .08; background-size: 52px 52px; }
-      .eyebrow { max-width: 300px; margin-bottom: 18px; gap: 10px; font-size: 11px; line-height: 1.55; }
-      .eyebrow::before { width: 28px; flex: 0 0 28px; }
-      h1 {
-        max-width: 100%;
-        font-size: clamp(42px, 11.8vw, 50px);
-        line-height: 1.05;
-        letter-spacing: -.06em;
-      }
-      .hero-copy { max-width: 100%; margin-top: 24px; font-size: 15px; line-height: 1.75; }
-      .hero-actions { width: 100%; margin-top: 28px; gap: 10px; }
-      .hero-actions .button { min-height: 54px; }
-      .hero-note { margin-top: 22px; font-size: 11px; line-height: 1.5; }
-      .button { width: 100%; }
-      .section { padding: 86px 20px; }
-      .section-head { margin-bottom: 46px; }
-      .service-row { min-height: 0; padding: 28px 0; grid-template-columns: 42px 1fr; }
-      .service-row:hover { padding-left: 0; padding-right: 0; }
-      .proof-item { grid-template-columns: 82px 1fr; gap: 16px; }
-      .proof-value { font-size: 25px; }
-      .process-line { grid-template-columns: 1fr; }
-      .step, .step + .step { min-height: 0; padding: 28px 0; border-left: 0; }
-      .step h3 { margin-top: 28px; }
-      .portrait-frame { width: min(78vw, 320px); }
-      .portrait-signature { right: -12px; bottom: 18px; }
-      .contact-detail { flex-direction: column; gap: 10px; }
-      .footer-inner { flex-direction: column; }
-    }
-
-    @media (max-width: 380px) {
-      .brand span:last-child { font-size: 12px; }
-      .hero-inner { padding-inline: 18px; }
-      h1 { font-size: clamp(40px, 11.5vw, 44px); }
-      .hero-copy { font-size: 14px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-      .reveal { opacity: 1; transform: none; }
-      .product-stage { transform: none !important; }
-    }
-  </style>
+  <meta property="og:image" content="https://zhilin.club/assets/og-cover.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>喻志林｜独立 AI 应用顾问</title>
+  <link rel="canonical" href="https://zhilin.club/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23161919'/%3E%3Cpath d='M16 17h33v8L27 40h22v8H15v-8l22-15H16z' fill='%23d8f1e8'/%3E%3C/svg%3E">
+  <link rel="preload" as="image" href="assets/visuals/hero-waves.webp">
+  <link rel="stylesheet" href="assets/site.css">
+  <script defer src="assets/site.js"></script>
 </head>
 <body>
-  <div class="progress" id="progress"></div>
-  <header class="site-header" id="header">
-    <nav class="nav" aria-label="主导航">
-      <a class="brand" href="#top" aria-label="返回首页">
-        <span class="brand-mark">Z</span>
-        <span>喻志林 / 独立技术顾问</span>
-      </a>
-      <button class="menu-button" id="menuButton" aria-label="打开菜单" aria-expanded="false">菜单</button>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <div class="announcement">
+    <span>独立 AI 应用顾问 · 开放项目合作</span>
+    <a href="#contact">欢迎交流 <span aria-hidden="true">↗</span></a>
+  </div>
+  <header class="site-header" id="siteHeader">
+    <nav class="nav container" aria-label="主导航">
+      <a class="brand" href="#top" aria-label="喻志林，返回首页">喻志林<span class="brand-dot" aria-hidden="true">.</span></a>
+      <button class="menu-button" id="menuButton" type="button" aria-controls="navLinks" aria-expanded="false">菜单</button>
       <div class="nav-links" id="navLinks">
-        <a href="#services">服务</a>
-        <a href="#proof">经验</a>
-        <a href="#process">合作方式</a>
-        <a href="https://resume.zhilin.club">完整履历</a>
-        <a class="nav-cta" href="mailto:yuzhilinvip@163.com?subject=项目合作咨询">聊聊项目</a>
+        <a href="#services">服务方案</a>
+        <a href="#products">选股研究工具</a>
+        <a href="#experience">职业经历</a>
+        <a href="#contact">联系我</a>
       </div>
+      <a class="nav-contact" href="mailto:yuzhilinvip@163.com?subject=AI%20项目合作咨询">预约沟通 <span aria-hidden="true">↗</span></a>
     </nav>
   </header>
 
-  <main id="top">
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-visual" aria-hidden="true">
-        <div class="product-stage" id="productStage">
-          <div class="orbit"></div>
-          <div class="product-shell">
-            <div class="product-topbar">
-              <div class="window-dots"><i></i><i></i><i></i></div>
-              <div class="product-title">NEXUS / AGENT WORKSPACE</div>
-              <div class="live-chip">● LIVE</div>
-            </div>
-            <div class="product-body">
-              <aside class="product-sidebar">
-                <div class="side-logo">N</div>
-                <div class="side-icon active">◇</div>
-                <div class="side-icon">⌁</div>
-                <div class="side-icon">⌘</div>
-                <div class="side-icon">◎</div>
-              </aside>
-              <div class="product-main">
-                <div class="workspace-head">
-                  <div><div class="workspace-kicker">ACTIVE WORKFLOW</div><h3>产品策略智能体</h3></div>
-                  <div class="workspace-meta">SESSION 07A2</div>
-                </div>
-                <div class="agent-grid">
-                  <div class="agent-panel">
-                    <div class="panel-label">AGENT EXECUTION TRACE</div>
-                    <div class="flow-step"><i class="flow-dot"></i><strong>需求上下文解析</strong>已提取目标用户与核心约束</div>
-                    <div class="flow-step"><i class="flow-dot"></i><strong>知识库检索</strong>命中 18 条高相关业务资料</div>
-                    <div class="flow-step running"><i class="flow-dot"></i><strong>工具调用 / 市场分析</strong>正在生成结构化竞争矩阵</div>
-                    <div class="flow-step"><i class="flow-dot"></i><strong>结果交付</strong>等待上游任务完成</div>
-                  </div>
-                  <div class="metric-panel">
-                    <div class="panel-label">RESPONSE QUALITY</div>
-                    <div class="metric-number">94.8<small> / 100</small></div>
-                    <div class="wave-chart">
-                      <svg viewBox="0 0 220 100" preserveAspectRatio="none">
-                        <defs><linearGradient id="waveGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7199ff"/><stop offset="1" stop-color="#7199ff" stop-opacity="0"/></linearGradient></defs>
-                        <path class="wave-area" d="M0 80 C25 74,30 60,48 67 S76 83,94 48 S122 60,142 35 S176 52,220 18 L220 100 L0 100Z"/>
-                        <path class="wave-line" d="M0 80 C25 74,30 60,48 67 S76 83,94 48 S122 60,142 35 S176 52,220 18"/>
-                      </svg>
-                    </div>
-                    <div class="metric-foot"><span>CONTEXT</span><span>+12.4%</span></div>
-                  </div>
-                </div>
-                <div class="prompt-bar"><span class="prompt-spark">✦</span>继续优化交付方案，并生成可执行的里程碑计划…<span class="prompt-send">↑</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="float-card float-a"><strong>8 tools connected</strong><span>MCP / RAG / SEARCH</span></div>
-          <div class="float-card float-b"><strong>✓ Workflow completed</strong><span>1.8s / 6 stages</span></div>
-        </div>
-      </div>
-      <div class="hero-grid" aria-hidden="true"></div>
-      <div class="hero-inner">
-        <p class="eyebrow">Enterprise AI Delivery / Chengdu & Remote</p>
-        <h1 id="hero-title">
-          <span>把 AI 想法</span>
-          <span>做成能交付的产品</span>
-          <span>而不只是 Demo</span>
-        </h1>
-        <p class="hero-copy">10 年企业级研发经验，提供 AI 应用 MVP、复杂前端架构治理与兼职技术负责人服务。从方案判断到上线交付，直接对结果负责。</p>
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-copy container">
+        <h1 id="hero-title"><span>把 AI 想法</span><span>做成真正能用的产品</span></h1>
+        <p>我是喻志林，独立 AI 应用顾问。提供从产品判断、原型搭建到工程交付的完整支持。</p>
         <div class="hero-actions">
-          <a class="button primary" href="mailto:yuzhilinvip@163.com?subject=项目合作咨询&body=志林你好，我想咨询一个项目：">发起项目沟通 <span aria-hidden="true">→</span></a>
-          <a class="button" href="#services">查看可合作服务</a>
+          <a class="button button-dark" href="mailto:yuzhilinvip@163.com?subject=AI%20项目合作咨询&body=志林你好，我想讨论的项目是：">聊聊你的项目 <span aria-hidden="true">↗</span></a>
+          <a class="button button-outline" href="#services">查看服务方案 <span aria-hidden="true">↘</span></a>
         </div>
-        <div class="hero-note"><span class="status-dot"></span>当前可承接远程项目与长期技术顾问合作</div>
+      </div>
+      <div class="hero-art" role="img" aria-label="柔和的数据波纹插画"></div>
+    </section>
+
+    <section class="section services-section" id="services" aria-labelledby="services-title">
+      <div class="container">
+        <div class="section-heading section-heading-center">
+          <p class="section-label">SERVICES</p>
+          <h2 id="services-title">把合作内容讲清楚</h2>
+          <p>从业务目标、技术边界到验收标准，每一步都可讨论、可交付。</p>
+        </div>
+        <div class="service-grid">
+          <article class="service-card">
+            <img class="service-art" src="assets/visuals/service-mvp.webp" alt="" loading="lazy" width="760" height="570">
+            <div class="service-card-body">
+              <div class="service-heading"><span class="card-number">01</span><h3>AI 应用 MVP</h3></div>
+              <p class="card-description">从想法到可验证的产品原型，覆盖智能体交互、知识库、工具调用和上线部署。</p>
+              <div class="deliverables"><span>交付内容</span><ul><li>需求与技术方案</li><li>可运行的 MVP 产品</li><li>部署与使用说明</li></ul></div>
+              <div class="card-bottom"><div class="card-price"><strong>2 万元起</strong><span>通常 2–5 周</span></div><a class="card-link" href="mailto:yuzhilinvip@163.com?subject=咨询AI应用MVP方案">咨询方案 <span aria-hidden="true">↗</span></a></div>
+            </div>
+          </article>
+          <article class="service-card">
+            <img class="service-art" src="assets/visuals/service-architecture.webp" alt="" loading="lazy" width="760" height="570">
+            <div class="service-card-body">
+              <div class="service-heading"><span class="card-number">02</span><h3>前端架构诊断</h3></div>
+              <p class="card-description">梳理性能、工程结构与可维护性问题，给出可执行的治理路线。</p>
+              <div class="deliverables"><span>交付内容</span><ul><li>现状与问题清单</li><li>架构优化方案</li><li>关键改造支持</li></ul></div>
+              <div class="card-bottom"><div class="card-price"><strong>1.2 万元起</strong><span>通常 1–3 周</span></div><a class="card-link" href="mailto:yuzhilinvip@163.com?subject=咨询前端架构诊断方案">咨询方案 <span aria-hidden="true">↗</span></a></div>
+            </div>
+          </article>
+          <article class="service-card">
+            <img class="service-art" src="assets/visuals/service-advisor.webp" alt="" loading="lazy" width="760" height="570">
+            <div class="service-card-body">
+              <div class="service-heading"><span class="card-number">03</span><h3>兼职技术负责人</h3></div>
+              <p class="card-description">为小团队提供持续技术判断，参与架构决策、评审和交付风险控制。</p>
+              <div class="deliverables"><span>交付内容</span><ul><li>技术路线建议</li><li>代码与方案评审</li><li>团队协作指导</li></ul></div>
+              <div class="card-bottom"><div class="card-price"><strong>8000 元/月起</strong><span>按月合作</span></div><a class="card-link" href="mailto:yuzhilinvip@163.com?subject=咨询兼职技术负责人服务">咨询方案 <span aria-hidden="true">↗</span></a></div>
+            </div>
+          </article>
+        </div>
+        <p class="price-note">以上为服务起步价，最终范围与报价在需求沟通后确认。</p>
       </div>
     </section>
 
-    <section class="section" id="services">
-      <div class="section-inner">
-        <div class="section-head reveal">
-          <div>
-            <div class="section-index">01 / SERVICES</div>
-            <h2>解决明确的问题，交付可运行的结果</h2>
+    <section class="section experience-section" id="experience" aria-labelledby="experience-title">
+      <div class="container experience-layout">
+        <div class="experience-intro">
+          <p class="section-label">EXPERIENCE</p>
+          <h2 id="experience-title">能落地，<br>才算好方案。</h2>
+          <p>10 余年企业级 Web 研发经历，参与过工业 AI、金融科技和低代码平台项目。我更关注真实业务约束、工程协作与长期维护。</p>
+          <a class="text-link" href="https://resume.zhilin.club" target="_blank" rel="noopener noreferrer">查看完整履历 <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="experience-list">
+          <article><span>01 / 工业 AI</span><div><h3>西门子 Xcelerator AI 平台</h3><p>参与 AI 搜索、知识库与智能体交互相关的前端模块建设。</p></div></article>
+          <article><span>02 / 金融科技</span><div><h3>交通银行营销中台</h3><p>参与大型业务系统交付和前端工程体系建设。</p></div></article>
+          <article><span>03 / 平台产品</span><div><h3>工业低代码引擎</h3><p>参与复杂交互、可视化与产品工程化落地。</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section products-section" id="products" aria-labelledby="products-title">
+      <div class="container">
+        <div class="products-heading">
+          <div class="section-heading">
+            <p class="section-label">RESEARCH TOOLS</p>
+            <h2 id="products-title">把研究流程，变成可复用的方法</h2>
+            <p>五款 AI 选股研究提示词电子版，帮助整理筛选、观察与复盘步骤。</p>
           </div>
-          <p class="section-intro">不出售模糊的“开发人天”。每项合作都从业务目标、技术边界和验收标准开始。</p>
-        </div>
-        <div class="services reveal">
-          <article class="service-row">
-            <div class="service-no">01</div>
-            <h3>AI 应用 MVP<br>从 0 到 1 交付</h3>
-            <p class="service-desc">适合需要快速验证 AI 产品的创业团队与企业部门。覆盖智能体交互、RAG 知识库、Tool Calling、流式响应、管理后台及上线部署。</p>
-            <div class="service-meta"><strong>2 万元起</strong>通常 2-5 周</div>
-          </article>
-          <article class="service-row">
-            <div class="service-no">02</div>
-            <h3>复杂前端架构<br>诊断与治理</h3>
-            <p class="service-desc">针对性能瓶颈、工程失控、微前端迁移、Monorepo、低代码引擎和可视化系统，输出诊断、方案并参与关键改造。</p>
-            <div class="service-meta"><strong>1.2 万元起</strong>通常 1-3 周</div>
-          </article>
-          <article class="service-row">
-            <div class="service-no">03</div>
-            <h3>兼职技术负责人<br>持续陪跑</h3>
-            <p class="service-desc">适合缺少资深技术负责人的小团队。参与架构决策、任务拆分、代码评审、招聘面试和交付风险控制。</p>
-            <div class="service-meta"><strong>8000 元/月起</strong>按月合作</div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="proof">
-      <div class="section-inner proof-layout">
-        <div class="proof-sticky reveal">
-          <div class="section-index">02 / PROOF</div>
-          <h2>做过复杂系统，也懂如何把复杂度收住</h2>
-          <p>经历覆盖工业 AI、金融科技、低代码平台和知识图谱。不是只会调用模型 API，而是能把模型能力接进真实业务系统。</p>
-          <a class="button" href="https://resume.zhilin.club">查看完整职业履历 <span aria-hidden="true">→</span></a>
-        </div>
-        <div class="proof-list reveal">
-          <article class="proof-item">
-            <div class="proof-value">10+</div>
-            <div><h3>年企业级 Web 研发</h3><p>从一线开发到前端组长、架构与平台负责人，熟悉大型项目的技术与协作成本。</p></div>
-          </article>
-          <article class="proof-item">
-            <div class="proof-value">8+</div>
-            <div><h3>AI 平台核心模块</h3><p>交付 AI 搜索、知识库、智能体交互、流程编排、MCP 工具接入与内容管理等模块。</p></div>
-          </article>
-          <article class="proof-item">
-            <div class="proof-value">100+</div>
-            <div><h3>大型金融平台业务模块</h3><p>参与交通银行营销中台建设，推进 TypeScript、微前端与 Monorepo 工程治理。</p></div>
-          </article>
-          <article class="proof-item">
-            <div class="proof-value">50%+</div>
-            <div><h3>万级图谱首屏性能提升</h3><p>通过 Canvas 渲染、分层加载和交互降级，解决大规模知识图谱性能瓶颈。</p></div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="process">
-      <div class="section-inner">
-        <div class="section-head reveal">
-          <div>
-            <div class="section-index">03 / PROCESS</div>
-            <h2>先把风险说清楚，再开始写代码</h2>
-          </div>
-          <p class="section-intro">默认小步交付、持续演示。你始终知道项目做到哪里、下一步是什么、风险在哪里。</p>
-        </div>
-        <div class="process-line reveal">
-          <article class="step"><div class="step-no">STEP 01</div><h3>需求诊断</h3><p>确认目标用户、核心流程、预算与期限，识别不值得做或暂时做不了的部分。</p></article>
-          <article class="step"><div class="step-no">STEP 02</div><h3>范围与方案</h3><p>给出功能边界、技术方案、里程碑、验收标准和明确报价。</p></article>
-          <article class="step"><div class="step-no">STEP 03</div><h3>迭代交付</h3><p>按里程碑提供可运行版本，以真实反馈校正方向，避免最后一天才看到结果。</p></article>
-          <article class="step"><div class="step-no">STEP 04</div><h3>上线与移交</h3><p>完成部署、文档、代码说明和必要培训，确保项目能够继续维护。</p></article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="about">
-      <div class="section-inner about-layout">
-        <div class="about-copy reveal">
-          <div class="section-index">04 / ABOUT</div>
-          <h2>喻志林，独立技术顾问与产品工程师</h2>
-          <p>我长期从事企业级前端架构、低代码平台、数据可视化与 AI 应用工程。做过西门子 Xcelerator AI 平台、交通银行营销中台、工业低代码引擎和金融知识图谱。</p>
-          <p>现在以独立合作方式，帮助团队缩短从想法到上线的距离，尤其擅长那些“业务复杂、交互复杂、工程也复杂”的项目。</p>
-          <div class="about-links">
-            <a class="button" href="https://resume.zhilin.club">完整简历</a>
-            <a class="button" href="https://github.com/zhilinYu" target="_blank" rel="noreferrer">GitHub</a>
+          <div class="rail-controls" aria-label="浏览商品">
+            <button class="rail-arrow" id="productsPrev" type="button" aria-label="上一组商品">←</button>
+            <button class="rail-arrow" id="productsNext" type="button" aria-label="下一组商品">→</button>
           </div>
         </div>
-        <div class="portrait-frame reveal">
-          <img src="photo.png" alt="喻志林个人照片" loading="lazy">
-          <div class="portrait-signature"><i></i>10+ YEARS / BUILDING SYSTEMS</div>
+        <div class="product-rail" id="productRail" role="region" tabindex="0" aria-label="五款选股研究提示词，可左右滑动浏览">
+          <article class="product-card" data-sku="quant-risk">
+            <img src="assets/products/quant-risk.webp" alt="量化风控提示词商品封面" loading="lazy" width="1242" height="1242">
+            <div class="product-card-body"><span class="product-index">01 / RESEARCH PROMPT</span><h3>量化风控</h3><p>从市场开关、硬性筛选到评分与风险边界，建立结构化研究流程。</p><div class="product-format">完整 Markdown / TXT 文档</div><div class="product-bottom"><strong>价格待公布</strong><button type="button" disabled aria-label="量化风控购买即将开放">微信支付即将开放</button></div></div>
+          </article>
+          <article class="product-card" data-sku="trend-leader">
+            <img src="assets/products/trend-leader.webp" alt="趋势龙头提示词商品封面" loading="lazy" width="1242" height="1242">
+            <div class="product-card-body"><span class="product-index">02 / RESEARCH PROMPT</span><h3>趋势龙头</h3><p>围绕主线识别、趋势结构和龙头分级，梳理观察重点。</p><div class="product-format">完整 Markdown / TXT 文档</div><div class="product-bottom"><strong>价格待公布</strong><button type="button" disabled aria-label="趋势龙头购买即将开放">微信支付即将开放</button></div></div>
+          </article>
+          <article class="product-card" data-sku="hot-money">
+            <img src="assets/products/hot-money.webp" alt="游资弹性提示词商品封面" loading="lazy" width="1242" height="1242">
+            <div class="product-card-body"><span class="product-index">03 / RESEARCH PROMPT</span><h3>游资弹性</h3><p>在修复或主升阶段观察低位启动与补涨线索。</p><div class="product-format">完整 Markdown / TXT 文档</div><div class="product-bottom"><strong>价格待公布</strong><button type="button" disabled aria-label="游资弹性购买即将开放">微信支付即将开放</button></div></div>
+          </article>
+          <article class="product-card" data-sku="countertrend">
+            <img src="assets/products/countertrend.webp" alt="逆势抗跌提示词商品封面" loading="lazy" width="1242" height="1242">
+            <div class="product-card-body"><span class="product-index">04 / RESEARCH PROMPT</span><h3>逆势抗跌</h3><p>在市场分歧期观察相对强度、板块生命力与资金承接。</p><div class="product-format">完整 Markdown / TXT 文档</div><div class="product-bottom"><strong>价格待公布</strong><button type="button" disabled aria-label="逆势抗跌购买即将开放">微信支付即将开放</button></div></div>
+          </article>
+          <article class="product-card" data-sku="limit-up-pullback">
+            <img src="assets/products/limit-up-pullback.webp" alt="涨停回吐提示词商品封面" loading="lazy" width="1242" height="1242">
+            <div class="product-card-body"><span class="product-index">05 / RESEARCH PROMPT</span><h3>涨停回吐</h3><p>整理涨停后回吐、缩量与二次转强的观察步骤。</p><div class="product-format">完整 Markdown / TXT 文档</div><div class="product-bottom"><strong>价格待公布</strong><button type="button" disabled aria-label="涨停回吐购买即将开放">微信支付即将开放</button></div></div>
+          </article>
+        </div>
+        <div class="product-note"><span aria-hidden="true">ⓘ</span><p>本系列仅提供研究流程提示词，不含实时行情、股票名单或个股推荐，不保证收益。分析时需自行提供可靠数据。</p></div>
+      </div>
+    </section>
+
+    <section class="section process-section" id="process" aria-labelledby="process-title">
+      <div class="container">
+        <div class="section-heading section-heading-center"><p class="section-label">HOW WE WORK</p><h2 id="process-title">合作从一个真实问题开始</h2><p>先讲清目标，再确定范围与交付方式。</p></div>
+        <div class="process-grid">
+          <article><span class="process-number">01</span><h3>沟通目标</h3><p>用一次沟通了解业务背景、现有系统与最急需解决的问题。</p></article>
+          <article><span class="process-number">02</span><h3>明确方案</h3><p>确认工作范围、时间、验收标准与合作报价。</p></article>
+          <article><span class="process-number">03</span><h3>交付迭代</h3><p>按阶段呈现结果，沟通调整，并交付可继续维护的成果。</p></article>
         </div>
       </div>
     </section>
 
-    <section class="section contact-section" id="contact">
-      <div class="section-inner contact-title reveal">
-        <div class="section-index">05 / START A PROJECT</div>
-        <h2>有一个需要认真做成的项目，我们可以先聊 30 分钟。</h2>
-        <div class="contact-actions">
-          <a class="button primary" href="mailto:yuzhilinvip@163.com?subject=项目合作咨询&body=志林你好，我的项目背景是：%0A希望解决的问题是：%0A预期时间是：">发送项目需求</a>
-          <a class="button" href="tel:18782088835">电话沟通</a>
-        </div>
-        <div class="contact-detail">
-          <span>EMAIL / yuzhilinvip@163.com</span>
-          <span>TEL & WECHAT / 18782088835</span>
-          <span>BASE / 成都，可远程</span>
-        </div>
+    <section class="section about-section" id="about" aria-labelledby="about-title">
+      <div class="container about-layout">
+        <div class="about-photo"><img src="photo.png" alt="喻志林的照片" loading="lazy" width="720" height="900"></div>
+        <div class="about-copy"><p class="section-label">ABOUT ME</p><h2 id="about-title">技术可以很复杂，<br>合作应该更清楚。</h2><p>我是喻志林，目前以独立顾问身份承接 AI 应用和产品工程项目。做过大型企业平台，也长期处理复杂前端系统的性能与协作问题。</p><p>我会先讨论真实业务目标，再决定模型、流程和工程架构该怎样配合。</p><a class="text-link" href="https://resume.zhilin.club" target="_blank" rel="noopener noreferrer">查看我的完整简历 <span aria-hidden="true">↗</span></a></div>
       </div>
+    </section>
+
+    <section class="contact-section" id="contact" aria-labelledby="contact-title">
+      <div class="container contact-layout"><div><p class="section-label">LET'S TALK</p><h2 id="contact-title">你的想法，<br>我们可以一起做成。</h2><p>请简单说说项目背景、预期目标和时间安排，我会从可行的第一步开始聊。</p></div><div class="contact-side"><a class="button button-dark" href="mailto:yuzhilinvip@163.com?subject=AI%20项目合作咨询&body=志林你好，项目背景：%0A希望解决的问题：%0A预期时间：">发送项目需求 <span aria-hidden="true">↗</span></a><a href="mailto:yuzhilinvip@163.com">yuzhilinvip@163.com</a><a href="tel:18782088835">187 8208 8835</a><span>成都 · 可远程合作</span></div></div>
     </section>
   </main>
 
-  <footer>
-    <div class="footer-inner">
-      <span>© 2026 喻志林 / Independent Technology Consultant</span>
-      <span><a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer">渝ICP备2026011149号</a></span>
-    </div>
-  </footer>
-
-  <script>
-    const header = document.getElementById('header');
-    const progress = document.getElementById('progress');
-    const menuButton = document.getElementById('menuButton');
-    const navLinks = document.getElementById('navLinks');
-    const productStage = document.getElementById('productStage');
-    const finePointer = window.matchMedia('(pointer: fine)').matches;
-
-    function updateScroll() {
-      const top = window.scrollY || document.documentElement.scrollTop;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      progress.style.width = (max > 0 ? Math.min(100, top / max * 100) : 0) + '%';
-      header.classList.toggle('scrolled', top > 18);
-    }
-
-    menuButton.addEventListener('click', () => {
-      const open = navLinks.classList.toggle('open');
-      menuButton.setAttribute('aria-expanded', String(open));
-    });
-
-    navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
-      navLinks.classList.remove('open');
-      menuButton.setAttribute('aria-expanded', 'false');
-    }));
-
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: .12 });
-
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-    if (finePointer) {
-      window.addEventListener('pointermove', event => {
-        document.body.style.setProperty('--cursor-x', event.clientX + 'px');
-        document.body.style.setProperty('--cursor-y', event.clientY + 'px');
-      }, { passive: true });
-
-      const hero = document.querySelector('.hero');
-      hero.addEventListener('pointermove', event => {
-        const rect = hero.getBoundingClientRect();
-        const x = (event.clientX - rect.left) / rect.width - .5;
-        const y = (event.clientY - rect.top) / rect.height - .5;
-        productStage.style.setProperty('--rx', (-3 - y * 11) + 'deg');
-        productStage.style.setProperty('--ry', (-7 + x * 15) + 'deg');
-      }, { passive: true });
-      hero.addEventListener('pointerleave', () => {
-        productStage.style.setProperty('--rx', '-3deg');
-        productStage.style.setProperty('--ry', '-7deg');
-      });
-
-      document.querySelectorAll('.service-row, .proof-item, .step').forEach(card => {
-        card.addEventListener('pointermove', event => {
-          const rect = card.getBoundingClientRect();
-          const x = (event.clientX - rect.left) / rect.width - .5;
-          const y = (event.clientY - rect.top) / rect.height - .5;
-          card.style.transform = `perspective(900px) rotateX(${-y * 4}deg) rotateY(${x * 4}deg) translateZ(5px)`;
-        });
-        card.addEventListener('pointerleave', () => { card.style.transform = ''; });
-      });
-    }
-    window.addEventListener('scroll', updateScroll, { passive: true });
-    updateScroll();
-  </script>
+  <footer><div class="container footer-inner"><span>© 2026 喻志林 · 独立 AI 应用顾问</span><div><a href="#top">返回顶部 ↑</a><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">渝ICP备2026011149号</a></div></div></footer>
 </body>
 </html>
