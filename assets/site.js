@@ -88,9 +88,83 @@
   function sync(){cancelAnimationFrame(raf);raf=0;if(motion.matches)draw(0);else if(visible&&!document.hidden)raf=requestAnimationFrame(loop)}
   canvas.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();pointer.x=e.clientX-r.left;pointer.y=e.clientY-r.top},{passive:true});
   canvas.addEventListener('pointerleave',()=>{pointer.x=pointer.y=-1000});
-  new ResizeObserver(resize).observe(canvas);
+  // The banner changes size while scrolling; redraw its particles once the
+  // visual resize settles so the scroll animation stays responsive.
+  let resizeTimer;
+  new ResizeObserver(() => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resize, 120);
+  }).observe(canvas);
+  resize();
   new IntersectionObserver(es=>{visible=es[0].isIntersecting;sync()}).observe(canvas);
   document.addEventListener('visibilitychange',sync);motion.addEventListener('change',sync);
+
+  const banner = document.querySelector('.hero-art');
+  let expansion = 0, expansionTarget = 0, expansionFrame = 0;
+  function applyExpansion() {
+    const viewportWidth = document.documentElement.clientWidth;
+    const baseWidth = viewportWidth <= 560 ? viewportWidth - 32 : Math.min(viewportWidth - 64, 1240);
+    const baseHeight = viewportWidth <= 560 ? 270 : viewportWidth <= 900 ? 360 : 440;
+    const fullHeight = Math.max(baseHeight, innerHeight);
+    banner.style.width = `${baseWidth + (viewportWidth - baseWidth) * expansion}px`;
+    banner.style.height = `${baseHeight + (fullHeight - baseHeight) * expansion}px`;
+    banner.style.borderRadius = `${(viewportWidth <= 560 ? 16 : 24) * (1 - expansion)}px`;
+    banner.dataset.expansion = expansion.toFixed(3);
+  }
+  function stepExpansion() {
+    expansionFrame = 0;
+    expansion += (expansionTarget - expansion) * .22;
+    if (Math.abs(expansionTarget - expansion) < .001) expansion = expansionTarget;
+    applyExpansion();
+    if (expansion !== expansionTarget) expansionFrame = requestAnimationFrame(stepExpansion);
+  }
+  function updateExpansion() {
+    const fraction = Math.min(Math.max(scrollY / 480, 0), 1);
+    expansionTarget = motion.matches ? 0 : 1 - (1 - fraction) ** 2;
+    if (motion.matches) {
+      cancelAnimationFrame(expansionFrame);
+      expansionFrame = 0;
+      expansion = 0;
+      applyExpansion();
+    } else if (!expansionFrame) {
+      expansionFrame = requestAnimationFrame(stepExpansion);
+    }
+  }
+  addEventListener('scroll', updateExpansion, {passive:true});
+  addEventListener('resize', updateExpansion, {passive:true});
+  motion.addEventListener('change', updateExpansion);
+  updateExpansion();
+
+  // Expanding the banner changes document height, so anchor targets below it
+  // need their final layout before the browser calculates the scroll position.
+  function jumpToHash(hash) {
+    const target = document.getElementById(hash.slice(1));
+    if (!target) return false;
+    if (target.id === 'top') {
+      scrollTo({top:0,behavior:'instant'});
+      updateExpansion();
+      return true;
+    }
+    if (target.compareDocumentPosition(banner) & Node.DOCUMENT_POSITION_PRECEDING && !motion.matches) {
+      cancelAnimationFrame(expansionFrame);
+      expansionFrame = 0;
+      expansion = expansionTarget = 1;
+      applyExpansion();
+    }
+    target.scrollIntoView({behavior:'instant',block:'start'});
+    updateExpansion();
+    return true;
+  }
+  document.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener('click', event => {
+    const hash = link.getAttribute('href');
+    if (!hash || hash === '#' || !document.getElementById(hash.slice(1))) return;
+    event.preventDefault();
+    history.pushState(null, '', hash);
+    jumpToHash(hash);
+  }));
+  addEventListener('hashchange', () => jumpToHash(location.hash));
+  addEventListener('load', () => { if (location.hash) jumpToHash(location.hash); });
+
   if(matchMedia('(pointer:fine)').matches){
     const ring=document.createElement('div');ring.className='cursor-ring';ring.setAttribute('aria-hidden','true');document.body.append(ring);
     document.addEventListener('pointermove',e=>{ring.style.opacity=motion.matches?'0':'1';ring.style.transform=`translate(${e.clientX-ring.offsetWidth/2}px,${e.clientY-ring.offsetHeight/2}px)`;ring.classList.toggle('over-link',Boolean(e.target.closest('a,button')))},{passive:true});
