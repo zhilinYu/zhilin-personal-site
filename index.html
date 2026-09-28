@@ -16,9 +16,8 @@
   <title>喻志林｜独立 AI 应用顾问</title>
   <link rel="canonical" href="https://zhilin.club/">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23161919'/%3E%3Cpath d='M16 17h33v8L27 40h22v8H15v-8l22-15H16z' fill='%23d8f1e8'/%3E%3C/svg%3E">
-  <link rel="preload" as="image" href="assets/visuals/hero-waves.webp">
-  <link rel="stylesheet" href="assets/site.css">
-  <script defer src="assets/site.js"></script>
+  <link rel="stylesheet" href="assets/site.css?v=20260928-2">
+  <script defer src="assets/site.js?v=20260928-2"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">跳到正文</a>
@@ -43,14 +42,14 @@
   <main id="main">
     <section class="hero" id="top" aria-labelledby="hero-title">
       <div class="hero-copy container">
-        <h1 id="hero-title"><span>把 AI 想法</span><span>做成真正能用的产品</span></h1>
+        <h1 id="hero-title"><span>把 AI 想法</span><span class="typing-line" aria-label="做成真正能用的产品"><span id="typedTitle" aria-hidden="true">做成真正能用的产品</span><i class="typing-cursor" aria-hidden="true"></i></span></h1>
         <p>我是喻志林，独立 AI 应用顾问。提供从产品判断、原型搭建到工程交付的完整支持。</p>
         <div class="hero-actions">
           <a class="button button-dark" href="mailto:yuzhilinvip@163.com?subject=AI%20项目合作咨询&body=志林你好，我想讨论的项目是：">聊聊你的项目 <span aria-hidden="true">↗</span></a>
           <a class="button button-outline" href="#services">查看服务方案 <span aria-hidden="true">↘</span></a>
         </div>
       </div>
-      <div class="hero-art" role="img" aria-label="柔和的数据波纹插画"></div>
+      <div class="hero-art" aria-label="AI 字符粒子交互动画"><canvas id="heroCanvas" aria-hidden="true"></canvas><div class="art-caption"><span>IDEA → INTELLIGENCE → IMPACT</span><span>独立思考 · 工程落地</span></div></div>
     </section>
 
     <section class="section services-section" id="services" aria-labelledby="services-title">
@@ -62,7 +61,7 @@
         </div>
         <div class="service-grid">
           <article class="service-card">
-            <img class="service-art" src="assets/visuals/service-mvp.webp" alt="" loading="lazy" width="760" height="570">
+            <img class="service-art" src="assets/visuals/service-mvp-v2.webp" alt="" loading="lazy" width="760" height="570">
             <div class="service-card-body">
               <div class="service-heading"><span class="card-number">01</span><h3>AI 应用 MVP</h3></div>
               <p class="card-description">从想法到可验证的产品原型，覆盖智能体交互、知识库、工具调用和上线部署。</p>
@@ -71,7 +70,7 @@
             </div>
           </article>
           <article class="service-card">
-            <img class="service-art" src="assets/visuals/service-architecture.webp" alt="" loading="lazy" width="760" height="570">
+            <img class="service-art" src="assets/visuals/service-architecture-v2.webp" alt="" loading="lazy" width="760" height="570">
             <div class="service-card-body">
               <div class="service-heading"><span class="card-number">02</span><h3>前端架构诊断</h3></div>
               <p class="card-description">梳理性能、工程结构与可维护性问题，给出可执行的治理路线。</p>
@@ -80,7 +79,7 @@
             </div>
           </article>
           <article class="service-card">
-            <img class="service-art" src="assets/visuals/service-advisor.webp" alt="" loading="lazy" width="760" height="570">
+            <img class="service-art" src="assets/visuals/service-advisor-v2.webp" alt="" loading="lazy" width="760" height="570">
             <div class="service-card-body">
               <div class="service-heading"><span class="card-number">03</span><h3>兼职技术负责人</h3></div>
               <p class="card-description">为小团队提供持续技术判断，参与架构决策、评审和交付风险控制。</p>
@@ -99,7 +98,7 @@
           <p class="section-label">EXPERIENCE</p>
           <h2 id="experience-title">能落地，<br>才算好方案。</h2>
           <p>10 余年企业级 Web 研发经历，参与过工业 AI、金融科技和低代码平台项目。我更关注真实业务约束、工程协作与长期维护。</p>
-          <a class="text-link" href="https://resume.zhilin.club" target="_blank" rel="noopener noreferrer">查看完整履历 <span aria-hidden="true">↗</span></a>
+          <a class="text-link" href="https://resume.zhilin.club">查看完整履历 <span aria-hidden="true">↗</span></a>
         </div>
         <div class="experience-list">
           <article><span>01 / 工业 AI</span><div><h3>西门子 Xcelerator AI 平台</h3><p>参与 AI 搜索、知识库与智能体交互相关的前端模块建设。</p></div></article>
@@ -117,31 +116,32 @@
             <h2 id="products-title">把研究流程，变成可复用的方法</h2>
             <p>五款 AI 选股研究提示词电子版，帮助整理筛选、观察与复盘步骤。</p>
           </div>
-          <div class="rail-controls" aria-label="浏览商品">
-            <button class="rail-arrow" id="productsPrev" type="button" aria-label="上一组商品">←</button>
-            <button class="rail-arrow" id="productsNext" type="button" aria-label="下一组商品">→</button>
-          </div>
+
         </div>
-        <div class="product-rail" id="productRail" role="region" tabindex="0" aria-label="五款选股研究提示词，可左右滑动浏览">
+        <div class="product-grid" id="productGrid" aria-label="选股研究提示词商品">
           <article class="product-card" data-sku="quant-risk">
             <img src="assets/products/quant-risk.webp" alt="量化风控提示词商品封面" loading="lazy" width="1242" height="1242">
-            <div class="product-card-body"><span class="product-index">01 / RESEARCH PROMPT</span><h3>量化风控</h3><p>从市场开关、硬性筛选到评分与风险边界，建立结构化研究流程。</p><div class="product-format">完整 Markdown / TXT 文档</div><div class="product-bottom"><strong>价格待公布</strong><button type="button" disabled aria-label="量化风控购买即将开放">微信支付即将开放</button></div></div>
+            <div class="product-card-body"><span class="product-index">01 / RESEARCH PROMPT</span><h3>量化风控</h3><p>从市场开关、硬性筛选到评分与风险边界，建立结构化研究流程。</p><div class="product-format">完整 Markdown / TXT 文档</div><div class="product-bottom"><strong>¥9.9</strong><button type="button" disabled aria-label="量化风控购买即将开放">微信支付即将开放</button></div></div>
           </article>
           <article class="product-card" data-sku="trend-leader">
             <img src="assets/products/trend-leader.webp" alt="趋势龙头提示词商品封面" loading="lazy" width="1242" height="1242">
-            <div class="product-card-body"><span class="product-index">02 / RESEARCH PROMPT</span><h3>趋势龙头</h3><p>围绕主线识别、趋势结构和龙头分级，梳理观察重点。</p><div class="product-format">完整 Markdown / TXT 文档</div><div class="product-bottom"><strong>价格待公布</strong><button type="button" disabled aria-label="趋势龙头购买即将开放">微信支付即将开放</button></div></div>
+            <div class="product-card-body"><span class="product-index">02 / RESEARCH PROMPT</span><h3>趋势龙头</h3><p>围绕主线识别、趋势结构和龙头分级，梳理观察重点。</p><div class="product-format">完整 Markdown / TXT 文档</div><div class="product-bottom"><strong>¥9.9</strong><button type="button" disabled aria-label="趋势龙头购买即将开放">微信支付即将开放</button></div></div>
           </article>
           <article class="product-card" data-sku="hot-money">
             <img src="assets/products/hot-money.webp" alt="游资弹性提示词商品封面" loading="lazy" width="1242" height="1242">
-            <div class="product-card-body"><span class="product-index">03 / RESEARCH PROMPT</span><h3>游资弹性</h3><p>在修复或主升阶段观察低位启动与补涨线索。</p><div class="product-format">完整 Markdown / TXT 文档</div><div class="product-bottom"><strong>价格待公布</strong><button type="button" disabled aria-label="游资弹性购买即将开放">微信支付即将开放</button></div></div>
+            <div class="product-card-body"><span class="product-index">03 / RESEARCH PROMPT</span><h3>游资弹性</h3><p>在修复或主升阶段观察低位启动与补涨线索。</p><div class="product-format">完整 Markdown / TXT 文档</div><div class="product-bottom"><strong>¥9.9</strong><button type="button" disabled aria-label="游资弹性购买即将开放">微信支付即将开放</button></div></div>
           </article>
           <article class="product-card" data-sku="countertrend">
             <img src="assets/products/countertrend.webp" alt="逆势抗跌提示词商品封面" loading="lazy" width="1242" height="1242">
-            <div class="product-card-body"><span class="product-index">04 / RESEARCH PROMPT</span><h3>逆势抗跌</h3><p>在市场分歧期观察相对强度、板块生命力与资金承接。</p><div class="product-format">完整 Markdown / TXT 文档</div><div class="product-bottom"><strong>价格待公布</strong><button type="button" disabled aria-label="逆势抗跌购买即将开放">微信支付即将开放</button></div></div>
+            <div class="product-card-body"><span class="product-index">04 / RESEARCH PROMPT</span><h3>逆势抗跌</h3><p>在市场分歧期观察相对强度、板块生命力与资金承接。</p><div class="product-format">完整 Markdown / TXT 文档</div><div class="product-bottom"><strong>¥9.9</strong><button type="button" disabled aria-label="逆势抗跌购买即将开放">微信支付即将开放</button></div></div>
           </article>
           <article class="product-card" data-sku="limit-up-pullback">
             <img src="assets/products/limit-up-pullback.webp" alt="涨停回吐提示词商品封面" loading="lazy" width="1242" height="1242">
-            <div class="product-card-body"><span class="product-index">05 / RESEARCH PROMPT</span><h3>涨停回吐</h3><p>整理涨停后回吐、缩量与二次转强的观察步骤。</p><div class="product-format">完整 Markdown / TXT 文档</div><div class="product-bottom"><strong>价格待公布</strong><button type="button" disabled aria-label="涨停回吐购买即将开放">微信支付即将开放</button></div></div>
+            <div class="product-card-body"><span class="product-index">05 / RESEARCH PROMPT</span><h3>涨停回吐</h3><p>整理涨停后回吐、缩量与二次转强的观察步骤。</p><div class="product-format">完整 Markdown / TXT 文档</div><div class="product-bottom"><strong>¥9.9</strong><button type="button" disabled aria-label="涨停回吐购买即将开放">微信支付即将开放</button></div></div>
+          </article>
+          <article class="product-card bundle-card" data-sku="research-bundle">
+            <div class="bundle-cover"><span>THE COMPLETE COLLECTION</span><div class="bundle-books"><i>01</i><i>02</i><i>03</i><i>04</i><i>05</i></div><strong>五种方法 · 一套研究体系</strong></div>
+            <div class="product-card-body"><span class="product-index">06 / COMPLETE BUNDLE</span><h3>全套研究提示词</h3><p>一次收齐五款：量化风控、趋势龙头、游资弹性、逆势抗跌与涨停回吐。</p><div class="product-format">5 份完整文档 · 比单买省 ¥9.6</div><div class="product-bottom"><strong>¥39.9 <del>¥49.5</del></strong><button type="button" disabled>微信支付即将开放</button></div></div>
           </article>
         </div>
         <div class="product-note"><span aria-hidden="true">ⓘ</span><p>本系列仅提供研究流程提示词，不含实时行情、股票名单或个股推荐，不保证收益。分析时需自行提供可靠数据。</p></div>
@@ -161,8 +161,7 @@
 
     <section class="section about-section" id="about" aria-labelledby="about-title">
       <div class="container about-layout">
-        <div class="about-photo"><img src="photo.png" alt="喻志林的照片" loading="lazy" width="720" height="900"></div>
-        <div class="about-copy"><p class="section-label">ABOUT ME</p><h2 id="about-title">技术可以很复杂，<br>合作应该更清楚。</h2><p>我是喻志林，目前以独立顾问身份承接 AI 应用和产品工程项目。做过大型企业平台，也长期处理复杂前端系统的性能与协作问题。</p><p>我会先讨论真实业务目标，再决定模型、流程和工程架构该怎样配合。</p><a class="text-link" href="https://resume.zhilin.club" target="_blank" rel="noopener noreferrer">查看我的完整简历 <span aria-hidden="true">↗</span></a></div>
+        <div class="about-copy"><p class="section-label">ABOUT ME</p><h2 id="about-title">技术可以很复杂，<br>合作应该更清楚。</h2><p>我是喻志林，目前以独立顾问身份承接 AI 应用和产品工程项目。做过大型企业平台，也长期处理复杂前端系统的性能与协作问题。</p><p>我会先讨论真实业务目标，再决定模型、流程和工程架构该怎样配合。</p><a class="text-link" href="https://resume.zhilin.club">查看我的完整简历 <span aria-hidden="true">↗</span></a></div>
       </div>
     </section>
 
