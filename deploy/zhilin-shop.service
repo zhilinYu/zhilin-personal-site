@@ -1,0 +1,23 @@
+[Unit]
+Description=Zhilin website payment and private delivery
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=zhilin-shop
+Group=zhilin-shop
+WorkingDirectory=/opt/zhilin-shop/payment
+EnvironmentFile=/etc/zhilin-shop/shop.env
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/opt/zhilin-shop/venv/bin/gunicorn --bind 127.0.0.1:9101 --workers 2 --threads 2 --timeout 45 wsgi:application
+Restart=on-failure
+StateDirectory=zhilin-shop
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/zhilin-shop
+
+[Install]
+WantedBy=multi-user.target

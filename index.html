@@ -16,8 +16,9 @@
   <title>喻志林｜独立 AI 应用顾问</title>
   <link rel="canonical" href="https://zhilin.club/">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23161919'/%3E%3Cpath d='M16 17h33v8L27 40h22v8H15v-8l22-15H16z' fill='%23d8f1e8'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/site.css?v=20260928-2">
+  <link rel="stylesheet" href="assets/site.css?v=20261001-1">
   <script defer src="assets/site.js?v=20260928-3"></script>
+  <script defer src="assets/checkout.js?v=20261001-1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">跳到正文</a>
@@ -116,6 +117,7 @@
             <h2 id="products-title">把研究流程，变成可复用的方法</h2>
             <p>五款 AI 选股研究提示词电子版，帮助整理筛选、观察与复盘步骤。</p>
           </div>
+          <button class="purchase-history-button" type="button" id="myPurchases">我的购买 ↗</button>
 
         </div>
         <div class="product-grid" id="productGrid" aria-label="选股研究提示词商品">
@@ -170,6 +172,22 @@
     </section>
   </main>
 
+  <dialog class="checkout-dialog" id="checkoutDialog" aria-labelledby="checkoutTitle">
+    <button class="checkout-close" type="button" id="checkoutClose" aria-label="关闭支付窗口">×</button>
+    <p class="section-label">致凌工作室 · 微信支付</p>
+    <h2 id="checkoutTitle">微信扫码购买</h2>
+    <p class="checkout-price" id="checkoutPrice"></p>
+    <p id="checkoutStatus" role="status" aria-live="polite"></p>
+    <img class="checkout-qr" id="checkoutQr" alt="本订单微信付款二维码" width="240" height="240" hidden>
+    <p class="checkout-order" id="checkoutOrder"></p>
+    <div class="checkout-actions">
+      <button type="button" class="button button-dark" id="checkoutDownload" hidden>下载完整文档</button>
+      <button type="button" class="button button-outline" id="checkoutRefresh" hidden>查询付款状态</button>
+    </div>
+    <div id="purchaseList" hidden></div>
+    <p class="checkout-help" id="checkoutHelp">请使用手机微信扫描电脑上的二维码。购买记录保存在当前浏览器；请保留订单号，以便售后查询。</p>
+    <p class="checkout-support">订单及退款咨询：<a href="mailto:yuzhilinvip@163.com">yuzhilinvip@163.com</a></p>
+  </dialog>
   <footer><div class="container footer-inner"><span>© 2026 喻志林 · 独立 AI 应用顾问</span><div><a href="#top">返回顶部 ↑</a><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">渝ICP备2026011149号</a></div></div></footer>
 </body>
 </html>

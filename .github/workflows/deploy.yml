@@ -10,6 +10,45 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Check payment service
+        run: |
+          python -m pip install --only-binary=:all: -r payment/requirements.txt
+          python -m unittest discover -s payment/tests -v
+          node --check assets/checkout.js
+
+      - name: Deploy Payment Service
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 106.75.250.138
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "payment,deploy/zhilin-shop.service"
+          target: "/opt/zhilin-shop/"
+          strip_components: 0
+
+      - name: Restart Payment Service
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: 106.75.250.138
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -eu
+            test -f /etc/zhilin-shop/shop.env
+            /opt/zhilin-shop/venv/bin/pip install --only-binary=:all: -r /opt/zhilin-shop/payment/requirements.txt
+            install -m 0644 /opt/zhilin-shop/deploy/zhilin-shop.service /etc/systemd/system/zhilin-shop.service
+            systemctl daemon-reload
+            systemctl restart zhilin-shop
+            for attempt in 1 2 3 4 5; do
+              if curl --fail --silent http://127.0.0.1:9101/api/shop/status; then break; fi
+              sleep 1
+            done
+            curl --fail --silent http://127.0.0.1:9101/api/shop/status
+
       - name: Deploy to Server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -26,4 +65,4 @@ jobs:
           host: 106.75.250.138
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: systemctl reload nginx
+          script: nginx -t && systemctl reload nginx
