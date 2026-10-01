@@ -12,6 +12,7 @@ Environment=PYTHONDONTWRITEBYTECODE=1
 ExecStart=/opt/zhilin-shop/venv/bin/gunicorn --bind 127.0.0.1:9101 --workers 2 --threads 2 --timeout 45 wsgi:application
 Restart=on-failure
 StateDirectory=zhilin-shop
+StateDirectoryMode=0700
 UMask=0077
 NoNewPrivileges=true
 PrivateTmp=true
