@@ -59,10 +59,16 @@
     orderNumber.textContent = order.id ? '订单号：' + order.id : '';
     historyList.hidden = true;
     download.hidden = true;
-    refresh.hidden = true;
+    refresh.hidden = true; refresh.disabled = false;
+    refresh.textContent = '查询付款状态';
     document.getElementById('checkoutHelp').hidden = false;
     showStatus('正在查询订单…');
     if (!dialog.open) dialog.showModal();
+  }
+  function showRefresh(order, data = {}) {
+    order.retryable = data.retryable === true;
+    refresh.textContent = order.retryable ? '重新获取付款二维码' : '查询付款状态';
+    refresh.hidden = false;
   }
   async function poll(current = generation) {
     if (!dialog.open || !active || !active.id) return;
@@ -73,7 +79,7 @@
       const data = await (await api('orders/' + order.id, { headers: headers(order) })).json();
       if (current !== generation || sequence !== pollSequence || !dialog.open) return;
       orderNumber.textContent = '订单号：' + order.id;
-      refresh.hidden = false;
+      showRefresh(order, data);
       download.hidden = data.status !== 'PAID';
       if (data.status === 'PAID') {
         clearQr();
@@ -96,7 +102,7 @@
       }
     } catch (error) {
       if (current !== generation || sequence !== pollSequence || !dialog.open) return;
-      showStatus(error.message); refresh.hidden = false;
+      showStatus(error.message); showRefresh(order, error.data);
     }
     if (current === generation && sequence === pollSequence && dialog.open) timer = setTimeout(() => poll(current), 5000);
   }
@@ -114,31 +120,45 @@
     }
     open(order);
     const current = generation;
-    if (!order.id) {
-      showStatus('正在创建付款订单…');
-      try {
-        const data = await (await api('orders', {
-          method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': order.token },
-          body: JSON.stringify({ sku }),
-        })).json();
-        order.id = data.id; remember(order);
-      } catch (error) {
-        if (error.data && error.data.id) {
-          order.id = error.data.id; remember(order);
-        }
-        if (current !== generation) return;
-        showStatus(error.message);
-        refresh.hidden = false;
-        return;
-      }
-    }
+    if (!order.id && !await prepareOrder(order, current)) return;
     if (current === generation) poll(current);
+  }
+  async function prepareOrder(order, current) {
+    showStatus(order.id ? '正在重新获取付款二维码…' : '正在创建付款订单…');
+    refresh.disabled = true;
+    try {
+      const data = await (await api('orders', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': order.token },
+        body: JSON.stringify({ sku: order.sku }),
+      })).json();
+      order.id = data.id;
+      order.retryable = data.retryable === true;
+      remember(order);
+      return true;
+    } catch (error) {
+      if (error.data && error.data.id) {
+        order.id = error.data.id; remember(order);
+      }
+      if (current !== generation || !dialog.open) return false;
+      showStatus(error.message);
+      showRefresh(order, error.data);
+      // A timed-out create may already be paid; reconcile without creating a new order.
+      if (order.id) timer = setTimeout(() => poll(current), 5000);
+      return false;
+    } finally {
+      if (current === generation) refresh.disabled = false;
+    }
   }
   document.getElementById('checkoutClose').addEventListener('click', () => dialog.close());
   dialog.addEventListener('close', stop);
-  refresh.addEventListener('click', () => {
-    if (active && !active.id) buy(active.sku);
-    else poll();
+  refresh.addEventListener('click', async () => {
+    if (refresh.disabled) return;
+    if (active && (!active.id || active.retryable)) {
+      const order = active;
+      open(order); // Invalidate older polls before retrying this exact token.
+      const current = generation;
+      if (await prepareOrder(order, current) && current === generation) poll(current);
+    } else poll();
   });
   download.addEventListener('click', async () => {
     if (!active || downloading) return;
@@ -178,10 +198,11 @@
     }
     if (!dialog.open) dialog.showModal();
   });
-  function buyExisting(order) {
+  async function buyExisting(order) {
     open(order);
-    if (order.id) poll();
-    else buy(order.sku);
+    const current = generation;
+    if (!order.id && !await prepareOrder(order, current)) return;
+    if (current === generation) poll(current);
   }
   document.querySelectorAll('.product-card').forEach(card => {
     card.querySelector('.product-bottom button').addEventListener('click', () => buy(card.dataset.sku));

@@ -213,3 +213,72 @@ test('download completion still updates the active order', async () => {
   assert.match(page.element('checkoutStatus').textContent, /下载已开始/);
   assert.equal(page.element('checkoutDownload').disabled, false);
 });
+
+test('manual retry recovers a failed creation using the same order and token', async () => {
+  let creates = 0;
+  const page = harness({ fetchOrder(url) {
+    if (url === '/api/shop/orders') {
+      creates++;
+      return Promise.resolve(creates === 1
+        ? response({ id: 'recover-order', error: '暂时不可用', retryable: true, retry_after: 5 }, 502)
+        : response({ id: 'recover-order', status: 'PENDING', retryable: false }));
+    }
+    if (url.endsWith('/qr')) return Promise.resolve(response({}));
+    return Promise.resolve(creates === 1
+      ? response({ error: '微信尚无订单', retryable: true, retry_after: 0 }, 502)
+      : response({ status: 'PENDING', qr_available: true, retryable: false }));
+  }});
+  await page.buy();
+  await flush();
+  assert.equal(page.element('checkoutRefresh').textContent, '重新获取付款二维码');
+  await page.element('checkoutRefresh').click();
+  await flush();
+  const posts = page.requests.filter(request => request.url === '/api/shop/orders');
+  assert.equal(posts.length, 2);
+  assert.equal(posts[0].options.headers['Idempotency-Key'], posts[1].options.headers['Idempotency-Key']);
+  assert.equal(page.saved().length, 1);
+  assert.equal(page.saved()[0].id, 'recover-order');
+  assert.equal(page.element('checkoutQr').hidden, false);
+});
+
+test('retry from history preserves the selected older order rather than choosing a newer same-SKU record', async () => {
+  const oldToken = 'a'.repeat(64), newerToken = 'b'.repeat(64);
+  const page = harness({
+    purchases: [
+      { sku: 'quant-risk', token: oldToken, id: 'old-order', created: Date.now() - 1000 },
+      { sku: 'quant-risk', token: newerToken, id: 'newer-order', created: Date.now() },
+    ],
+    fetchOrder(url) {
+      if (url === '/api/shop/orders') return Promise.resolve(response({ id: 'old-order', status: 'PENDING' }));
+      return Promise.resolve(response({ status: 'CREATING', qr_available: false, retryable: true, retry_after: 0 }));
+    },
+  });
+  page.element('myPurchases').click();
+  await page.element('purchaseList').children[1].click();
+  await flush();
+  await page.element('checkoutRefresh').click();
+  await flush();
+  const posts = page.requests.filter(request => request.url === '/api/shop/orders');
+  assert.equal(posts.length, 1);
+  assert.equal(posts[0].options.headers['Idempotency-Key'], oldToken);
+});
+
+test('delayed retry response cannot overwrite reopened purchase history', async () => {
+  const retry = deferred();
+  const page = harness({
+    purchases: [{ sku: 'quant-risk', token: 'a'.repeat(64), id: 'retry-order', created: Date.now() }],
+    fetchOrder: url => url === '/api/shop/orders' ? retry.promise
+      : Promise.resolve(response({ status: 'CREATING', qr_available: false, retryable: true, retry_after: 0 })),
+  });
+  await page.buy();
+  await flush();
+  const retrying = page.element('checkoutRefresh').click();
+  page.element('checkoutClose').click();
+  page.element('myPurchases').click();
+  const historyStatus = page.element('checkoutStatus').textContent;
+  retry.resolve(response({ id: 'retry-order', status: 'PENDING' }));
+  await retrying;
+  await flush();
+  assert.equal(page.element('checkoutStatus').textContent, historyStatus);
+  assert.equal(page.requests.filter(request => request.url === '/api/shop/orders').length, 1);
+});
