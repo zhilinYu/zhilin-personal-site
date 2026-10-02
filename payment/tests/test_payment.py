@@ -1,6 +1,7 @@
 import base64
 import io
 import json
+import sqlite3
 import sys
 import tempfile
 import time
@@ -88,6 +89,19 @@ class OrderTests(unittest.TestCase):
         self.assertEqual(first.json["id"], second.json["id"])
         self.assertEqual(len(self.gateway.created), 1)
         self.assertEqual(self.order("hot-money").status_code, 409)
+
+    def test_expired_lost_creation_response_retains_recoverable_order_identity(self):
+        order_id = self.order().json["id"]
+        with sqlite3.connect(self.app.config["SHOP_DB"]) as conn:
+            conn.execute("UPDATE orders SET expires=? WHERE id=?", (int(time.time()) - 1, order_id))
+        response = self.order()
+        self.assertEqual(response.status_code, 410)
+        self.assertEqual(response.json.get("id"), order_id)
+        self.assertEqual(len(self.gateway.created), 1)
+        # A delayed valid payment still reconciles against the original retained order.
+        self.client.post("/api/shop/wechat/notify", json=self.gateway.paid(order_id))
+        self.assertEqual(self.client.get("/api/shop/orders/" + order_id,
+                                        headers=self.auth()).json["status"], "PAID")
 
     def test_origin_and_product_validation(self):
         self.assertEqual(self.client.post("/api/shop/orders", json={"sku": "quant-risk"}).status_code, 403)

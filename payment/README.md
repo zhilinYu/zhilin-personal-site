@@ -57,7 +57,10 @@ python3 payment/package_products.py \
 ```sh
 python3 -m unittest discover -s payment/tests -v
 node --check assets/checkout.js
+node --test tests/checkout.test.cjs
 ```
 
-本地测试使用隔离测试网关，不接触真实资金。上线验收还需要完成真实付款、
+Python 测试使用隔离测试网关，Node 测试使用隔离 DOM/网络替身验证异步状态，
+均不接触真实资金。Node 回归覆盖过期订单恢复、乱序查询和关闭后下载提示；
+它不能替代真实浏览器与微信支付验收。上线验收还需要完成真实付款、
 验签通知、重新领取和退款后无法再次下载的闭环。

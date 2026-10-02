@@ -9,7 +9,7 @@
   const refresh = document.getElementById('checkoutRefresh');
   const historyList = document.getElementById('purchaseList');
   const storageKey = 'zhilin.purchases.v1';
-  let active = null, timer = 0, qrUrl = '', generation = 0, downloading = false;
+  let active = null, timer = 0, qrUrl = '', generation = 0, pollSequence = 0, downloading = false;
 
   function purchases() {
     try {
@@ -68,9 +68,10 @@
     if (!dialog.open || !active || !active.id) return;
     clearTimeout(timer);
     const order = active;
+    const sequence = ++pollSequence;
     try {
       const data = await (await api('orders/' + order.id, { headers: headers(order) })).json();
-      if (current !== generation || !dialog.open) return;
+      if (current !== generation || sequence !== pollSequence || !dialog.open) return;
       orderNumber.textContent = '订单号：' + order.id;
       refresh.hidden = false;
       download.hidden = data.status !== 'PAID';
@@ -89,15 +90,15 @@
       if (data.qr_available && !qrUrl) {
         const image = await api('orders/' + order.id + '/qr', { headers: headers(order) });
         const blob = await image.blob();
-        if (current !== generation || !dialog.open) return;
+        if (current !== generation || sequence !== pollSequence || !dialog.open) return;
         qrUrl = URL.createObjectURL(blob);
         qr.src = qrUrl; qr.hidden = false;
       }
     } catch (error) {
-      if (current !== generation || !dialog.open) return;
+      if (current !== generation || sequence !== pollSequence || !dialog.open) return;
       showStatus(error.message); refresh.hidden = false;
     }
-    if (current === generation && dialog.open) timer = setTimeout(() => poll(current), 5000);
+    if (current === generation && sequence === pollSequence && dialog.open) timer = setTimeout(() => poll(current), 5000);
   }
   async function buy(sku) {
     let order = purchases().reverse().find(x => x.sku === sku && (!x.id || x.created > Date.now() - 15 * 60 * 1000));
@@ -142,6 +143,7 @@
   download.addEventListener('click', async () => {
     if (!active || downloading) return;
     const order = active;
+    const current = generation;
     downloading = true; download.disabled = true;
     try {
       const response = await api('orders/' + order.id + '/download', { headers: headers(order) });
@@ -151,8 +153,10 @@
       link.download = (skuCard(order.sku)?.querySelector('h3').textContent || '研究提示词') + '.zip';
       document.body.append(link); link.click(); link.remove();
       setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
-      showStatus('下载已开始。可在“我的购买”中重新领取。');
-    } catch (error) { showStatus(error.message); }
+      if (current === generation && dialog.open) showStatus('下载已开始。可在“我的购买”中重新领取。');
+    } catch (error) {
+      if (current === generation && dialog.open) showStatus(error.message);
+    }
     finally { downloading = false; download.disabled = false; }
   });
   document.getElementById('myPurchases').addEventListener('click', () => {

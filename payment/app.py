@@ -288,7 +288,9 @@ def create_app(config=None, gateway=None):
             if existing["sku"] != sku:
                 return error("订单商品不一致", 409)
             if existing["expires"] <= time.time() and existing["status"] != "PAID":
-                return error("订单已到期，请重新购买", 410)
+                # Preserve recovery after a lost create response, even after expiry.
+                return jsonify({"id": existing["id"], "status": existing["status"],
+                                "error": "订单已到期，请关闭窗口后重新购买"}), 410
             return jsonify({"id": existing["id"], "status": existing["status"]})
         if limited("create:" + str(request.remote_addr)):
             return error("操作频繁，请一分钟后重试", 429)

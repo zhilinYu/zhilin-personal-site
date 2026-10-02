@@ -19,6 +19,7 @@ jobs:
           python -m pip install --only-binary=:all: -r payment/requirements.txt
           python -m unittest discover -s payment/tests -v
           node --check assets/checkout.js
+          node --test tests/checkout.test.cjs
 
       - name: Deploy Payment Service
         uses: appleboy/scp-action@v0.1.7
