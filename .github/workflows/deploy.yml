@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: zhilin-production
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -19,6 +23,30 @@ jobs:
           python -m pip install --only-binary=:all: -r payment/requirements.txt
           python -m unittest discover -s payment/tests -v
           node --check assets/checkout.js
+          node --test tests/checkout.test.cjs
+
+      - name: Upload release backup guard
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 106.75.250.138
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "deploy/preflight_backup.py"
+          target: "/opt/zhilin-shop/"
+          strip_components: 0
+
+      - name: Back up and verify current deployment
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: 106.75.250.138
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -eu
+            timeout --signal=TERM --kill-after=5s 45s /opt/zhilin-shop/venv/bin/python /opt/zhilin-shop/deploy/preflight_backup.py \
+              --run-id '${{ github.run_id }}-${{ github.run_attempt }}' \
+              --target-sha '${{ github.sha }}' \
+              --rollback-sha '${{ github.event.before }}'
 
       - name: Deploy Payment Service
         uses: appleboy/scp-action@v0.1.7

@@ -174,6 +174,8 @@ def create_app(config=None, gateway=None):
                 expires INTEGER NOT NULL, last_query INTEGER NOT NULL DEFAULT 0);
             CREATE TABLE IF NOT EXISTS limits(
                 bucket TEXT PRIMARY KEY, count INTEGER NOT NULL, expires INTEGER NOT NULL);
+            CREATE TABLE IF NOT EXISTS creation_attempts(
+                order_id TEXT PRIMARY KEY, claim_token TEXT NOT NULL, lease_until INTEGER NOT NULL);
         """)
     payment = gateway
     if payment is None and app.config["SHOP_ENABLED"]:
@@ -257,6 +259,74 @@ def create_app(config=None, gateway=None):
         with db() as conn:
             return conn.execute("SELECT * FROM orders WHERE id=?", (order["id"],)).fetchone()
 
+    def reload_order(order_id):
+        with db() as conn:
+            return conn.execute("SELECT * FROM orders WHERE id=?", (order_id,)).fetchone()
+
+    def retry_metadata(order):
+        now = int(time.time())
+        retryable = order["status"] == "CREATING" and not order["code_url"] and order["expires"] > now + 90
+        with db() as conn:
+            claim = conn.execute("SELECT lease_until FROM creation_attempts WHERE order_id=?",
+                                 (order["id"],)).fetchone()
+        return {"retryable": bool(retryable),
+                "retry_after": max(0, claim["lease_until"] - now) if retryable and claim else 0}
+
+    def create_native(order, success_status=200, reconcile=False):
+        # A short persisted lease spans workers and is recoverable after a crash.
+        # Remote timeouts can be ambiguous: every attempt reuses the SAME merchant order.
+        now, claim_token = int(time.time()), secrets.token_hex(16)
+        with db() as conn:
+            claimed = conn.execute("""
+                INSERT INTO creation_attempts(order_id,claim_token,lease_until)
+                SELECT id,?,? FROM orders
+                WHERE id=? AND status='CREATING' AND code_url IS NULL AND expires>?
+                ON CONFLICT(order_id) DO UPDATE SET
+                    claim_token=excluded.claim_token,lease_until=excluded.lease_until
+                WHERE creation_attempts.lease_until<=?
+            """, (claim_token, now + 60, order["id"], now + 90, now)).rowcount
+        failure = False
+        if claimed:
+            if reconcile:
+                try:
+                    sync_order(order)
+                except PaymentError:
+                    # A missing/uncertain provider order is safe to recreate with the same parameters.
+                    pass
+            order = reload_order(order["id"])
+            with db() as conn:
+                still_owned = conn.execute(
+                    "SELECT 1 FROM creation_attempts WHERE order_id=? AND claim_token=? AND lease_until>?",
+                    (order["id"], claim_token, int(time.time())),
+                ).fetchone()
+            try:
+                # The provider enforces at least one minute for a new expiry; retain a transit margin.
+                if still_owned and order["status"] == "CREATING" and order["expires"] > time.time() + 90:
+                    result = payment.create(order)
+                    code = result.get("code_url", "") if isinstance(result, dict) else ""
+                    if not isinstance(code, str) or not code.startswith("weixin://wxpay/"):
+                        raise InvalidPayment("invalid payment code")
+                    with db() as conn:
+                        conn.execute("""
+                            UPDATE orders SET code_url=?,status='PENDING'
+                            WHERE id=? AND status='CREATING' AND expires>?
+                            AND EXISTS(SELECT 1 FROM creation_attempts
+                                       WHERE order_id=orders.id AND claim_token=?)
+                        """, (code, order["id"], int(time.time()), claim_token))
+            except PaymentError:
+                failure = True
+                app.logger.warning("WeChat order creation failed: %s", order["id"])
+            with db() as conn:
+                # An old request must not release or shorten a newer worker's lease.
+                conn.execute("UPDATE creation_attempts SET lease_until=? WHERE order_id=? AND claim_token=?",
+                             (int(time.time()) + (5 if failure else 0), order["id"], claim_token))
+        order = reload_order(order["id"])
+        metadata = retry_metadata(order)
+        if failure and metadata["retryable"]:
+            return jsonify({"id": order["id"], "status": "UNAVAILABLE", **metadata,
+                            "error": "暂时无法获取支付二维码，请稍后点击重新获取付款二维码"}), 502
+        return jsonify({"id": order["id"], "status": order["status"], **metadata}), success_status
+
     @app.after_request
     def headers(response):
         response.headers["Cache-Control"] = "no-store"
@@ -288,8 +358,10 @@ def create_app(config=None, gateway=None):
             if existing["sku"] != sku:
                 return error("订单商品不一致", 409)
             if existing["expires"] <= time.time() and existing["status"] != "PAID":
-                return error("订单已到期，请重新购买", 410)
-            return jsonify({"id": existing["id"], "status": existing["status"]})
+                # Preserve recovery after a lost create response, even after expiry.
+                return jsonify({"id": existing["id"], "status": existing["status"],
+                                "error": "订单已到期，请关闭窗口后重新购买"}), 410
+            return create_native(existing, reconcile=True)
         if limited("create:" + str(request.remote_addr)):
             return error("操作频繁，请一分钟后重试", 429)
         now = int(time.time())
@@ -306,23 +378,8 @@ def create_app(config=None, gateway=None):
                 order = conn.execute("SELECT * FROM orders WHERE token_hash=?", (key,)).fetchone()
             if not order or order["sku"] != sku:
                 return error("订单冲突", 409)
-            return jsonify({"id": order["id"], "status": order["status"]})
-        try:
-            result = payment.create(order)
-            code = result.get("code_url", "")
-            if not code.startswith("weixin://wxpay/"):
-                raise InvalidPayment("invalid payment code")
-            with db() as conn:
-                conn.execute(
-                    "UPDATE orders SET code_url=?,status=CASE WHEN status='CREATING' THEN 'PENDING' ELSE status END WHERE id=?",
-                    (code, order_id),
-                )
-        except PaymentError:
-            app.logger.warning("WeChat order creation failed: %s", order_id)
-            # Keep the order number so a delayed payment can still be reconciled.
-            return jsonify({"id": order_id, "status": "UNAVAILABLE",
-                            "error": "暂时无法获取支付二维码，请稍后查询该订单"}), 502
-        return jsonify({"id": order_id, "status": "PENDING"}), 201
+            return create_native(order, reconcile=True)
+        return create_native(order, success_status=201)
 
     @app.get("/api/shop/orders/<order_id>")
     def get_order(order_id):
@@ -340,14 +397,18 @@ def create_app(config=None, gateway=None):
             try:
                 order = sync_order(order)
             except PaymentError:
-                return error("支付状态暂时无法确认，请稍后重试", 502)
+                order = reload_order(order_id)
+                if order["status"] not in ("PAID", "REFUNDED", "CLOSED"):
+                    return jsonify({"error": "支付状态暂时无法确认，请稍后重试",
+                                    **retry_metadata(order)}), 502
+        order = reload_order(order_id)
         state = order["status"]
         if state in ("CREATING", "PENDING") and order["expires"] <= now:
             state = "EXPIRED"
         return jsonify({"id": order["id"], "sku": order["sku"], "amount": order["amount"],
                         "status": state, "expires": order["expires"],
                         "qr_available": bool(order["code_url"]),
-                        "name": CATALOG[order["sku"]][0]})
+                        "name": CATALOG[order["sku"]][0], **retry_metadata(order)})
 
     @app.get("/api/shop/orders/<order_id>/qr")
     def qr(order_id):
