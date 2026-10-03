@@ -2,13 +2,15 @@
   const header = document.getElementById('siteHeader');
   const menuButton = document.getElementById('menuButton');
   const navLinks = document.getElementById('navLinks');
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const banner = document.querySelector('.hero-art');
+  let scrollFrame = 0;
 
   function setMenu(open) {
     navLinks.classList.toggle('is-open', open);
     menuButton.setAttribute('aria-expanded', String(open));
-    menuButton.textContent = open ? '关闭' : '菜单';
+    menuButton.innerHTML = open ? '关闭 <span aria-hidden="true">−</span>' : '菜单 <span aria-hidden="true">＋</span>';
   }
-
   menuButton.addEventListener('click', () => setMenu(!navLinks.classList.contains('is-open')));
   navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenu(false)));
   document.addEventListener('keydown', event => {
@@ -22,152 +24,66 @@
   });
   matchMedia('(min-width: 761px)').addEventListener('change', () => setMenu(false));
 
-  function updateHeader() {
+  function updateScroll() {
+    scrollFrame = 0;
     header.classList.toggle('is-scrolled', scrollY > 8);
+    const width = document.documentElement.clientWidth;
+    const inset = width <= 760 ? 20 : Math.max(32, (width - 1240) / 2);
+    const progress = motion.matches ? 0 : Math.min(1, Math.max(0, scrollY / 440));
+    const eased = 1 - (1 - progress) ** 2;
+    // Clip a fixed-size stage so zooming cannot move the anchor targets below it.
+    banner.style.setProperty('--frame-x', `${inset * (1 - eased)}px`);
+    banner.style.setProperty('--frame-y', `${(width <= 760 ? 16 : 24) * (1 - eased)}px`);
+    banner.style.setProperty('--frame-radius', `${(width <= 760 ? 16 : 22) * (1 - eased)}px`);
+    banner.style.setProperty('--image-scale', String(1 + eased * .07));
+    banner.dataset.expansion = eased.toFixed(3);
   }
-  addEventListener('scroll', updateHeader, { passive: true });
-  updateHeader();
+  function scheduleScroll() {
+    if (!scrollFrame) scrollFrame = requestAnimationFrame(updateScroll);
+  }
+  addEventListener('scroll', scheduleScroll, { passive: true });
+  addEventListener('resize', scheduleScroll, { passive: true });
+  motion.addEventListener('change', updateScroll);
+  updateScroll();
 
+  try {
+    if (!sessionStorage.getItem('zhilin.oil-ui.seen') && !motion.matches) {
+      document.body.classList.add('first-visit');
+      sessionStorage.setItem('zhilin.oil-ui.seen', '1');
+    }
+  } catch { /* The page works when browser storage is unavailable. */ }
 
-  const sectionLinks = [...navLinks.querySelectorAll('a[href^="#"]')];
   if ('IntersectionObserver' in window) {
+    const sectionLinks = [...navLinks.querySelectorAll('a[href^="#"]')];
     const sections = sectionLinks.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        const link = sectionLinks.find(item => item.getAttribute('href') === '#' + entry.target.id);
-        if (!link) return;
-        if (entry.isIntersecting) link.setAttribute('aria-current', 'location');
+    const activeSections = new Map();
+    const sectionObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => activeSections.set(entry.target.id, entry.isIntersecting));
+      const active = sections.find(section => activeSections.get(section.id));
+      sectionLinks.forEach(link => {
+        if (active && link.hash === '#' + active.id) link.setAttribute('aria-current', 'location');
         else link.removeAttribute('aria-current');
       });
-    }, { rootMargin: '-25% 0px -60% 0px' });
-    sections.forEach(section => observer.observe(section));
-  }
-})();
+    }, { rootMargin: '-20% 0px -55% 0px' });
+    sections.forEach(section => sectionObserver.observe(section));
 
-(() => {
-  const motion = matchMedia('(prefers-reduced-motion: reduce)');
-  const title = document.getElementById('typedTitle');
-  let typingTimer;
-  if (!motion.matches) {
-    const text = title.textContent; title.textContent = ''; let i = 0;
-    const type = () => { title.textContent = text.slice(0, ++i); if (i < text.length) typingTimer = setTimeout(type, 110); };
-    typingTimer = setTimeout(type, 350);
-    motion.addEventListener('change', () => { clearTimeout(typingTimer); title.textContent = text; });
-  }
-  const reveal = new IntersectionObserver(entries => entries.forEach(e => {
-    if (e.isIntersecting) { e.target.classList.add('visible'); reveal.unobserve(e.target); }
-  }), {threshold:.08});
-  document.querySelectorAll('.section-heading,.service-card,.experience-list article,.product-card,.process-grid article,.about-copy,.contact-layout').forEach((el,i) => {
-    el.classList.add('reveal'); el.style.transitionDelay = `${(i % 3) * 65}ms`; reveal.observe(el);
-  });
-
-  const canvas = document.getElementById('heroCanvas'), ctx = canvas.getContext('2d');
-  const mask = document.createElement('canvas'), mc = mask.getContext('2d', {willReadFrequently:true});
-  let w=0,h=0,points=[],raf=0,visible=true,last=0;
-  const pointer={x:-1000,y:-1000};
-  function resize(){
-    const r=canvas.getBoundingClientRect(); w=r.width;h=r.height;
-    const dpr=Math.min(devicePixelRatio || 1,2);canvas.width=w*dpr;canvas.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
-    mask.width=Math.round(w);mask.height=Math.round(h);mc.font=`500 ${Math.min(w*.24,h*.7)}px Georgia`;mc.textAlign='center';mc.textBaseline='middle';mc.fillText('AI',w/2,h*.47);
-    const data=mc.getImageData(0,0,mask.width,mask.height).data;points=[];
-    for(let y=8;y<h-40;y+=7)for(let x=7;x<w;x+=7)points.push({x,y,letter:data[(Math.floor(y)*mask.width+Math.floor(x))*4+3]>80});
-    draw(0);
-  }
-  function draw(ms){
-    const t=motion.matches?0:ms*.00035;ctx.fillStyle='#e9eddf';ctx.fillRect(0,0,w,h);
-    for(const p of points){
-      const dx=p.x-pointer.x,dy=p.y-pointer.y,d=Math.hypot(dx,dy),force=motion.matches?0:Math.max(0,1-d/125);
-      const wave=Math.sin(p.x*.015+t*2+Math.sin(p.y*.018-t))*Math.cos(p.y*.022-t);
-      const x=p.x+(d?dx/d:0)*force*26,y=p.y+(d?dy/d:0)*force*26;
-      ctx.fillStyle=p.letter?'#385036':`rgba(100,127,75,${.12+(wave+1)*.19})`;
-      if(p.letter && !motion.matches && Math.sin(p.x*.12+p.y*.08+t*3)>.55){ctx.font='7px monospace';ctx.fillText('01AI'[(p.x+p.y)%4],x,y)}
-      else {ctx.beginPath();ctx.arc(x,y,p.letter?1.75:1+((wave+1)*.4),0,Math.PI*2);ctx.fill()}
+    if (!motion.matches) {
+      const reveal = new IntersectionObserver(entries => entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          reveal.unobserve(entry.target);
+        }
+      }), { threshold: .06 });
+      document.querySelectorAll('.section-heading, .service-card, .experience-intro, .experience-list article, .product-card, .process-grid article, .contact-layout').forEach(element => {
+        element.classList.add('reveal');
+        reveal.observe(element);
+      });
+      motion.addEventListener('change', () => {
+        if (motion.matches) {
+          reveal.disconnect();
+          document.querySelectorAll('.reveal').forEach(element => element.classList.add('visible'));
+        }
+      });
     }
-  }
-  function loop(ms){raf=0;if(!visible||document.hidden||motion.matches)return;if(ms-last>32){draw(ms);last=ms}raf=requestAnimationFrame(loop)}
-  function sync(){cancelAnimationFrame(raf);raf=0;if(motion.matches)draw(0);else if(visible&&!document.hidden)raf=requestAnimationFrame(loop)}
-  canvas.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();pointer.x=e.clientX-r.left;pointer.y=e.clientY-r.top},{passive:true});
-  canvas.addEventListener('pointerleave',()=>{pointer.x=pointer.y=-1000});
-  // The banner changes size while scrolling; redraw its particles once the
-  // visual resize settles so the scroll animation stays responsive.
-  let resizeTimer;
-  new ResizeObserver(() => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(resize, 120);
-  }).observe(canvas);
-  resize();
-  new IntersectionObserver(es=>{visible=es[0].isIntersecting;sync()}).observe(canvas);
-  document.addEventListener('visibilitychange',sync);motion.addEventListener('change',sync);
-
-  const banner = document.querySelector('.hero-art');
-  let expansion = 0, expansionTarget = 0, expansionFrame = 0;
-  function applyExpansion() {
-    const viewportWidth = document.documentElement.clientWidth;
-    const baseWidth = viewportWidth <= 560 ? viewportWidth - 32 : Math.min(viewportWidth - 64, 1240);
-    const baseHeight = viewportWidth <= 560 ? 270 : viewportWidth <= 900 ? 360 : 440;
-    const fullHeight = Math.max(baseHeight, innerHeight);
-    banner.style.width = `${baseWidth + (viewportWidth - baseWidth) * expansion}px`;
-    banner.style.height = `${baseHeight + (fullHeight - baseHeight) * expansion}px`;
-    banner.style.borderRadius = `${(viewportWidth <= 560 ? 16 : 24) * (1 - expansion)}px`;
-    banner.dataset.expansion = expansion.toFixed(3);
-  }
-  function stepExpansion() {
-    expansionFrame = 0;
-    expansion += (expansionTarget - expansion) * .22;
-    if (Math.abs(expansionTarget - expansion) < .001) expansion = expansionTarget;
-    applyExpansion();
-    if (expansion !== expansionTarget) expansionFrame = requestAnimationFrame(stepExpansion);
-  }
-  function updateExpansion() {
-    const fraction = Math.min(Math.max(scrollY / 480, 0), 1);
-    expansionTarget = motion.matches ? 0 : 1 - (1 - fraction) ** 2;
-    if (motion.matches) {
-      cancelAnimationFrame(expansionFrame);
-      expansionFrame = 0;
-      expansion = 0;
-      applyExpansion();
-    } else if (!expansionFrame) {
-      expansionFrame = requestAnimationFrame(stepExpansion);
-    }
-  }
-  addEventListener('scroll', updateExpansion, {passive:true});
-  addEventListener('resize', updateExpansion, {passive:true});
-  motion.addEventListener('change', updateExpansion);
-  updateExpansion();
-
-  // Expanding the banner changes document height, so anchor targets below it
-  // need their final layout before the browser calculates the scroll position.
-  function jumpToHash(hash) {
-    const target = document.getElementById(hash.slice(1));
-    if (!target) return false;
-    if (target.id === 'top') {
-      scrollTo({top:0,behavior:'instant'});
-      updateExpansion();
-      return true;
-    }
-    if (target.compareDocumentPosition(banner) & Node.DOCUMENT_POSITION_PRECEDING && !motion.matches) {
-      cancelAnimationFrame(expansionFrame);
-      expansionFrame = 0;
-      expansion = expansionTarget = 1;
-      applyExpansion();
-    }
-    target.scrollIntoView({behavior:'instant',block:'start'});
-    updateExpansion();
-    return true;
-  }
-  document.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener('click', event => {
-    const hash = link.getAttribute('href');
-    if (!hash || hash === '#' || !document.getElementById(hash.slice(1))) return;
-    event.preventDefault();
-    history.pushState(null, '', hash);
-    jumpToHash(hash);
-  }));
-  addEventListener('hashchange', () => jumpToHash(location.hash));
-  addEventListener('load', () => { if (location.hash) jumpToHash(location.hash); });
-
-  if(matchMedia('(pointer:fine)').matches){
-    const ring=document.createElement('div');ring.className='cursor-ring';ring.setAttribute('aria-hidden','true');document.body.append(ring);
-    document.addEventListener('pointermove',e=>{ring.style.opacity=motion.matches?'0':'1';ring.style.transform=`translate(${e.clientX-ring.offsetWidth/2}px,${e.clientY-ring.offsetHeight/2}px)`;ring.classList.toggle('over-link',Boolean(e.target.closest('a,button')))},{passive:true});
-    document.addEventListener('pointerleave',()=>{ring.style.opacity=0});
   }
 })();
