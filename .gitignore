@@ -7,3 +7,11 @@ node_modules/
 .venv/
 __pycache__/
 *.sqlite3*
+
+# Local content tooling and generated release files
+deployment/site/
+.local-tests/
+*.pyc
+*.tmp
+admin/vendor/*.tgz
+资源/内容与来源.json

@@ -1,0 +1,17 @@
+{
+  "id": "gpt-image-library",
+  "title": "GPT Image 生图合集",
+  "desc": "浏览人物、海报、产品展示、角色设定等类别的提示词案例。",
+  "type": "link-prompt",
+  "group": "community",
+  "tag": "生图灵感库",
+  "art": "image",
+  "source": "EvoLinkAI",
+  "url": "https://github.com/EvoLinkAI/awesome-gpt-image-2-API-and-Prompts",
+  "license": "CC0-1.0",
+  "licenseUrl": "https://github.com/EvoLinkAI/awesome-gpt-image-2-API-and-Prompts/blob/main/LICENSE",
+  "stars": 17285,
+  "body": "收录到这里的是原仓库入口与介绍。案例提示词和对应素材请以原仓库的逐项说明为准。我的 GitHub 也 Fork 过这个项目。",
+  "enabled": true,
+  "order": 8
+}

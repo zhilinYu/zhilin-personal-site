@@ -1,0 +1,13 @@
+{
+  "id": "disk-cleanup",
+  "title": "macOS 空间清理",
+  "desc": "先扫描占用与候选项，再按确认范围移入废纸篓。",
+  "type": "local-skill",
+  "group": "local",
+  "tag": "本地定制",
+  "art": "folder",
+  "source": "本地工作流",
+  "body": "先扫描占用与候选项，再按确认范围移入废纸篓。\n\n这项工具已在我的本地技能目录中使用；公开分发版本可联系我了解。",
+  "enabled": true,
+  "order": 16
+}

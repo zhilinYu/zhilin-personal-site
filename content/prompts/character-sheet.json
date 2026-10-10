@@ -1,0 +1,18 @@
+{
+  "id": "character-sheet",
+  "title": "角色设定与一致性",
+  "desc": "先固定角色身份、造型与材质，再写可复用的角色板和场景提示词。",
+  "type": "open-prompt",
+  "group": "community",
+  "tag": "生图 / 角色资产",
+  "art": "character",
+  "source": "zenstory-ai / Drama Skills",
+  "url": "https://github.com/zenstory-ai/drama-skills/tree/main/skills/short-drama-image-prompts",
+  "license": "MIT",
+  "licenseUrl": "https://github.com/zenstory-ai/drama-skills/blob/main/LICENSE",
+  "stars": 2620,
+  "prompt": "请依据我给出的角色资料编写一套可复制的角色设定图提示词。\n按以下顺序描述：主体身份 → 当前造型 → 构图与视角 → 光线与材质 → 背景边界 → 禁止项。\n固定发型、五官、服装、配饰和颜色等识别锚点；状态变化只修改被允许变化的部分。\n三视图必须对应同一角色，明确正面、侧面、背面。\n不添加资料中没有的角色、文字、Logo 或道具；不把提示词当成已经生成的图片。\n\n角色资料与用途：\n[粘贴内容]",
+  "body": "依据 Drama Skills 的资产提示词方法整理；这是改写版本。",
+  "enabled": true,
+  "order": 7
+}

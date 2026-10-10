@@ -1,0 +1,13 @@
+{
+  "story": "<div class=\"story-art\"><i></i><i></i><i></i><b>01</b><b>02</b><b>03</b></div>",
+  "character": "<div class=\"story-art\"><i></i><i></i><i></i><b>01</b><b>02</b><b>03</b></div>",
+  "image": "<div class=\"paper-art\"><span>Create.</span><i></i><i></i><i></i></div>",
+  "banana": "<div class=\"paper-art\"><span>Color.</span><i></i><i></i><i></i></div>",
+  "comic": "<div class=\"story-art\"><i></i><i></i><i></i><b>01</b><b>02</b><b>03</b></div>",
+  "bookmark": "<div class=\"paper-art\"><span>Save.</span><i></i><i></i><i></i></div>",
+  "chart": "<svg viewBox=\"0 0 240 160\" fill=\"none\"><path d=\"M20 120H225M20 80H225M20 40H225\" stroke=\"currentColor\" opacity=\".12\"/><path class=\"chart-line\" d=\"M20 115L54 92 80 105 111 66 142 81 183 31 222 44\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"183\" cy=\"31\" r=\"8\" fill=\"var(--sage)\"/></svg>",
+  "browser": "<div class=\"flow-art\"><span></span><span></span><span></span><i>↗</i></div>",
+  "note": "<div class=\"paper-art\"><span>Read.</span><i></i><i></i><i></i></div>",
+  "folder": "<div class=\"paper-art\"><span>Clean.</span><i></i><i></i><i></i></div>",
+  "flow": "<div class=\"flow-art\"><span></span><span></span><span></span><i>↗</i></div>"
+}

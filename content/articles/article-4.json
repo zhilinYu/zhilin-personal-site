@@ -1,0 +1,11 @@
+{
+  "id": "article-4",
+  "title": "能落地，才算好方案",
+  "desc": "真实业务约束、工程协作与长期维护，决定方案是否有用。",
+  "tag": "ENGINEERING",
+  "type": "article",
+  "art": "note",
+  "body": "10 余年企业级 Web 研发经历，参与过工业 AI、金融科技与低代码平台项目。\n\n我会先讨论真实业务目标，再决定模型、流程和工程架构该怎样配合。",
+  "enabled": true,
+  "order": 34
+}

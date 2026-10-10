@@ -1,0 +1,18 @@
+{
+  "id": "storyboard",
+  "title": "AI 漫剧分镜",
+  "desc": "把剧本拆成镜头表，并保持动作、场景与角色状态连贯。",
+  "type": "open-prompt",
+  "group": "community",
+  "tag": "漫剧创作",
+  "art": "story",
+  "source": "zenstory-ai / Drama Skills",
+  "url": "https://github.com/zenstory-ai/drama-skills/tree/main/skills/short-drama-storyboard",
+  "license": "MIT",
+  "licenseUrl": "https://github.com/zenstory-ai/drama-skills/blob/main/LICENSE",
+  "stars": 2620,
+  "prompt": "请根据我提供的短剧剧本和角色设定，编制逐镜分镜表。\n每镜包含：剧情职责、时长、景别、机位、运镜、起点、唯一主要动作、终点、对白或声音。\n明确人物位置、视线、持物与进出场方向，保持相邻镜头连续。\n为每镜写起始关键帧生图提示词；只描写镜头起点，不提前画出结束状态。\n遇到缺失的角色、场景或时长事实，先列出缺口，不编造。\n\n我的剧本与设定：\n[粘贴内容]",
+  "body": "依据 Drama Skills 的分镜方法整理为通用中文模板；这是改写版本。",
+  "enabled": true,
+  "order": 6
+}

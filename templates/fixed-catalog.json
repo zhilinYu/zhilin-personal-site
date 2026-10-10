@@ -1,0 +1,92 @@
+[
+  {
+    "id": "blue-tuanzi",
+    "title": "蓝团子",
+    "desc": "接入微信的 AI 私人助理：交流、记忆与定时任务，放在日常使用的入口里。",
+    "type": "product",
+    "image": "assets/blue-tuanzi.png",
+    "tag": "AI PRIVATE ASSISTANT",
+    "detail": "每位用户使用专属助理运行时，微信承载实际聊天。小程序管理服务、接入微信、定时任务与账号设置。\n\n可联系我了解产品与体验方式。"
+  },
+  {
+    "id": "zinhua-miniapp",
+    "title": "三张牌好友局",
+    "desc": "和朋友创建房间、邀请入局，在小程序里体验多人实时对局。",
+    "type": "product",
+    "art": "game",
+    "tag": "ZINHUA MINIAPP",
+    "detail": "微信原生小程序，采用服务端权威判定与实时房间同步。包含房间管理、实时发牌、状态同步、积分排名与断线重连。\n\n积分仅用于娱乐记分，不具备兑现、交易或提现功能。"
+  },
+  {
+    "id": "app-development",
+    "title": "AI 应用开发",
+    "desc": "从需求和原型开始，把模型、交互与业务功能做成可运行的应用。",
+    "type": "service",
+    "tag": "项目制 · 按需求报价",
+    "art": "app",
+    "detail": "应用原型、前后端开发、AI 能力集成、部署与交付说明。"
+  },
+  {
+    "id": "ai-consulting",
+    "title": "AI 咨询",
+    "desc": "梳理适合你的 AI 应用方向，确认技术路线、投入与落地顺序。",
+    "type": "service",
+    "tag": "专题咨询 · 按需求报价",
+    "art": "consult",
+    "detail": "围绕业务目标讨论可行性、实现范围、风险与验收方式。"
+  },
+  {
+    "id": "workflow-building",
+    "title": "工作流搭建",
+    "desc": "把信息采集、内容处理与业务动作连起来，让重复工作顺畅运行。",
+    "type": "service",
+    "tag": "工作流设计 · 按需求报价",
+    "art": "flow",
+    "detail": "确定输入、处理步骤、工具连接、输出和异常恢复方式。"
+  },
+  {
+    "id": "one-on-one",
+    "title": "一对一交流咨询",
+    "desc": "带着一个具体问题来，聊 AI、开发、设计或产品实践。",
+    "type": "service",
+    "tag": "语音 / 视频 · 预约沟通",
+    "art": "chat",
+    "detail": "说明希望讨论的议题与背景，按实际议题确认交流安排。"
+  },
+  {
+    "id": "qa-community",
+    "title": "交流答疑群",
+    "desc": "围绕 AI 工具、产品、自媒体和求职，把问题带进持续交流。",
+    "type": "service",
+    "tag": "付费交流 · 联系了解",
+    "art": "chat",
+    "detail": "适合希望持续讨论实践问题的朋友。交流安排与费用请邮件咨询。"
+  },
+  {
+    "id": "deep-community",
+    "title": "灵机共创社群",
+    "desc": "和开发者、创作者与产品实践者深入交流，讨论作品与合作。",
+    "type": "service",
+    "tag": "深度交流 · 联系了解",
+    "art": "community",
+    "detail": "讨论独立开发、AI 产品、创作流程与长期协作。参与方式与费用请邮件咨询。"
+  },
+  {
+    "id": "sharing",
+    "title": "直播 / 线下分享",
+    "desc": "围绕 AI 应用、工具与内容创作，做一场有主题的交流。",
+    "type": "service",
+    "tag": "分享邀约 · 邮件联系",
+    "art": "mic",
+    "detail": "欢迎提出分享主题、受众、时间与活动形式。"
+  },
+  {
+    "id": "submissions",
+    "title": "作品投稿",
+    "desc": "把认真完成的 AI 产品、应用或创作项目发来，一起看看。",
+    "type": "service",
+    "tag": "免费投稿 · 邮件联系",
+    "art": "submit",
+    "detail": "请提供作品链接、简介与作者署名信息。提交后由我阅读与确认交流方式。"
+  }
+]

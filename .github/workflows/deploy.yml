@@ -8,11 +8,34 @@ concurrency:
   group: zhilin-production
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Build current static content
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm test
+          node tools/export.mjs
+
+      - name: Determine payment deployment scope
+        id: changes
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: node tools/deployment-scope.mjs "$BEFORE_SHA" "$HEAD_SHA" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-python@v5
         with:
@@ -49,6 +72,7 @@ jobs:
               --rollback-sha '${{ github.event.before }}'
 
       - name: Deploy Payment Service
+        if: steps.changes.outputs.payment == 'true'
         uses: appleboy/scp-action@v0.1.7
         with:
           host: 106.75.250.138
@@ -59,6 +83,7 @@ jobs:
           strip_components: 0
 
       - name: Restart Payment Service
+        if: steps.changes.outputs.payment == 'true'
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: 106.75.250.138
@@ -83,9 +108,9 @@ jobs:
           host: 106.75.250.138
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "index.html,photo.png,resume,assets"
+          source: "deployment/site/*"
           target: "/usr/share/nginx/html/"
-          strip_components: 0
+          strip_components: 2
 
       - name: Reload Nginx
         uses: appleboy/ssh-action@v1.2.2

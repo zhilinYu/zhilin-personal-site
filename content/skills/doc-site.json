@@ -1,0 +1,13 @@
+{
+  "id": "doc-site",
+  "title": "单文件文档站",
+  "desc": "把长教程整理成可离线打开、可检索的单页文档。",
+  "type": "local-skill",
+  "group": "local",
+  "tag": "本地定制",
+  "art": "note",
+  "source": "本地工作流",
+  "body": "把长教程整理成可离线打开、可检索的单页文档。\n\n这项工具已在我的本地技能目录中使用；公开分发版本可联系我了解。",
+  "enabled": true,
+  "order": 15
+}

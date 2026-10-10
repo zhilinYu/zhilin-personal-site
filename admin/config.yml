@@ -1,0 +1,510 @@
+{
+  "backend": {
+    "name": "github",
+    "repo": "zhilinYu/zhilin-personal-site",
+    "branch": "main",
+    "base_url": "https://zhilin.club",
+    "auth_endpoint": "cms/auth",
+    "squash_merges": true
+  },
+  "local_backend": {
+    "url": "http://127.0.0.1:8081/api/v1"
+  },
+  "publish_mode": "editorial_workflow",
+  "locale": "zh_Hans",
+  "site_url": "https://zhilin.club",
+  "display_url": "https://zhilin.club",
+  "logo_url": "/assets/blue-tuanzi.png",
+  "media_folder": "assets/uploads",
+  "public_folder": "/assets/uploads",
+  "collections": [
+    {
+      "name": "articles",
+      "label": "文章",
+      "folder": "content/articles",
+      "format": "json",
+      "extension": "json",
+      "create": true,
+      "delete": true,
+      "identifier_field": "id",
+      "slug": "{{id}}",
+      "summary": "{{title}} · {{id}}",
+      "sortable_fields": [
+        "order",
+        "title"
+      ],
+      "fields": [
+        {
+          "name": "type",
+          "label": "内容类型",
+          "widget": "hidden",
+          "default": "article"
+        },
+        {
+          "name": "id",
+          "label": "固定 ID（小写字母、数字、短横线；保存后请勿修改）",
+          "widget": "string",
+          "pattern": [
+            "^[a-z0-9][a-z0-9-]{0,79}$",
+            "请输入稳定的英文 ID，如 my-first-article"
+          ]
+        },
+        {
+          "name": "title",
+          "label": "标题",
+          "widget": "string"
+        },
+        {
+          "name": "desc",
+          "label": "摘要",
+          "widget": "text"
+        },
+        {
+          "name": "tag",
+          "label": "卡片标签",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "image",
+          "label": "封面（公开图片，不超过 2 MiB）",
+          "widget": "image",
+          "required": false,
+          "media_library": {
+            "config": {
+              "max_file_size": 2097152
+            }
+          },
+          "choose_url": false
+        },
+        {
+          "name": "date",
+          "label": "日期",
+          "widget": "datetime",
+          "required": false,
+          "date_format": "YYYY-MM-DD",
+          "time_format": false,
+          "format": "YYYY-MM-DD"
+        },
+        {
+          "name": "tags",
+          "label": "标签",
+          "widget": "list",
+          "required": false
+        },
+        {
+          "name": "order",
+          "label": "排序（数字越小越靠前）",
+          "widget": "number",
+          "value_type": "int",
+          "default": 100,
+          "min": -100000,
+          "max": 100000
+        },
+        {
+          "name": "enabled",
+          "label": "在网站公开展示",
+          "widget": "boolean",
+          "default": false
+        },
+        {
+          "name": "source",
+          "label": "作者／来源",
+          "widget": "string",
+          "required": false,
+          "default": "志林整理"
+        },
+        {
+          "name": "url",
+          "label": "来源或 GitHub 链接（HTTPS）",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "license",
+          "label": "许可证名称",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "licenseUrl",
+          "label": "许可证链接（HTTPS）",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "body",
+          "label": "正文／使用说明（Markdown）",
+          "widget": "markdown",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "prompts",
+      "label": "提示词",
+      "folder": "content/prompts",
+      "format": "json",
+      "extension": "json",
+      "create": true,
+      "delete": true,
+      "identifier_field": "id",
+      "slug": "{{id}}",
+      "summary": "{{title}} · {{id}}",
+      "sortable_fields": [
+        "order",
+        "title"
+      ],
+      "fields": [
+        {
+          "name": "type",
+          "label": "内容类型",
+          "widget": "select",
+          "options": [
+            {
+              "label": "免费全文",
+              "value": "open-prompt"
+            },
+            {
+              "label": "收费公开介绍",
+              "value": "paid-prompt"
+            },
+            {
+              "label": "开源提示词链接",
+              "value": "link-prompt"
+            }
+          ],
+          "default": "open-prompt"
+        },
+        {
+          "name": "id",
+          "label": "固定 ID（小写字母、数字、短横线；保存后请勿修改）",
+          "widget": "string",
+          "pattern": [
+            "^[a-z0-9][a-z0-9-]{0,79}$",
+            "请输入稳定的英文 ID，如 my-first-article"
+          ]
+        },
+        {
+          "name": "title",
+          "label": "标题",
+          "widget": "string"
+        },
+        {
+          "name": "desc",
+          "label": "摘要",
+          "widget": "text"
+        },
+        {
+          "name": "tag",
+          "label": "卡片标签",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "image",
+          "label": "封面（公开图片，不超过 2 MiB）",
+          "widget": "image",
+          "required": false,
+          "media_library": {
+            "config": {
+              "max_file_size": 2097152
+            }
+          },
+          "choose_url": false
+        },
+        {
+          "name": "date",
+          "label": "日期",
+          "widget": "datetime",
+          "required": false,
+          "date_format": "YYYY-MM-DD",
+          "time_format": false,
+          "format": "YYYY-MM-DD"
+        },
+        {
+          "name": "tags",
+          "label": "标签",
+          "widget": "list",
+          "required": false
+        },
+        {
+          "name": "order",
+          "label": "排序（数字越小越靠前）",
+          "widget": "number",
+          "value_type": "int",
+          "default": 100,
+          "min": -100000,
+          "max": 100000
+        },
+        {
+          "name": "enabled",
+          "label": "在网站公开展示",
+          "widget": "boolean",
+          "default": false
+        },
+        {
+          "name": "source",
+          "label": "作者／来源",
+          "widget": "string",
+          "required": false,
+          "default": "志林整理"
+        },
+        {
+          "name": "url",
+          "label": "来源或 GitHub 链接（HTTPS）",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "license",
+          "label": "许可证名称",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "licenseUrl",
+          "label": "许可证链接（HTTPS）",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "group",
+          "label": "栏目分类",
+          "widget": "select",
+          "options": [
+            {
+              "label": "AI 选股研究",
+              "value": "stock"
+            },
+            {
+              "label": "创作与生图",
+              "value": "community"
+            }
+          ],
+          "default": "stock"
+        },
+        {
+          "name": "body",
+          "label": "正文／使用说明（Markdown）",
+          "widget": "markdown",
+          "required": false
+        },
+        {
+          "name": "prompt",
+          "label": "免费提示词全文（收费条目必须留空）",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "price",
+          "label": "公开价格（绑定支付时必须与既有价格一致，不能在此改收款金额）",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "sku",
+          "label": "既有支付商品（已绑定的不可改绑；新条目可留空咨询）",
+          "widget": "select",
+          "required": false,
+          "options": [
+            {
+              "label": "量化风控 · ¥9.9",
+              "value": "quant-risk"
+            },
+            {
+              "label": "趋势龙头 · ¥9.9",
+              "value": "trend-leader"
+            },
+            {
+              "label": "游资弹性 · ¥9.9",
+              "value": "hot-money"
+            },
+            {
+              "label": "逆势抗跌 · ¥9.9",
+              "value": "countertrend"
+            },
+            {
+              "label": "涨停回吐 · ¥9.9",
+              "value": "limit-up-pullback"
+            },
+            {
+              "label": "全套研究提示词 · ¥39.9",
+              "value": "research-bundle"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "skills",
+      "label": "Skills",
+      "folder": "content/skills",
+      "format": "json",
+      "extension": "json",
+      "create": true,
+      "delete": true,
+      "identifier_field": "id",
+      "slug": "{{id}}",
+      "summary": "{{title}} · {{id}}",
+      "sortable_fields": [
+        "order",
+        "title"
+      ],
+      "fields": [
+        {
+          "name": "type",
+          "label": "内容类型",
+          "widget": "select",
+          "options": [
+            {
+              "label": "公开 Skill",
+              "value": "skill"
+            },
+            {
+              "label": "本地定制 Skill",
+              "value": "local-skill"
+            }
+          ],
+          "default": "skill"
+        },
+        {
+          "name": "id",
+          "label": "固定 ID（小写字母、数字、短横线；保存后请勿修改）",
+          "widget": "string",
+          "pattern": [
+            "^[a-z0-9][a-z0-9-]{0,79}$",
+            "请输入稳定的英文 ID，如 my-first-article"
+          ]
+        },
+        {
+          "name": "title",
+          "label": "标题",
+          "widget": "string"
+        },
+        {
+          "name": "desc",
+          "label": "摘要",
+          "widget": "text"
+        },
+        {
+          "name": "tag",
+          "label": "卡片标签",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "image",
+          "label": "封面（公开图片，不超过 2 MiB）",
+          "widget": "image",
+          "required": false,
+          "media_library": {
+            "config": {
+              "max_file_size": 2097152
+            }
+          },
+          "choose_url": false
+        },
+        {
+          "name": "date",
+          "label": "日期",
+          "widget": "datetime",
+          "required": false,
+          "date_format": "YYYY-MM-DD",
+          "time_format": false,
+          "format": "YYYY-MM-DD"
+        },
+        {
+          "name": "tags",
+          "label": "标签",
+          "widget": "list",
+          "required": false
+        },
+        {
+          "name": "order",
+          "label": "排序（数字越小越靠前）",
+          "widget": "number",
+          "value_type": "int",
+          "default": 100,
+          "min": -100000,
+          "max": 100000
+        },
+        {
+          "name": "enabled",
+          "label": "在网站公开展示",
+          "widget": "boolean",
+          "default": false
+        },
+        {
+          "name": "source",
+          "label": "作者／来源",
+          "widget": "string",
+          "required": false,
+          "default": "志林整理"
+        },
+        {
+          "name": "url",
+          "label": "来源或 GitHub 链接（HTTPS）",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "license",
+          "label": "许可证名称",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "licenseUrl",
+          "label": "许可证链接（HTTPS）",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "group",
+          "label": "栏目分类",
+          "widget": "select",
+          "options": [
+            {
+              "label": "我的开源",
+              "value": "own"
+            },
+            {
+              "label": "本地定制",
+              "value": "local"
+            },
+            {
+              "label": "开源社区",
+              "value": "external"
+            }
+          ],
+          "default": "own"
+        },
+        {
+          "name": "body",
+          "label": "正文／使用说明（Markdown）",
+          "widget": "markdown",
+          "required": false
+        },
+        {
+          "name": "version",
+          "label": "版本",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "attachment",
+          "label": "公开 Skill ZIP（不超过 10 MiB）",
+          "widget": "file",
+          "required": false,
+          "choose_url": false,
+          "media_library": {
+            "config": {
+              "max_file_size": 10485760
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -21,7 +21,7 @@ AppID、订单号、金额、币种、交易类型和交易号。
 
 ```sh
 python3 payment/package_products.py \
-  --source '/Users/apple/Documents/股票大师/AI选股提示词' \
+  --source '/path/to/private-prompt-source' \
   --destination .local/products
 ```
 
