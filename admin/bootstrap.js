@@ -12,7 +12,7 @@
    if(data.get('type')==='paid-prompt'&&(data.get('prompt')?.trim()||data.get('attachment')))throw Error('收费条目只能保存公开介绍，请清空全文和附件。');
    return data;
   }});
-  message.textContent=local?'本地编辑：保存写入本机。开启“公开展示”后生成预览；正式 GitHub 草稿流程上线后启用。':'GitHub 内容管理：保存草稿后可预览，再点击发布。上线结果请查看发布任务。';
+  message.textContent=local?'本地编辑：保存写入本机。开启“公开展示”后生成预览；正式 GitHub 草稿流程上线后启用。':'GitHub 内容管理：保存草稿 → 预览 → 状态设为“就绪” → 发布；网站更新结果请查看发布任务。';
   if(local){
    const update=async()=>{try{const r=await fetch('/__build/status',{cache:'no-store'});if(!r.ok)return;const state=await r.json();hint.dataset.error=String(!state.ok);message.textContent=state.ok?'本地模式：预览正常。编辑后点击发布写入本机；未开启“公开展示”的内容保持隐藏。':'预览生成失败，旧页面已保留：'+state.error;}catch{message.textContent='本地服务已停止，重新启动后即可继续编辑。';}};
    await update();setInterval(update,2500);
