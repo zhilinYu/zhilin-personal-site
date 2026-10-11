@@ -8,6 +8,7 @@ test('后台三类集合使用真实 JSON 文件，公开上传有限制',()=>{
   const filename=path.join(root,'admin/config.yml');assert.ok(fs.existsSync(filename),'后台配置必须存在');
   const config=JSON.parse(fs.readFileSync(filename));assert.deepEqual(config.collections.map(x=>x.name),['articles','prompts','skills']);
   assert.equal(config.backend.name,'github');assert.equal(config.backend.repo,'zhilinYu/zhilin-personal-site');assert.equal(config.publish_mode,'editorial_workflow');
+  assert.equal(config.backend.auth_scope,'public_repo');
   for(const collection of config.collections){assert.equal(collection.format,'json');assert.equal(collection.identifier_field,'id');assert.equal(collection.folder,'content/'+collection.name);assert.ok(collection.fields.some(x=>x.name==='enabled'&&x.default===false));}
   const skill=config.collections[2];assert.equal(skill.fields.find(x=>x.name==='attachment').media_library.config.max_file_size,10*1024*1024);
   assert.equal(skill.fields.find(x=>x.name==='image').media_library.config.max_file_size,2*1024*1024);

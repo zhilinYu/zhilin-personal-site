@@ -24,7 +24,7 @@ export function createOAuthServer({origin,clientId,clientSecret,allowedLogin,rep
    if(states.size>=500){fail(429,'授权请求过多，请稍后重试');return;}
    const state=crypto.randomBytes(32).toString('hex'),session=crypto.randomBytes(32).toString('hex');
    states.set(state,{session,created:now()});res.setHeader('Set-Cookie',`__Host-cms_session=${session}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600`);
-   const authorize=new URL('https://github.com/login/oauth/authorize');for(const [k,v] of Object.entries({client_id:clientId,redirect_uri:callback,state,scope:'repo'}))authorize.searchParams.set(k,v);
+   const authorize=new URL('https://github.com/login/oauth/authorize');for(const [k,v] of Object.entries({client_id:clientId,redirect_uri:callback,state,scope:'public_repo'}))authorize.searchParams.set(k,v);
    res.writeHead(302,{Location:authorize.toString()});res.end();return;
   }
   if(url.pathname!=='/cms/callback'){fail(404,'未找到');return;}

@@ -18,6 +18,7 @@ async function setup(t,override={}) {
 }
 test('有效授权只将令牌发给固定站点，state 一次性使用',async t=>{
  const api=await setup(t);const auth=await api.begin();assert.equal(auth.response.status,302);
+ assert.equal(auth.url.searchParams.get('scope'),'public_repo');
  assert.equal(auth.url.searchParams.get('redirect_uri'),'https://zhilin.club/cms/callback');assert.match(auth.response.headers.get('set-cookie'),/HttpOnly.*Secure.*SameSite=Lax/);
  const r=await api.callback(auth);assert.equal(r.status,200);const body=await r.text();assert.match(body,/authentication:github:success/);assert.match(body,/https:\/\/zhilin.club/);assert.doesNotMatch(body,/evil\.example|postMessage\([^)]*,\s*["']\*["']/);
  assert.ok(r.headers.get('content-security-policy').includes("default-src 'none'"));assert.equal(r.headers.get('cache-control'),'no-store');
