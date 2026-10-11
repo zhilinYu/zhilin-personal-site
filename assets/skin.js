@@ -34,7 +34,9 @@ document.querySelectorAll('[data-open]').forEach(button=>button.addEventListener
  source.querySelector('span').textContent=item.source+(item.license?' · '+item.license:'')+(item.stars?' · ★ '+item.stars.toLocaleString():'');
  const origin=source.querySelector('.origin-link'),license=source.querySelector('.license-link');
  origin.href=item.url||'#';license.href=item.licenseUrl||'#';license.hidden=!item.licenseUrl;
- const action=dialog.querySelector('.dialog-action');action.hidden=['article','skill','link-prompt'].includes(item.type);action.textContent=item.type==='product'?'咨询体验 ↗':item.type==='service'?'聊聊这个需求 ↗':'联系志林 ↗';action.href='mailto:yuzhilinvip@163.com?subject='+encodeURIComponent('咨询：'+item.title);
+ const action=dialog.querySelector('.dialog-action');action.hidden=!!item.sku||['article','skill','link-prompt'].includes(item.type);action.textContent=item.type==='product'?'咨询体验 ↗':item.type==='service'?'聊聊这个需求 ↗':'联系志林 ↗';action.href='mailto:yuzhilinvip@163.com?subject='+encodeURIComponent('咨询：'+item.title);
+ const buy=dialog.querySelector('#detailBuy');buy.hidden=!item.sku;buy.dataset.buySku=item.sku||'';
+ buy.disabled=!window.ZhilinCheckout?.available;buy.textContent=buy.disabled?'购买暂未开放':'微信扫码购买';
  dialog.querySelector('.dialog-status').textContent='';dialog.showModal();
 }));
 dialog.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());

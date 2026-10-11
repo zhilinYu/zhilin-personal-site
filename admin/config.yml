@@ -299,9 +299,41 @@
         },
         {
           "name": "price",
-          "label": "公开价格",
+          "label": "公开价格（绑定支付时必须与既有价格一致，不能在此改收款金额）",
           "widget": "string",
           "required": false
+        },
+        {
+          "name": "sku",
+          "label": "既有支付商品（已绑定的不可改绑；新条目可留空咨询）",
+          "widget": "select",
+          "required": false,
+          "options": [
+            {
+              "label": "量化风控 · ¥9.9",
+              "value": "quant-risk"
+            },
+            {
+              "label": "趋势龙头 · ¥9.9",
+              "value": "trend-leader"
+            },
+            {
+              "label": "游资弹性 · ¥9.9",
+              "value": "hot-money"
+            },
+            {
+              "label": "逆势抗跌 · ¥9.9",
+              "value": "countertrend"
+            },
+            {
+              "label": "涨停回吐 · ¥9.9",
+              "value": "limit-up-pullback"
+            },
+            {
+              "label": "全套研究提示词 · ¥39.9",
+              "value": "research-bundle"
+            }
+          ]
         }
       ]
     },

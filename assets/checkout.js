@@ -9,7 +9,10 @@
   const refresh = document.getElementById('checkoutRefresh');
   const historyList = document.getElementById('purchaseList');
   const storageKey = 'zhilin.purchases.v1';
-  let active = null, timer = 0, qrUrl = '', generation = 0, pollSequence = 0, downloading = false;
+  const catalog = new Map(JSON.parse(document.getElementById('shop-catalog').textContent).map(item => [item.sku, item]));
+  const detail = document.getElementById('detail');
+  const checkoutState = window.ZhilinCheckout = { available: false };
+  let active = null, timer = 0, qrUrl = '', generation = 0, pollSequence = 0, downloading = false, buying = false;
 
   function purchases() {
     try {
@@ -41,21 +44,18 @@
     if (!response.ok) {
       const data = await response.json().catch(() => ({}));
       const error = new Error(data.error || '连接暂时不可用，请稍后重试');
-      error.data = data;
+      error.data = data; error.status = response.status;
       throw error;
     }
     return response;
   }
   function headers(order) { return { Authorization: 'Bearer ' + order.token }; }
-  function skuCard(sku) {
-    return [...document.querySelectorAll('.product-card')].find(card => card.dataset.sku === sku);
-  }
   function open(order) {
     stop();
     active = order;
-    const card = skuCard(order.sku);
-    title.textContent = card ? card.querySelector('h3').textContent : '我的购买';
-    price.textContent = order.sku === 'research-bundle' ? '¥39.9' : '¥9.9';
+    const item = catalog.get(order.sku);
+    title.textContent = item ? item.title : '我的购买';
+    price.textContent = item ? '¥' + (item.amount / 100).toFixed(1) : '';
     orderNumber.textContent = order.id ? '订单号：' + order.id : '';
     historyList.hidden = true;
     download.hidden = true;
@@ -78,6 +78,8 @@
     try {
       const data = await (await api('orders/' + order.id, { headers: headers(order) })).json();
       if (current !== generation || sequence !== pollSequence || !dialog.open) return;
+      order.status = data.status;
+      try { remember(order); } catch { /* Existing order remains usable in this open window. */ }
       orderNumber.textContent = '订单号：' + order.id;
       showRefresh(order, data);
       download.hidden = data.status !== 'PAID';
@@ -107,21 +109,25 @@
     if (current === generation && sequence === pollSequence && dialog.open) timer = setTimeout(() => poll(current), 5000);
   }
   async function buy(sku) {
-    let order = purchases().reverse().find(x => x.sku === sku && (!x.id || x.created > Date.now() - 15 * 60 * 1000));
-    if (!order) {
-      const bytes = crypto.getRandomValues(new Uint8Array(32));
-      order = { sku, token: [...bytes].map(b => b.toString(16).padStart(2, '0')).join(''), created: Date.now() };
-    }
-    // Persist before payment begins so a lost response can be recovered.
-    try { remember(order); } catch {
+    if (buying || !checkoutState.available || !catalog.get(sku)?.sellable) return;
+    buying = true;
+    try {
+      let order = purchases().reverse().find(x => x.sku === sku && !['REFUNDED','CLOSED','EXPIRED'].includes(x.status) && (!x.id || x.created > Date.now() - 15 * 60 * 1000));
+      if (!order) {
+        const bytes = crypto.getRandomValues(new Uint8Array(32));
+        order = { sku, token: [...bytes].map(b => b.toString(16).padStart(2, '0')).join(''), created: Date.now() };
+      }
+      // Persist before payment begins so a lost response can be recovered.
+      try { remember(order); } catch {
+        open(order);
+        showStatus('浏览器无法保存购买记录。请允许本站使用本地存储后再购买。');
+        return;
+      }
       open(order);
-      showStatus('浏览器无法保存购买记录。请允许本站使用本地存储后再购买。');
-      return;
-    }
-    open(order);
-    const current = generation;
-    if (!order.id && !await prepareOrder(order, current)) return;
-    if (current === generation) poll(current);
+      const current = generation;
+      if (!order.id && !await prepareOrder(order, current)) return;
+      if (current === generation) poll(current);
+    } finally { buying = false; }
   }
   async function prepareOrder(order, current) {
     showStatus(order.id ? '正在重新获取付款二维码…' : '正在创建付款订单…');
@@ -132,12 +138,15 @@
         body: JSON.stringify({ sku: order.sku }),
       })).json();
       order.id = data.id;
+      order.status = data.status;
       order.retryable = data.retryable === true;
       remember(order);
       return true;
     } catch (error) {
       if (error.data && error.data.id) {
-        order.id = error.data.id; remember(order);
+        order.id = error.data.id;
+        if (error.status === 410) order.status = 'EXPIRED';
+        remember(order);
       }
       if (current !== generation || !dialog.open) return false;
       showStatus(error.message);
@@ -150,7 +159,13 @@
     }
   }
   document.getElementById('checkoutClose').addEventListener('click', () => dialog.close());
-  dialog.addEventListener('close', stop);
+  dialog.addEventListener('close', () => {
+    stop(); active = null;
+    document.getElementById('myPurchases').focus({ preventScroll: true });
+  });
+  // Invalidate requests before browser return navigation or page teardown.
+  window.addEventListener('popstate', () => { if (dialog.open) dialog.close(); });
+  window.addEventListener('pagehide', stop);
   refresh.addEventListener('click', async () => {
     if (refresh.disabled) return;
     if (active && (!active.id || active.retryable)) {
@@ -167,15 +182,20 @@
     downloading = true; download.disabled = true;
     try {
       const response = await api('orders/' + order.id + '/download', { headers: headers(order) });
-      const blobUrl = URL.createObjectURL(await response.blob());
+      const blob = await response.blob();
+      if (current !== generation || !dialog.open || active !== order) return;
+      const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = blobUrl;
-      link.download = (skuCard(order.sku)?.querySelector('h3').textContent || '研究提示词') + '.zip';
+      link.download = (catalog.get(order.sku)?.title || '研究提示词') + '.zip';
       document.body.append(link); link.click(); link.remove();
       setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
       if (current === generation && dialog.open) showStatus('下载已开始。可在“我的购买”中重新领取。');
     } catch (error) {
-      if (current === generation && dialog.open) showStatus(error.message);
+      if (current === generation && dialog.open) {
+        showStatus(error.message);
+        if (error.status === 403) { download.hidden = true; poll(current); }
+      }
     }
     finally { downloading = false; download.disabled = false; }
   });
@@ -191,7 +211,7 @@
     for (const order of list) {
       const button = document.createElement('button');
       button.type = 'button'; button.className = 'purchase-row';
-      const name = skuCard(order.sku)?.querySelector('h3').textContent || '研究提示词';
+      const name = catalog.get(order.sku)?.title || '研究提示词';
       button.textContent = name + ' · ' + (order.id || '未完成订单');
       button.addEventListener('click', () => buyExisting(order));
       historyList.append(button);
@@ -204,15 +224,21 @@
     if (!order.id && !await prepareOrder(order, current)) return;
     if (current === generation) poll(current);
   }
-  document.querySelectorAll('.product-card').forEach(card => {
-    card.querySelector('.product-bottom button').addEventListener('click', () => buy(card.dataset.sku));
+  document.querySelectorAll('[data-buy-sku]').forEach(button => {
+    button.addEventListener('click', () => {
+      const sku = button.dataset.buySku;
+      if (!checkoutState.available || !catalog.get(sku)?.sellable || buying) return;
+      if (detail.open) detail.close();
+      return buy(sku);
+    });
   });
   api('status').then(r => r.json()).then(data => {
     if (!data.available) return;
-    document.querySelectorAll('.product-card').forEach(card => {
-      const button = card.querySelector('.product-bottom button');
+    checkoutState.available = true;
+    document.querySelectorAll('[data-buy-sku]').forEach(button => {
+      const item = catalog.get(button.dataset.buySku);
+      if (!item?.sellable) return;
       button.disabled = false; button.textContent = '微信扫码购买';
-      button.setAttribute('aria-label', '购买' + card.querySelector('h3').textContent);
     });
   }).catch(() => {});
 })();

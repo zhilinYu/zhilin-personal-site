@@ -2,10 +2,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import MarkdownIt from 'markdown-it';
+import {SHOP_CATALOG,displayPrice,paymentSku} from './shop-catalog.mjs';
 
 export const ROOT=fileURLToPath(new URL('../',import.meta.url));
 const collections={articles:['article'],prompts:['open-prompt','paid-prompt','link-prompt'],skills:['skill','local-skill']};
-const textFields=['title','desc','tag','body','prompt','source','license','price','version','image','url','licenseUrl','attachment','date'];
+const textFields=['title','desc','tag','body','prompt','source','license','price','version','image','url','licenseUrl','attachment','date','sku'];
 const md=new MarkdownIt({html:false,linkify:false,breaks:true});
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const readJSON=p=>JSON.parse(fs.readFileSync(p,'utf8'));
@@ -37,6 +38,7 @@ export function validateItem(root,item,kind) {
   if(kind==='prompts'&&!['stock','community'].includes(item.group))throw Error(`${item.id} 分类无效`);
   if(kind==='skills'&&!['own','local','external'].includes(item.group))throw Error(`${item.id} 分类无效`);
   if(item.type==='paid-prompt'&&(item.prompt?.trim()||item.attachment))throw Error('付费提示词不能包含公开全文或附件');
+  paymentSku(item);
   if(item.attachment&&kind!=='skills')throw Error('附件只能用于公开 Skills');
   if(item.attachment&&!item.attachment.replace(/^\//,'').startsWith('assets/uploads/'))throw Error('附件只能放在公开上传目录');
   https(item.url,'来源链接');https(item.licenseUrl,'许可链接');
@@ -50,12 +52,14 @@ export function validateItem(root,item,kind) {
   return item;
 }
 export function loadCatalog(root=ROOT) {
-  const items=[];const ids=new Set();
+  const items=[];const ids=new Set();const skus=new Set();
   for(const kind of Object.keys(collections)) {
     const dir=path.join(root,'content',kind);
     for(const filename of fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort()) {
       const target=path.join(dir,filename);if(fs.lstatSync(target).isSymbolicLink())throw Error('内容文件不能是符号链接');
       const item=validateItem(root,readJSON(target),kind);
+      const sku=paymentSku(item);
+      if(sku&&skus.has(sku))throw Error(`重复支付商品：${sku}`);if(sku)skus.add(sku);
       if(ids.has(item.id))throw Error(`重复 ID：${item.id}`);ids.add(item.id);items.push(item);
     }
   }
@@ -81,7 +85,11 @@ function atomicWrite(target,data) {
 }
 export function buildSite(root=ROOT) {
   const raw=loadCatalog(root).filter(x=>x.enabled);const arts=readJSON(path.join(root,'templates/art.json'));
-  const items=raw.map(x=>({...x,detail:x.body??x.detail??'',bodyHtml:md.render(x.body??x.detail??'')}));
+  const items=raw.map(x=>{
+    const sku=paymentSku(x);
+    return {...x,...(sku?{sku,price:displayPrice(SHOP_CATALOG[sku].amount)}:{}),detail:x.body??x.detail??'',bodyHtml:md.render(x.body??x.detail??'')};
+  });
+  const shop=Object.entries(SHOP_CATALOG).map(([sku,entry])=>({sku,...entry,sellable:items.some(x=>x.sku===sku),title:items.find(x=>x.sku===sku)?.title||entry.name}));
   const prompts=items.filter(x=>collections.prompts.includes(x.type));const skills=items.filter(x=>collections.skills.includes(x.type));const articles=items.filter(x=>x.type==='article');
   const sections={
     PROMPTS:groups(prompts,[['stock','AI 选股研究',`${prompts.filter(x=>x.group==='stock').length} 个提示词`],['community','创作与生图','开源灵感与可复用的方法']],arts),
@@ -93,6 +101,7 @@ export function buildSite(root=ROOT) {
   for(const [key,value] of Object.entries(sections)) {
     const marker=`<!-- CMS:${key} -->`;if(!output.includes(marker))throw Error(`模板缺少 ${key}`);output=output.replace(marker,()=>value);
   }
+  output=output.replace('<!-- CMS:SHOP -->',()=>JSON.stringify(shop).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029'));
   atomicWrite(path.join(root,'index.html'),output);
   atomicWrite(path.join(root,'资源/内容与来源.json'),JSON.stringify({checked_at:new Date().toISOString().slice(0,10),items:raw},null,2)+'\n');
   return {items,output};

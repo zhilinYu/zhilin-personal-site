@@ -10,5 +10,6 @@
   "source": "志林整理",
   "body": "内容包括筛选规则、观察步骤与风险边界。请使用可靠数据核验结论；数据不足时停止生成具体价位。",
   "enabled": true,
-  "order": 1
+  "order": 1,
+  "sku": "trend-leader"
 }

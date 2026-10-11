@@ -15,13 +15,13 @@ function deferred() {
 function response(data, status = 200) {
   return { ok: status < 400, status, json: async () => data, blob: async () => new Blob(['test']) };
 }
-function harness({ purchases = [], fetchOrder } = {}) {
+function harness({ purchases = [], fetchOrder, available = true, storageFails = false } = {}) {
   const elements = new Map();
   function element(id) {
     if (elements.has(id)) return elements.get(id);
     const handlers = {};
     const el = {
-      textContent: '', hidden: false, open: false, disabled: false, children: [],
+      textContent: '', hidden: false, open: false, disabled: false, children: [], dataset: {},
       addEventListener(type, fn) { handlers[type] = fn; },
       click() { return handlers.click?.(); },
       showModal() { this.open = true; },
@@ -30,41 +30,43 @@ function harness({ purchases = [], fetchOrder } = {}) {
       setAttribute(name, value) { this[name] = value; },
       replaceChildren() { this.children = []; },
       append(child) { this.children.push(child); },
-      remove() {},
+      remove() {}, focus() {},
     };
     elements.set(id, el);
     return el;
   }
-  const cards = ['quant-risk', 'trend-leader'].map(sku => ({
-    dataset: { sku },
-    querySelector(selector) {
-      const el = element(sku + selector);
-      if (selector === 'h3') el.textContent = sku;
-      return el;
-    },
-  }));
+  const shop = ['quant-risk', 'trend-leader', 'hot-money', 'countertrend', 'limit-up-pullback', 'research-bundle'].map(sku => ({sku, title:sku, amount:sku === 'research-bundle' ? 3990 : 990, sellable:sku !== 'research-bundle'}));
+  element('shop-catalog').textContent = JSON.stringify(shop);
+  const buyButtons = shop.filter(item => item.sellable).map(item => {
+    const button = element('buy-' + item.sku); button.dataset.buySku = item.sku; return button;
+  });
+  const windowHandlers = {};
+  const window = { addEventListener(type, fn) { windowHandlers[type] = fn; } };
   let saved = JSON.stringify(purchases), blobId = 0;
   const requests = [];
   runInNewContext(source, {
+    window,
     document: {
       getElementById: element,
-      querySelectorAll: () => cards,
+      querySelectorAll: () => buyButtons,
       createElement: () => element('created-' + elements.size),
       body: element('body'),
     },
-    localStorage: { getItem: () => saved, setItem: (_, value) => { saved = value; } },
+    localStorage: { getItem: () => saved, setItem: (_, value) => { if (storageFails) throw Error('storage disabled'); saved = value; } },
     crypto: webcrypto, Uint8Array, Date, AbortSignal,
     URL: { createObjectURL: () => 'blob:test-' + ++blobId, revokeObjectURL() {} },
     setTimeout: () => 1, clearTimeout() {},
     fetch: (url, options) => {
       requests.push({ url, options });
-      if (url === '/api/shop/status') return Promise.resolve(response({ available: true }));
+      if (url === '/api/shop/status') return Promise.resolve(response({ available }));
       return fetchOrder(url, options);
     },
   });
   return {
     elements, requests, element,
-    buy: (sku = 'quant-risk') => cards.find(card => card.dataset.sku === sku).querySelector('.product-bottom button').click(),
+    buy: async (sku = 'quant-risk') => { await flush(); return element('buy-' + sku).click(); },
+    navigate: () => windowHandlers.popstate(),
+    window,
     saved: () => JSON.parse(saved),
   };
 }
@@ -127,6 +129,7 @@ test('download completion does not overwrite a newly opened purchase history', a
   download.resolve(response({}));
   await downloading;
   assert.equal(page.element('checkoutStatus').textContent, historyStatus);
+  assert.equal(page.element('body').children.length, 0, 'closed checkout must not trigger a late file download');
 });
 
 test('expired lost-response order retains its identity and next purchase uses a new token', async () => {
@@ -212,6 +215,7 @@ test('download completion still updates the active order', async () => {
   await page.element('checkoutDownload').click();
   assert.match(page.element('checkoutStatus').textContent, /下载已开始/);
   assert.equal(page.element('checkoutDownload').disabled, false);
+  assert.equal(page.element('body').children.length, 1);
 });
 
 test('manual retry recovers a failed creation using the same order and token', async () => {
@@ -281,4 +285,64 @@ test('delayed retry response cannot overwrite reopened purchase history', async 
   await flush();
   assert.equal(page.element('checkoutStatus').textContent, historyStatus);
   assert.equal(page.requests.filter(request => request.url === '/api/shop/orders').length, 1);
+});
+
+test('double purchase click creates one request with only the SKU', async () => {
+  const create = deferred();
+  const page = harness({fetchOrder: url => url === '/api/shop/orders' ? create.promise : Promise.resolve(response({status:'PENDING'}))});
+  const first = page.buy();
+  await flush(); await page.buy();
+  const posts = page.requests.filter(x=>x.url === '/api/shop/orders');
+  assert.equal(posts.length,1);
+  assert.deepEqual(JSON.parse(posts[0].options.body),{sku:'quant-risk'});
+  assert.match(posts[0].options.headers['Idempotency-Key'],/^[a-f0-9]{64}$/);
+  create.resolve(response({id:'one-order',status:'PENDING'},201));await first;
+  assert.equal(page.saved().length,1);
+});
+
+test('unavailable shop and denied browser storage never submit orders', async () => {
+  for (const option of [{available:false},{storageFails:true}]) {
+    const page = harness({...option,fetchOrder:()=>{throw Error('must not call provider');}});
+    await page.buy();
+    assert.equal(page.requests.filter(x=>x.url === '/api/shop/orders').length,0);
+    if(option.storageFails)assert.match(page.element('checkoutStatus').textContent,/无法保存购买记录/);
+  }
+});
+
+test('refunded and closed orders hide QR and download', async () => {
+  for (const state of ['REFUNDED','CLOSED','EXPIRED']) {
+    const page = harness({purchases:[{sku:'quant-risk',id:'terminal',token:'a'.repeat(64),created:Date.now()}],fetchOrder:()=>Promise.resolve(response({status:state,qr_available:true}))});
+    await page.buy();await flush();
+    assert.equal(page.element('checkoutDownload').hidden,true);
+    assert.equal(page.element('checkoutQr').hidden,true);
+    assert.match(page.element('checkoutStatus').textContent,state==='REFUNDED'?/已退款/:/到期或关闭/);
+  }
+});
+
+test('browser return navigation invalidates outstanding status responses', async () => {
+  const query=deferred();
+  const page=harness({purchases:[{sku:'quant-risk',id:'return-order',token:'a'.repeat(64),created:Date.now()}],fetchOrder:()=>query.promise});
+  await page.buy();page.navigate();
+  assert.equal(page.element('checkoutDialog').open,false);
+  page.element('myPurchases').click();const message=page.element('checkoutStatus').textContent;
+  query.resolve(response({status:'PAID'}));await flush();
+  assert.equal(page.element('checkoutStatus').textContent,message);
+  assert.equal(page.element('checkoutDownload').hidden,true);
+});
+
+test('old bundle purchase remains recoverable at its existing price',async()=>{
+  const page=harness({purchases:[{sku:'research-bundle',id:'old-bundle',token:'a'.repeat(64),created:1}],fetchOrder:()=>Promise.resolve(response({status:'PAID'}))});
+  page.element('myPurchases').click();await page.element('purchaseList').children[0].click();await flush();
+  assert.equal(page.element('checkoutPrice').textContent,'¥39.9');
+  assert.equal(page.element('checkoutDownload').hidden,false);
+  assert.equal(page.requests.filter(x=>x.url === '/api/shop/orders').length,0);
+});
+
+test('confirmed refunded order is retained in history and a new purchase uses a new token',async()=>{
+  const old='a'.repeat(64);
+  const page=harness({purchases:[{sku:'quant-risk',id:'refunded-order',token:old,created:Date.now()}],fetchOrder:url=>Promise.resolve(response(url==='/api/shop/orders'?{id:'new-order',status:'PENDING'}:{status:'REFUNDED'}))});
+  await page.buy();await flush();page.element('checkoutClose').click();await page.buy();
+  const posts=page.requests.filter(x=>x.url==='/api/shop/orders');
+  assert.equal(posts.length,1);assert.notEqual(posts[0].options.headers['Idempotency-Key'],old);
+  assert.equal(page.saved().find(x=>x.token===old).status,'REFUNDED');
 });

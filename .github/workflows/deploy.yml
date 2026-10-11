@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -31,6 +33,19 @@ jobs:
           npm test
           python3 tests/content_backup_test.py
           node tools/export.mjs
+
+      - name: Determine payment deployment scope
+        id: changes
+        env:
+          RELEASE_EVENT: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          if [ "$RELEASE_EVENT" = "workflow_dispatch" ]; then
+            node tools/deployment-scope.mjs --manual >> "$GITHUB_OUTPUT"
+          else
+            node tools/deployment-scope.mjs "$BEFORE_SHA" "$HEAD_SHA" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: actions/setup-python@v5
         with:
@@ -67,16 +82,18 @@ jobs:
               --rollback-sha '${{ github.event.before }}'
 
       - name: Deploy Payment Service
+        if: steps.changes.outputs.payment == 'true'
         uses: appleboy/scp-action@v0.1.7
         with:
           host: 106.75.250.138
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "payment,deploy/zhilin-shop.service"
+          source: "payment/app.py,payment/wsgi.py,payment/package_products.py,payment/requirements.txt,deploy/zhilin-shop.service"
           target: "/opt/zhilin-shop/"
           strip_components: 0
 
       - name: Restart Payment Service
+        if: steps.changes.outputs.payment == 'true'
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: 106.75.250.138

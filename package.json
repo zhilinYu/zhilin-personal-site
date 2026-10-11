@@ -3,13 +3,20 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "build": "node tools/build.mjs",
     "dev": "node tools/dev.mjs",
-    "test": "node --test tests/*.test.mjs",
-    "oauth": "node deployment/oauth.mjs"
+    "test": "node --test tests/*.test.mjs tests/*.test.cjs",
+    "oauth": "node deployment/oauth.mjs",
+    "preview:payment": "node tools/build.mjs && python3 tools/preview-payment.py"
   },
-  "dependencies": { "markdown-it": "15.0.2" },
-  "devDependencies": { "decap-server": "3.11.3" }
+  "dependencies": {
+    "markdown-it": "15.0.2"
+  },
+  "devDependencies": {
+    "decap-server": "3.11.3"
+  }
 }
