@@ -16,6 +16,7 @@ test('发布包只有页面、后台、公开资源和简历，不含内容源�
  const out=fs.mkdtempSync(path.join(os.tmpdir(),'zhilin-export-'));t.after(()=>fs.rmSync(out,{recursive:true,force:true}));fs.writeFileSync(path.join(out,'.env'),'old');fs.mkdirSync(path.join(out,'content'));fs.writeFileSync(path.join(out,'content/old.json'),'{}');exportSite(root,out);
  assert.deepEqual(fs.readdirSync(out).sort(),['admin','assets','index.html','resume']);assert.ok(fs.existsSync(path.join(out,'admin/config.yml')));assert.equal(fs.existsSync(path.join(out,'content')),false);assert.equal(fs.existsSync(path.join(out,'.env')),false);
  assert.equal(JSON.parse(fs.readFileSync(path.join(out,'admin/config.yml'))).local_backend,undefined);
+ assert.equal(fs.statSync(out).mode&0o777,0o755,'发布目录必须允许上传容器读取');
  assert.throws(()=>exportSite(root,path.join(root,'assets')),/源码/);
 });
 test('首次后台接入不触发支付部署，支付代码仍有独立发布入口',()=>{

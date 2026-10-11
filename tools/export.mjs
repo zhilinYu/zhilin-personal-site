@@ -15,7 +15,7 @@ export function exportSite(root=ROOT,out=path.join(ROOT,'deployment/site')) {
   return !source.endsWith('.map')&&!path.basename(source).startsWith('.');
  }});
  const configPath=path.join(stage,'admin/config.yml'),config=JSON.parse(fs.readFileSync(configPath,'utf8'));delete config.local_backend;fs.writeFileSync(configPath,JSON.stringify(config,null,2)+'\n');
- fs.rmSync(out,{recursive:true,force:true});fs.renameSync(stage,out);
+ fs.chmodSync(stage,0o755);fs.rmSync(out,{recursive:true,force:true});fs.renameSync(stage,out);
  }finally{fs.rmSync(stage,{recursive:true,force:true});}
  return out;
 }
