@@ -3,13 +3,16 @@ name: Deploy to VPS
 on:
   push:
     branches: [main]
+    paths:
+      - 'payment/**'
+      - 'deploy/zhilin-shop.service'
+      - 'assets/checkout.js'
+      - 'tests/checkout.test.cjs'
+  workflow_dispatch:
 
 concurrency:
   group: zhilin-production
   cancel-in-progress: false
-
-permissions:
-  contents: read
 
 jobs:
   deploy:
@@ -28,14 +31,21 @@ jobs:
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
           npm test
+          python3 tests/content_backup_test.py
           node tools/export.mjs
 
       - name: Determine payment deployment scope
         id: changes
         env:
+          RELEASE_EVENT: ${{ github.event_name }}
           BEFORE_SHA: ${{ github.event.before }}
           HEAD_SHA: ${{ github.sha }}
-        run: node tools/deployment-scope.mjs "$BEFORE_SHA" "$HEAD_SHA" >> "$GITHUB_OUTPUT"
+        run: |
+          if [ "$RELEASE_EVENT" = "workflow_dispatch" ]; then
+            node tools/deployment-scope.mjs --manual >> "$GITHUB_OUTPUT"
+          else
+            node tools/deployment-scope.mjs "$BEFORE_SHA" "$HEAD_SHA" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: actions/setup-python@v5
         with:
@@ -78,7 +88,7 @@ jobs:
           host: 106.75.250.138
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "payment,deploy/zhilin-shop.service"
+          source: "payment/app.py,payment/wsgi.py,payment/package_products.py,payment/requirements.txt,deploy/zhilin-shop.service"
           target: "/opt/zhilin-shop/"
           strip_components: 0
 

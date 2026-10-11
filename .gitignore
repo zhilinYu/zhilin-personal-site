@@ -8,10 +8,12 @@ node_modules/
 __pycache__/
 *.sqlite3*
 
-# Local content tooling and generated release files
+.env.*
 deployment/site/
+验收截图/
+*.tgz
+
 .local-tests/
 *.pyc
 *.tmp
-admin/vendor/*.tgz
 资源/内容与来源.json

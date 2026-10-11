@@ -35,6 +35,7 @@ jobs:
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
           npm test
+          python3 tests/content_backup_test.py
           node tools/export.mjs
       - name: Upload existing release backup guard
         uses: appleboy/scp-action@v0.1.7

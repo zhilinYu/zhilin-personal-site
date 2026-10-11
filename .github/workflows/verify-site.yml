@@ -35,6 +35,7 @@ jobs:
         run: |
           npm test
           python -m unittest discover -s payment/tests -v
+          python3 tests/content_backup_test.py
           node --check assets/checkout.js
           node tools/export.mjs
           git diff --exit-code -- index.html

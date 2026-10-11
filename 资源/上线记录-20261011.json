@@ -1,0 +1,100 @@
+{
+  "status": "live_complete",
+  "release_sha": "7e4369afebd688d227565cb90d3aa7e5595844b5",
+  "previous_sha": "67d66745cbd54df4eddc76edcd4cce77366a2fa5",
+  "preflight_verified": true,
+  "backup_dir": "/var/lib/zhilin-shop/backups/releases/1791689201443-1-35e965b77e5d",
+  "payment_pid_before": 3321703,
+  "oauth_app_id": 3922016,
+  "oauth_status": "real_github_login_passed",
+  "source_directory": "/private/tmp/zhilin-release-20261011",
+  "initial_run": {
+    "id": 38108525972,
+    "result": "failed_before_upload",
+    "reason": "tar: empty archive"
+  },
+  "validation": {
+    "content_tests": 21,
+    "checkout_tests": 11,
+    "payment_backup_tests": 40,
+    "cms_backup_check": true,
+    "export_directory_mode": "0755"
+  },
+  "deployment_run": {
+    "id": 38110264563,
+    "result": "success",
+    "url": "https://github.com/zhilinYu/zhilin-personal-site/actions/runs/38110264563"
+  },
+  "http": {
+    "homepage": 200,
+    "admin": 200,
+    "hero": 200,
+    "resume_subdomain": 200,
+    "oauth_health": 200
+  },
+  "live_home_sha256": "24335d0dbb396a1db424c162082bebf62e178abe5c244e893e2d7e929cbc4d86",
+  "payment_pid_after": 3321703,
+  "browser_frontend": "1440/390/320px passed on HTTPS production site",
+  "oauth_protocol_fix_sha": "da8748543d62515ce576c241db01ee62bf7c44ca",
+  "cms_browser": {
+    "account": "zhilinYu",
+    "draft_save": true,
+    "draft_reopen": true,
+    "preview": true,
+    "hidden_entry_not_on_homepage": true,
+    "zip_upload": true,
+    "publish_to_main": true,
+    "public_zip_download_status": 200,
+    "zip_sha256": "8a48b664e7541d394b1f3e45b6ce05fb02a848808a5f5fb0dde2a00b9330136d",
+    "zip_matches_original": true,
+    "fixture_removed_from_main": true,
+    "fixture_removed_from_server": true,
+    "test_pr": 2,
+    "draft_branch_removed": true
+  },
+  "cms_deployment_run": {
+    "id": 38110149872,
+    "result": "success",
+    "url": "https://github.com/zhilinYu/zhilin-personal-site/actions/runs/38110149872"
+  },
+  "cleanup_deployment_run": {
+    "id": 38110264563,
+    "result": "success",
+    "url": "https://github.com/zhilinYu/zhilin-personal-site/actions/runs/38110264563"
+  },
+  "verified_at": "2026-10-11T12:04:05.850225+08:00",
+  "payment_restarts": 0,
+  "payment_available": true,
+  "payment_method": "wechat_native",
+  "http_detail": {
+    "homepage": {
+      "status": 200,
+      "sha256": "24335d0dbb396a1db424c162082bebf62e178abe5c244e893e2d7e929cbc4d86",
+      "matches_export": true
+    },
+    "admin": {
+      "status": 200
+    },
+    "hero": {
+      "status": 200
+    },
+    "resume_subdomain": {
+      "status": 200
+    },
+    "oauth_health": {
+      "status": 200
+    },
+    "removed_test_zip": {
+      "status": 404
+    },
+    "bootstrap": {
+      "status": 200,
+      "sha256": "02f2c8bc63de5c02abe6b946b350cbe0daa313d8c9574624f0e25914b40b75f9",
+      "matches_export": true
+    }
+  },
+  "unverified": [
+    "真实支付交易",
+    "其他 GitHub 账号实际登录（拒绝分支已自动化验证）"
+  ]
+}

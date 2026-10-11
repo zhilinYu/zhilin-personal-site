@@ -3,6 +3,7 @@
     "name": "github",
     "repo": "zhilinYu/zhilin-personal-site",
     "branch": "main",
+    "auth_scope": "public_repo",
     "base_url": "https://zhilin.club",
     "auth_endpoint": "cms/auth",
     "squash_merges": true

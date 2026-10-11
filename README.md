@@ -32,9 +32,10 @@ npm run preview:payment
 - `tools/build.mjs`：生成根目录 `index.html`；`tools/export.mjs`：导出 `deployment/site/`，只含页面、公开资源、后台与简历。生成包不提交 Git。
 - `payment/`、`deploy/`：沿用既有支付、私有交付和发布备份门禁；私有配置、订单库、商品 ZIP 均不进入 Git 或静态发布包。
 - `.github/workflows/verify-site.yml`：分支和 PR 仅测试构建，不接触服务器或部署凭据。
-- `.github/workflows/deploy.yml`：只监听 `main` 推送；发布前通过既有备份门禁，上传新版导出包。只有 `payment/` 或 `deploy/` 改动才更新并重启支付服务；纯内容改动只发布静态文件。
+- `.github/workflows/content-deploy.yml`：沿用已上线 CMS 的静态发布流程，只发布公开内容，不重启支付服务。
+- `.github/workflows/deploy.yml`：保留既有 main 支付文件触发和手工发布入口；发布前通过既有备份门禁，上传新版导出包。只有支付运行文件或服务单元改动才更新并重启支付服务；测试和说明改动不触发重启。上传支付运行文件使用明确清单，不复制测试、模拟入口、订单或配置。
 
-合并到 `main` 会自动触发生产发布。当前集成应通过独立分支和草稿 PR 评审，发布授权前不要合并。
+合并到 `main` 会按上述触发规则自动发布。两个生产流程沿用 `zhilin-production` 串行锁；混合更新可能分别运行，但均构建同一提交的静态包。
 
 ## 支付商品
 
@@ -42,6 +43,6 @@ npm run preview:payment
 
 ## 内容后台上线前提
 
-本地 CMS 已可编辑文章、提示词和 Skills，默认草稿不公开。正式后台需独立接入现有 GitHub OAuth 授权服务：参考 `deployment/cms.env.example`、`deployment/oauth.mjs`、服务单元和 Nginx 配置。账号、密钥与权限配置由持有人另行授权，不在本次分支提交中创建或扩大。
+CMS 已在既有生产站接入，可编辑文章、提示词和 Skills，默认草稿不公开。本次保留现有 OAuth 服务与固定账号校验、`public_repo` 范围、回调协议和受限配置，不创建凭证或扩大权限。
 
-`deployment/content-deploy.yml` 和 `deployment/legacy-deploy.yml` 是本地原方案的备用示例，不自动启用；本仓库实际使用上述单一 main 发布流程，避免两个工作流重叠发布。正式 OAuth 登录、CMS 草稿发布和真实支付验收尚未在服务器执行。
+`deployment/` 下的 YAML 是接入示例，实际工作流位于 `.github/workflows/`。CMS 原有生产验收记录保留；本次仅做非交易检查，不重新授权账号或创建订单。真实支付验收仍待另行授权。

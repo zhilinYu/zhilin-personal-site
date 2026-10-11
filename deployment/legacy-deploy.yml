@@ -3,19 +3,12 @@ name: Deploy to VPS
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - 'content/**'
-      - 'templates/**'
-      - 'admin/**'
-      - 'assets/uploads/**'
-      - 'tools/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'tests/build.test.mjs'
-      - 'tests/admin.test.mjs'
-      - 'tests/oauth.test.mjs'
-      - 'tests/deployment.test.mjs'
-      - '资源/内容与来源.json'
+    paths:
+      - 'payment/**'
+      - 'deploy/zhilin-shop.service'
+      - 'assets/checkout.js'
+      - 'tests/checkout.test.cjs'
+  workflow_dispatch:
 
 concurrency:
   group: zhilin-production
@@ -36,6 +29,7 @@ jobs:
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
           npm test
+          python3 tests/content_backup_test.py
           node tools/export.mjs
 
       - uses: actions/setup-python@v5

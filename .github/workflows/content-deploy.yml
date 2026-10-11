@@ -1,0 +1,78 @@
+name: Publish Site Content
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'content/**'
+      - 'templates/**'
+      - 'admin/**'
+      - 'assets/**'
+      - 'resume/**'
+      - 'tools/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/content-deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zhilin-production
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Validate and prepare static release
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm test
+          python3 tests/content_backup_test.py
+          node tools/export.mjs
+      - name: Upload existing release backup guard
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 106.75.250.138
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: 'deploy/preflight_backup.py'
+          target: '/opt/zhilin-shop/'
+      - name: Back up and verify current deployment
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: 106.75.250.138
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -eu
+            timeout --signal=TERM --kill-after=5s 45s /opt/zhilin-shop/venv/bin/python /opt/zhilin-shop/deploy/preflight_backup.py \
+              --run-id '${{ github.run_id }}-${{ github.run_attempt }}' \
+              --target-sha '${{ github.sha }}' \
+              --rollback-sha '${{ github.event.before }}'
+      - name: Publish static files
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 106.75.250.138
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: 'deployment/site/*'
+          target: '/usr/share/nginx/html/'
+          strip_components: 2
+      - name: Verify public pages
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: 106.75.250.138
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -eu
+            curl --fail --silent --output /dev/null https://zhilin.club/
+            curl --fail --silent --output /dev/null https://zhilin.club/admin/
