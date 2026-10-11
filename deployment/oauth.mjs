@@ -39,7 +39,7 @@ export function createOAuthServer({origin,clientId,clientSecret,allowedLogin,rep
    const user=await json('https://api.github.com/user',{headers});
    if(user.login?.toLowerCase()!==allowedLogin.toLowerCase()){fail(403,'此账号不能管理本站内容');return;}
    const repository=await json('https://api.github.com/repos/'+repo,{headers});if(!repository.permissions?.push){fail(403,'此账号没有内容仓库的写入权限');return;}
-   const payload='authentication:github:success:'+JSON.stringify({token:result.access_token,provider:'github'});
+   const payload='authorization:github:success:'+JSON.stringify({token:result.access_token,provider:'github'});
    res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});
    res.end(`<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>GitHub 登录完成</title><p>登录完成，正在返回内容后台。可以关闭此窗口。</p><script nonce="${nonce}">const origin=${safeJSON(origin)};const payload=${safeJSON(payload)};function receive(event){if(event.origin!==origin||event.source!==window.opener||event.data!=='authorizing:github')return;window.removeEventListener('message',receive);window.opener.postMessage(payload,origin);window.close();}window.addEventListener('message',receive);if(window.opener)window.opener.postMessage('authorizing:github',origin);setTimeout(()=>window.removeEventListener('message',receive),30000);</script></html>`);
   }catch{fail(503,'GitHub 授权暂时不可用，请稍后重新登录');}

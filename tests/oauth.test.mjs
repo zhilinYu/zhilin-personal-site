@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import vm from 'node:vm';
 const root=fileURLToPath(new URL('../',import.meta.url));
 async function setup(t,override={}) {
  const filename=path.join(root,'deployment/oauth.mjs');assert.ok(fs.existsSync(filename),'独立授权服务必须存在');
@@ -20,9 +21,23 @@ test('有效授权只将令牌发给固定站点，state 一次性使用',async 
  const api=await setup(t);const auth=await api.begin();assert.equal(auth.response.status,302);
  assert.equal(auth.url.searchParams.get('scope'),'public_repo');
  assert.equal(auth.url.searchParams.get('redirect_uri'),'https://zhilin.club/cms/callback');assert.match(auth.response.headers.get('set-cookie'),/HttpOnly.*Secure.*SameSite=Lax/);
- const r=await api.callback(auth);assert.equal(r.status,200);const body=await r.text();assert.match(body,/authentication:github:success/);assert.match(body,/https:\/\/zhilin.club/);assert.doesNotMatch(body,/evil\.example|postMessage\([^)]*,\s*["']\*["']/);
+ const r=await api.callback(auth);assert.equal(r.status,200);const body=await r.text();assert.match(body,/authorization:github:success/);assert.match(body,/https:\/\/zhilin.club/);assert.doesNotMatch(body,/evil\.example|postMessage\([^)]*,\s*["']\*["']/);
  assert.ok(r.headers.get('content-security-policy').includes("default-src 'none'"));assert.equal(r.headers.get('cache-control'),'no-store');
  assert.equal((await api.callback(auth)).status,400);assert.equal(api.calls(),3);
+});
+test('真实 Decap 接收器能完成授权回调',async t=>{
+ const api=await setup(t),response=await api.callback(await api.begin()),html=await response.text();
+ const source=fs.readFileSync(path.join(root,'admin/vendor/decap-cms.js'),'utf8');
+ const start=source.indexOf('authorizeCallback(e,t){'),end=source.indexOf('getSiteID(){',start);
+ assert.ok(start>=0&&end>start,'必须使用当前后台的真实授权接收器');
+ const opener={removeEventListener(){}};let authenticated,receive,closed=false;
+ const consumer=vm.runInNewContext('({'+source.slice(start,end)+'})',{window:opener});
+ const handle=consumer.authorizeCallback.call({base_url:api.config.origin,authWindow:{close(){}}},{provider:'github'},(error,result)=>{assert.equal(error,null);authenticated=result;});
+ opener.postMessage=(data,origin)=>{assert.equal(origin,api.config.origin);if(data==='authorizing:github')return;handle({origin,data});};
+ const popup={opener,addEventListener:(_,fn)=>{receive=fn;},removeEventListener(){},close(){closed=true;}};
+ vm.runInNewContext(html.match(/<script nonce="[^"]+">([\s\S]*?)<\/script>/)[1],{window:popup,setTimeout(){}});
+ receive({origin:api.config.origin,source:opener,data:'authorizing:github'});
+ assert.equal(authenticated?.token,'test-token','Decap 必须接收到令牌并进入登录状态');assert.ok(closed);
 });
 test('无 state、错误浏览器会话和过期回调不交换令牌',async t=>{
  const api=await setup(t);const auth=await api.begin();assert.equal((await api.callback({...auth,state:'bad'})).status,400);assert.equal((await api.callback({...auth,cookie:'__Host-cms_session=other'})).status,400);
