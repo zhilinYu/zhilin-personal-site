@@ -1,0 +1,13 @@
+{
+  "id": "ashare-local",
+  "title": "A 股五策略",
+  "desc": "围绕趋势、弹性、抗跌、风控与回吐，组织研究采集和证据核验。",
+  "type": "local-skill",
+  "group": "local",
+  "tag": "本地定制",
+  "art": "chart",
+  "source": "本地工作流",
+  "body": "围绕趋势、弹性、抗跌、风控与回吐，组织研究采集和证据核验。\n\n这项工具已在我的本地技能目录中使用；公开分发版本可联系我了解。",
+  "enabled": true,
+  "order": 13
+}

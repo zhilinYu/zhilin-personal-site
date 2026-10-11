@@ -1,0 +1,17 @@
+{
+  "id": "frontend-design",
+  "title": "Frontend Design",
+  "desc": "从产品内容、字体、构图和视觉细节出发，形成有辨识度的界面。",
+  "type": "skill",
+  "group": "external",
+  "tag": "开源精选",
+  "art": "image",
+  "source": "anthropics",
+  "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design",
+  "license": "Apache-2.0",
+  "licenseUrl": "https://github.com/anthropics/skills/blob/main/skills/frontend-design/LICENSE.txt",
+  "stars": 180149,
+  "body": "从产品内容、字体、构图和视觉细节出发，形成有辨识度的界面。",
+  "enabled": true,
+  "order": 17
+}

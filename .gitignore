@@ -7,3 +7,8 @@ node_modules/
 .venv/
 __pycache__/
 *.sqlite3*
+
+.env.*
+deployment/site/
+验收截图/
+*.tgz

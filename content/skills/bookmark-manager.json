@@ -1,0 +1,16 @@
+{
+  "id": "bookmark-manager",
+  "title": "收藏链接管家",
+  "desc": "解析收藏链接，识别可执行步骤，再整理成结构化知识笔记。",
+  "type": "skill",
+  "group": "own",
+  "tag": "我的开源",
+  "art": "bookmark",
+  "url": "https://github.com/zhilinYu/bookmark-manager-skill",
+  "source": "zhilinYu",
+  "license": "MIT",
+  "licenseUrl": "https://github.com/zhilinYu/bookmark-manager-skill/blob/main/LICENSE",
+  "body": "解析收藏链接，识别可执行步骤，再整理成结构化知识笔记。",
+  "enabled": true,
+  "order": 12
+}

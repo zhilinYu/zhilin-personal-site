@@ -1,0 +1,17 @@
+{
+  "id": "nano-banana-library",
+  "title": "Nano Banana 提示词库",
+  "desc": "从构图、质感和视觉任务出发，寻找适合自己作品的生图思路。",
+  "type": "link-prompt",
+  "group": "community",
+  "tag": "生图灵感库",
+  "art": "banana",
+  "source": "YouMind OpenLab",
+  "url": "https://github.com/YouMind-OpenLab/awesome-nano-banana-pro-prompts",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://github.com/YouMind-OpenLab/awesome-nano-banana-pro-prompts/blob/main/LICENSE",
+  "stars": 13547,
+  "body": "保留作者、仓库与许可链接，仅收录原仓库入口，不复制社区案例图片。案例可能包含第三方素材，使用时仍需查看各条目的来源。",
+  "enabled": true,
+  "order": 9
+}

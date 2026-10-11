@@ -3,6 +3,12 @@ name: Deploy to VPS
 on:
   push:
     branches: [main]
+    paths:
+      - 'payment/**'
+      - 'deploy/zhilin-shop.service'
+      - 'assets/checkout.js'
+      - 'tests/checkout.test.cjs'
+  workflow_dispatch:
 
 concurrency:
   group: zhilin-production
@@ -13,6 +19,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Build current static content
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm test
+          python3 tests/content_backup_test.py
+          node tools/export.mjs
 
       - uses: actions/setup-python@v5
         with:
@@ -83,9 +101,9 @@ jobs:
           host: 106.75.250.138
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "index.html,photo.png,resume,assets"
+          source: "deployment/site/*"
           target: "/usr/share/nginx/html/"
-          strip_components: 0
+          strip_components: 2
 
       - name: Reload Nginx
         uses: appleboy/ssh-action@v1.2.2

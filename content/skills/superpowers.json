@@ -1,0 +1,17 @@
+{
+  "id": "superpowers",
+  "title": "Superpowers",
+  "desc": "让需求梳理、计划、实现、调试与验证有明确的工作流程。",
+  "type": "skill",
+  "group": "external",
+  "tag": "开源精选",
+  "art": "flow",
+  "source": "obra",
+  "url": "https://github.com/obra/superpowers",
+  "license": "MIT",
+  "licenseUrl": "https://github.com/obra/superpowers/blob/main/LICENSE",
+  "stars": 296657,
+  "body": "让需求梳理、计划、实现、调试与验证有明确的工作流程。",
+  "enabled": true,
+  "order": 18
+}

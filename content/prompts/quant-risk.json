@@ -1,0 +1,14 @@
+{
+  "id": "quant-risk",
+  "title": "量化风控",
+  "desc": "从市场开关、硬性筛选到评分与风险边界，建立结构化研究流程。",
+  "type": "paid-prompt",
+  "group": "stock",
+  "tag": "研究提示词",
+  "price": "¥9.9",
+  "image": "assets/quant-risk.webp",
+  "source": "志林整理",
+  "body": "内容包括筛选规则、观察步骤与风险边界。请使用可靠数据核验结论；数据不足时停止生成具体价位。",
+  "enabled": true,
+  "order": 0
+}

@@ -1,0 +1,20 @@
+[Unit]
+Description=Zhilin CMS GitHub OAuth
+After=network.target
+
+[Service]
+Type=simple
+User=zhilin-cms
+Group=zhilin-cms
+WorkingDirectory=/opt/zhilin-cms
+EnvironmentFile=/etc/zhilin-cms/cms.env
+ExecStart=/usr/bin/node /opt/zhilin-cms/deployment/oauth.mjs
+Restart=on-failure
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

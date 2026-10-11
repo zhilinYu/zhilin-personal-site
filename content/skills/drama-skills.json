@@ -1,0 +1,17 @@
+{
+  "id": "drama-skills",
+  "title": "Drama Skills",
+  "desc": "从剧本、角色资产、分镜到图片与视频提示词的漫剧创作技能集。",
+  "type": "skill",
+  "group": "external",
+  "tag": "开源精选",
+  "art": "story",
+  "source": "zenstory-ai",
+  "url": "https://github.com/zenstory-ai/drama-skills",
+  "license": "MIT",
+  "licenseUrl": "https://github.com/zenstory-ai/drama-skills/blob/main/LICENSE",
+  "stars": 2620,
+  "body": "从剧本、角色资产、分镜到图片与视频提示词的漫剧创作技能集。",
+  "enabled": true,
+  "order": 19
+}

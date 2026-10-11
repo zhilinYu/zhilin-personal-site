@@ -68,7 +68,10 @@ def code_files(payment_root, static_root, unit_file):
             if prefix == 'payment':
                 eligible = path.suffix == '.py' or relative.as_posix() in ('README.md', 'requirements.txt')
             else:
-                eligible = (relative.parts[0] in ('assets', 'resume') or relative.as_posix() in ('index.html', 'photo.png')) and path.suffix.lower() in ('.html', '.css', '.js', '.png', '.jpg', '.jpeg', '.webp', '.svg', '.ico', '.woff', '.woff2')
+                extension = path.suffix.lower()
+                eligible = (relative.parts[0] in ('assets', 'resume', 'admin') or relative.as_posix() in ('index.html', 'photo.png')) and extension in ('.html', '.css', '.js', '.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.ico', '.woff', '.woff2')
+                eligible = eligible or (relative.parts[0] == 'admin' and (extension in ('.json', '.yml', '.yaml', '.wasm', '.txt') or relative.as_posix() == 'admin/vendor/LICENSE'))
+                eligible = eligible or (relative.parts[:2] == ('assets', 'uploads') and extension == '.zip')
             if not eligible:
                 continue
             if path.is_symlink() or any(parent.is_symlink() for parent in path.parents if parent != root.parent):

@@ -1,0 +1,16 @@
+{
+  "id": "comic-production",
+  "title": "科普漫画制作",
+  "desc": "把选题、分格、生图与长图编排串成可重复的漫画制作流程。",
+  "type": "skill",
+  "group": "own",
+  "tag": "我的开源",
+  "art": "comic",
+  "url": "https://github.com/zhilinYu/comic-production",
+  "source": "zhilinYu",
+  "license": "MIT",
+  "licenseUrl": "https://github.com/zhilinYu/comic-production/blob/main/LICENSE",
+  "body": "把选题、分格、生图与长图编排串成可重复的漫画制作流程。",
+  "enabled": true,
+  "order": 11
+}

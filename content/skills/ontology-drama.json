@@ -1,0 +1,16 @@
+{
+  "id": "ontology-drama",
+  "title": "本体论驱动 AI 漫剧",
+  "desc": "用结构化故事状态连接分集、情节、镜头与提示词，检查跨集一致性。",
+  "type": "skill",
+  "group": "own",
+  "tag": "我的开源",
+  "art": "story",
+  "url": "https://github.com/zhilinYu/ontology-driven-ai-drama-skill",
+  "source": "zhilinYu",
+  "license": "MIT",
+  "licenseUrl": "https://github.com/zhilinYu/ontology-driven-ai-drama-skill/blob/main/LICENSE",
+  "body": "用结构化故事状态连接分集、情节、镜头与提示词，检查跨集一致性。",
+  "enabled": true,
+  "order": 10
+}

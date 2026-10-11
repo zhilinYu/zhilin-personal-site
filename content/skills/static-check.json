@@ -1,0 +1,13 @@
+{
+  "id": "static-check",
+  "title": "静态站点验收",
+  "desc": "检查静态页面的路由、交互、窄屏布局与浏览器错误。",
+  "type": "local-skill",
+  "group": "local",
+  "tag": "本地定制",
+  "art": "browser",
+  "source": "本地工作流",
+  "body": "检查静态页面的路由、交互、窄屏布局与浏览器错误。\n\n这项工具已在我的本地技能目录中使用；公开分发版本可联系我了解。",
+  "enabled": true,
+  "order": 14
+}
