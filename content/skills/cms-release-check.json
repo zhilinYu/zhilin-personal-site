@@ -1,0 +1,12 @@
+{
+  "enabled": false,
+  "body": "这是隐藏的上线验收内容。",
+  "attachment": "/assets/uploads/zhilin-cms-release-check.zip",
+  "order": 100,
+  "desc": "临时验证草稿、Skill ZIP 上传及发布，验收后删除。",
+  "title": "后台上线验收（隐藏测试）",
+  "type": "skill",
+  "source": "志林整理",
+  "id": "cms-release-check",
+  "group": "own"
+}
