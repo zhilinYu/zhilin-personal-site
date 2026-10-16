@@ -1,0 +1,18 @@
+{
+  "id": "anthropic-skill-creator",
+  "title": "Skill Creator：让技能有测试",
+  "desc": "从用途、触发条件和输出格式开始，围绕样例与反馈改进可复用技能。",
+  "type": "skill",
+  "group": "external",
+  "tag": "日更精选 · 未实测",
+  "art": "flow",
+  "source": "Anthropic（anthropics）",
+  "url": "https://github.com/anthropics/skills/tree/main/skills/skill-creator",
+  "license": "Apache-2.0",
+  "licenseUrl": "https://github.com/anthropics/skills/blob/main/skills/skill-creator/LICENSE.txt",
+  "stars": 181409,
+  "date": "2026-10-16",
+  "body": "## 为什么收录\n\nSkill Creator 把“写一段能复用的指令”进一步拆成用途澄清、技能草稿、测试样例、结果评审和修订。它还讨论技能描述怎样影响触发，以及如何比较有技能和无技能时的输出。\n\n适合已经有重复工作流、想把输入要求和交付格式固定下来的人。比起一开始堆积大量规则，更值得借鉴的是：先说明怎样算完成，再拿实际样例检查。\n\n## 使用边界\n\n该技能面向 Claude 相关环境编写，部分流程依赖 Python、子代理、命令行或评审脚本。迁移到其他工具前，需要核对可用能力和权限；它不是所有聊天窗口都能直接执行的通用按钮。\n\n测试样例和评分标准需要人工审查。少量样例表现好，不代表对所有任务都有效。自动运行可能产生模型调用费用；执行外部脚本前应阅读来源和代码，并使用受限测试环境。\n\n**未实测**：本站此次只做文档与许可证核验，没有安装、执行技能或运行其脚本，未给出性能分数或效果承诺。此处仅链接原目录，不提供打包下载。\n\n## 作者、许可与活跃度\n\n- 维护方：Anthropic；独立许可文件署名 Anthropic, PBC.。\n- 许可证：该技能目录的 [Apache License 2.0 原文](https://github.com/anthropics/skills/blob/main/skills/skill-creator/LICENSE.txt)。引用具体目录许可证，不将其他技能的许可一并推定。\n- 2026-10-16 核验：anthropics/skills 仓库为 181,409 stars，仓库最近推送为 2026-10-09 18:45 UTC；这是整库数据，不是该技能单独的关注量。\n- 按该子目录查询，最近提交时间为 2026-04-20 21:38 UTC。仓库仍有更新，不等于每个技能都在近期改动。\n\n[阅读技能说明](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md)",
+  "enabled": true,
+  "order": 21
+}

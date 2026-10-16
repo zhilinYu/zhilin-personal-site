@@ -1,0 +1,18 @@
+{
+  "id": "prompts-chat-library",
+  "title": "prompts.chat 提示词库",
+  "desc": "从社区范例寻找任务表达思路，再补齐自己的材料、边界与验收要求。",
+  "type": "link-prompt",
+  "group": "community",
+  "tag": "日更精选 · 未实测",
+  "art": "note",
+  "source": "Fatih Kadir Akin（f）及贡献者",
+  "url": "https://github.com/f/prompts.chat",
+  "license": "提示词 CC0-1.0 / 代码 MIT",
+  "licenseUrl": "https://github.com/f/prompts.chat/blob/main/LICENSE",
+  "stars": 173099,
+  "date": "2026-10-16",
+  "body": "## 为什么收录\n\nprompts.chat 原名 Awesome ChatGPT Prompts，提供社区提示词的网页入口、Markdown 与 CSV 数据。它适合拿来观察同一类任务怎样描述读者、角色和输出要求，帮助从空白页开始组织自己的提示词。\n\n本站提供原创中文简介与来源入口，不转载提示词全文。建议先选一个与你的任务接近的案例，再补齐实际材料、禁止编造的字段和可检查的交付格式。\n\n## 使用边界\n\n社区提示词并不等于经过统一效果验证的产品。模型、版本、上下文和任务不同，结果也可能变化。涉及事实、引用或代码时，仍需逐项核对；不要把密码、密钥或无权分享的资料粘贴到在线服务。\n\n**未实测**：本次仅核对仓库说明、许可与活动信息，没有运行提示词、CLI、插件或 MCP 服务，也不承诺效果。\n\n## 作者、许可与活跃度\n\n- 作者：Fatih Kadir Akin（GitHub：f）及贡献者。\n- 2026-10-16 核验：GitHub API 返回 173,099 stars；最近推送为 2026-10-15 03:18 UTC。Stars 是关注度信号，不是质量评分。\n- 许可分开适用：提示词数据及用户提交的提示词使用 [CC0 1.0 原文](https://github.com/f/prompts.chat/blob/main/LICENSE-CC0)；源代码和站点原创内容（含交互书）使用 [MIT 原文](https://github.com/f/prompts.chat/blob/main/LICENSE-MIT)。不要把整库一概标为 CC0。\n- 具体使用前以文件及[总许可说明](https://github.com/f/prompts.chat/blob/main/LICENSE)为准。",
+  "enabled": true,
+  "order": 20
+}
