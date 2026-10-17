@@ -1,0 +1,18 @@
+{
+  "id": "prompt-engineering-guide",
+  "title": "Prompt Engineering Guide：把需求写清楚",
+  "desc": "从指令、背景、输入与输出格式入手，学习可反复调整的提示词写法。",
+  "type": "link-prompt",
+  "group": "community",
+  "tag": "日更精选 · 未实测",
+  "art": "note",
+  "source": "DAIR.AI（Elvis Saravia 及贡献者）",
+  "url": "https://github.com/dair-ai/Prompt-Engineering-Guide",
+  "license": "MIT",
+  "licenseUrl": "https://github.com/dair-ai/Prompt-Engineering-Guide/blob/57673726396dd94acb23bdb1e67f27c78ee85a8e/LICENSE.md",
+  "stars": 79236,
+  "date": "2026-10-17",
+  "body": "## 为什么收录\n\n这份指南把提示词的常见组成拆成指令、上下文、输入数据和输出要求，并用分类、摘要、信息提取等任务展示写法。它既有基础章节，也整理了少样本提示、检索增强和工具使用等方向，适合在实际工作里按问题查阅。\n\n建议先读“提示词要素”，再找一个与你的任务接近的例子。不要一次塞入所有技巧：先确定要交付什么、模型能使用哪些材料，再用几份不同输入检查输出。指南也提醒，四种要素并非每次都必须出现，格式应服从任务。\n\n本站提供原创中文导读与来源入口，不转载提示词全文。[中文要素章节](https://github.com/dair-ai/Prompt-Engineering-Guide/blob/57673726396dd94acb23bdb1e67f27c78ee85a8e/pages/introduction/elements.zh.mdx)可作为起点；[英文设计建议](https://github.com/dair-ai/Prompt-Engineering-Guide/blob/57673726396dd94acb23bdb1e67f27c78ee85a8e/pages/introduction/tips.en.mdx)适合继续了解如何把要求写具体。\n\n## 使用边界\n\n这是学习资料和示例集合，没有统一证明每个示例在当前所有模型上都有效。部分章节、模型名称和演示结果有其写作时间背景；迁移到自己的模型与材料后仍需复核。涉及事实或引用时，提示词不能代替来源核验。\n\n仅阅读 GitHub 文档不需要运行代码。仓库另有本地网站依赖与 Notebook；若要运行，应先检查依赖、接口费用及输入资料的保密要求，不要提交密码、密钥或无权分享的内容。README 和部分页面包含课程推广入口，本站此次收录的是公开指南。\n\n**未实测**：本次只阅读 README、相关章节、许可证及仓库活动信息，没有运行提示词、Notebook 或网站安装命令，不提供效果评分。\n\n## 作者、许可与核验\n\n- 作者与维护方：DAIR.AI；README 的引用信息列出 Elvis Saravia。\n- 许可证：[MIT 原文](https://github.com/dair-ai/Prompt-Engineering-Guide/blob/57673726396dd94acb23bdb1e67f27c78ee85a8e/LICENSE.md)，版权署名为 DAIR.AI。外链论文、视频和第三方内容需分别核对权利。\n- 2026-10-17 01:31 UTC 核验：整库为 79,236 stars；仓库最近推送时间为 2026-03-11 20:09 UTC。Stars 是关注度信息，不是质量评分。\n- 本次固定核验版本：[5767372](https://github.com/dair-ai/Prompt-Engineering-Guide/commit/57673726396dd94acb23bdb1e67f27c78ee85a8e)。所读英文“提示词要素”文件的最近提交为 2026-02-01；新增到本站的日期不代表上游当天发布。",
+  "enabled": true,
+  "order": 22
+}

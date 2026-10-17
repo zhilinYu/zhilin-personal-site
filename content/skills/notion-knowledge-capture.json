@@ -1,0 +1,18 @@
+{
+  "id": "notion-knowledge-capture",
+  "title": "Notion Knowledge Capture：把讨论存成知识",
+  "desc": "把聊天与笔记整理成决策记录、操作指南或 FAQ，并保留来源和关联页面。",
+  "type": "skill",
+  "group": "external",
+  "tag": "日更精选 · 未实测",
+  "art": "flow",
+  "source": "Notion Labs（收录于 openai/plugins）",
+  "url": "https://github.com/openai/plugins/tree/main/plugins/notion/skills/notion-knowledge-capture",
+  "license": "MIT",
+  "licenseUrl": "https://github.com/openai/plugins/blob/0722921d5542fc593105c27bd52630babd8b8c2a/plugins/notion/skills/notion-knowledge-capture/LICENSE.txt",
+  "stars": 7466,
+  "date": "2026-10-17",
+  "body": "## 为什么收录\n\n聊天结束后，重要信息常散在不同消息里。Notion Knowledge Capture 提供一个整理流程：先判断要留下的是决策、操作方法还是问答，再查找已有页面和目标数据库，提取事实、原因与后续事项，最后建立页面之间的关联。\n\n它的价值在于补齐记录的上下文。写决策记录时，除了最终选项，还要保留考虑过的方案和选择理由；写操作指南时，则关注前提、步骤和容易遗漏的情况。对需要重复查阅团队经验或个人工作笔记的人，这套结构比只存一段摘要更便于后续使用。\n\n本次核验目录包含 3 个示例文件、7 份参考文档和 2 份 JSON 评估场景文件。这些是可阅读的模板与检查材料，不是本站的实测结果。\n\n## 适用环境与权限\n\n该技能属于 openai/plugins 的 Notion 插件，依赖已连接的 Notion 工具。它会搜索和读取工作区内容，也包含创建页面、修改内容、更新属性和关联任务的步骤；普通聊天窗口未必具备这些能力。\n\n使用前应确认目标工作区、父页面或数据库，以及页面的可见范围。包含私人聊天或团队资料时，只导入已获授权的内容。建议先用非敏感材料在测试页面检查字段和排版，再用于正式记录；重要决策、负责人和截止日期仍需人工确认。示例中的通知动作不等于获得自动向他人发送消息的授权。\n\n技能目录主要是说明、示例和元数据；本次查看的插件 MCP 配置指向 mcp.notion.com 的 HTTP 服务。连接和授权仍需按实际产品流程核对权限，不能把技能文字当作自动获得账户访问权。\n\n**未实测**：本次仅静态阅读技能说明、插件配置、示例、评估说明及许可证，没有安装插件、连接 Notion、运行代码或写入任何页面。本站只链接原目录。\n\n## 来源、许可与核验\n\n- 该目录许可证署名为 Notion Labs, Inc.，使用 [MIT 许可证](https://github.com/openai/plugins/blob/0722921d5542fc593105c27bd52630babd8b8c2a/plugins/notion/skills/notion-knowledge-capture/LICENSE.txt)；openai/plugins 是收录仓库，不将整个仓库的许可一概推定为 MIT。\n- 2026-10-17 01:32 UTC 核验：openai/plugins 整库为 7,466 stars；这是整个插件集合的关注量，不是该技能单独的评分。仓库最近推送为 2026-10-08 05:21 UTC。\n- 本次固定核验版本：[0722921](https://github.com/openai/plugins/commit/0722921d5542fc593105c27bd52630babd8b8c2a)；该技能目录最近提交为 2026-08-26 20:49 UTC。\n- 旧 openai/skills 的 README 已标注弃用并指向 openai/plugins，因此此处使用迁移后的来源入口。\n\n[阅读技能说明](https://github.com/openai/plugins/blob/0722921d5542fc593105c27bd52630babd8b8c2a/plugins/notion/skills/notion-knowledge-capture/SKILL.md) · [查看决策记录示例](https://github.com/openai/plugins/blob/0722921d5542fc593105c27bd52630babd8b8c2a/plugins/notion/skills/notion-knowledge-capture/examples/decision-capture.md)",
+  "enabled": true,
+  "order": 23
+}
