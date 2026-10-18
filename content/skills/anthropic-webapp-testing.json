@@ -1,0 +1,18 @@
+{
+  "id": "anthropic-webapp-testing",
+  "title": "webapp-testing：让网页验收可复查",
+  "desc": "用 Python Playwright 检查本地网页，保留截图与日志；先审查启动命令和数据写入边界。",
+  "type": "skill",
+  "group": "external",
+  "tag": "日更精选 · 未实测",
+  "art": "code",
+  "source": "Anthropic",
+  "url": "https://github.com/anthropics/skills/tree/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/webapp-testing",
+  "license": "Apache-2.0（该 Skill 子目录）",
+  "licenseUrl": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/webapp-testing/LICENSE.txt",
+  "stars": 181801,
+  "date": "2026-10-18",
+  "enabled": true,
+  "order": 21,
+  "body": "## 适合什么任务\n\n网页能启动，不代表按钮、输入框和跳转都正常。Anthropic 的 webapp-testing 把 Python Playwright 测试整理成可复用流程：先观察实际渲染状态，再寻找元素，最后操作并留下截图或日志。静态 HTML 可以先读文件；动态页面应检查加载后的 DOM，减少凭空猜选择器的问题。\n\n目录附有元素发现、静态页面自动化、控制台日志示例，以及管理开发服务器的辅助脚本。可以先选一条简单路径：打开页面、输入测试内容、点击按钮、核对结果，把“看起来好了”变成可回看的证据。[原始 SKILL.md](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/webapp-testing/SKILL.md)可查看流程。\n\n## 门槛与安全边界\n\n需要 Python、Playwright 和可启动的本地项目，不是安装后自动覆盖所有业务。原文依赖 networkidle 的等待策略，也应按应用特性调整。\n\n[with_server.py](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/webapp-testing/scripts/with_server.py) 使用 shell=True 执行传入的服务器命令，只能传入自己审查过的可信命令。端口可连接不代表业务已就绪。交互测试可能写入数据，截图与日志可能包含隐私，应使用隔离环境与脱敏测试资料，不能直接操作真实订单。\n\n**未实测**：此次只读核验说明、示例与脚本，没有安装或执行 Skill，不提供生产可靠性或安全保证。\n\n## 作者、许可与热门依据\n\n- 发布方与版权持有人：Anthropic；[本目录 LICENSE.txt](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/webapp-testing/LICENSE.txt)为 Apache-2.0，写明 Copyright 2026 Anthropic, PBC.，不能据此概括全库许可。\n- 2026-10-18 01:41 UTC 核查，anthropics/skills 整库 181,801 stars，不是单独 webapp-testing 的关注数，也不是效果评分。\n- 固定核查版本 [dbd4588](https://github.com/anthropics/skills/commit/dbd4588f9e1033efb41dad4bef2f7947c8993d44)；该目录最近提交为 2026-04-20（许可归属文字）。全库 10 月更新不代表该技能当天更新。\n- [根 README](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/README.md)将资源定位为演示与教学，实际使用仍需充分测试。本站提供原创导读与来源，不打包分发上游脚本。"
+}

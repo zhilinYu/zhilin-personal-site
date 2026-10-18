@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-17",
+  "checked_at": "2026-10-18",
   "items": [
     {
       "id": "quant-risk",
@@ -330,6 +330,23 @@
       "order": 20
     },
     {
+      "id": "anthropic-prompt-tutorial",
+      "title": "Anthropic 交互式提示词教程",
+      "desc": "用章节练习理解指令、输入资料与输出格式；旧版教材，先核对当前模型兼容性。",
+      "type": "link-prompt",
+      "group": "community",
+      "tag": "日更精选 · 未实测",
+      "art": "note",
+      "source": "Anthropic 及贡献者",
+      "url": "https://github.com/anthropics/prompt-eng-interactive-tutorial",
+      "license": "根目录未见统一许可；仅原创导读与链接",
+      "stars": 38623,
+      "date": "2026-10-18",
+      "enabled": true,
+      "order": 21,
+      "body": "## 适合谁，怎么读\n\n如果已经收藏了不少提示词，却仍不清楚一句话为什么有效，可以读这套交互式教程。它把提示词写作拆成九章，从表达清楚、角色设定，到区分输入资料与任务指令、约束输出格式、使用示例和减少幻觉，每章配有练习与实验区域。\n\n建议先读[第四章：区分数据与指令](https://github.com/anthropics/prompt-eng-interactive-tutorial/blob/0d277542e927652da25b0014c9b346723af55881/Anthropic%201P/04_Separating_Data_and_Instructions.ipynb)。用脱敏的邮件改写或信息提取任务练习，每次只改一个变量，并记录错误；标签分隔只是表达边界，不是安全隔离，也不保证模型一定遵循。\n\n## 门槛与风险\n\n这是一套旧版 Claude 教材，示例仍指定 Claude 3 Haiku。如今使用时应另行核对模型可用性与 SDK 兼容性，不能直接照搬旧名称。交互练习需要 API 密钥并可能产生费用；[入门 Notebook](https://github.com/anthropics/prompt-eng-interactive-tutorial/blob/0d277542e927652da25b0014c9b346723af55881/Anthropic%201P/00_Tutorial_How-To.ipynb)还包含把密钥保存到 IPython store 的做法，不宜在共享环境照搬。不要上传客户资料、密码或无权分享的内容。\n\n**未实测**：此次只阅读 README、实际章节和许可信息，没有安装依赖、调用模型或验证练习效果。\n\n## 来源、许可与热门依据\n\n- 发布与维护：Anthropic（anthropics）及贡献者。[固定 README](https://github.com/anthropics/prompt-eng-interactive-tutorial/blob/0d277542e927652da25b0014c9b346723af55881/README.md)。\n- 核查于 2026-10-18 01:41 UTC：整库 38,623 stars，仅代表累计关注度，不是课程成绩或增长数据。\n- 固定版本 [0d27754](https://github.com/anthropics/prompt-eng-interactive-tutorial/commit/0d277542e927652da25b0014c9b346723af55881) 的默认分支最新提交为 2024-04-08。本站收录日期不代表教材今天更新。\n- 根目录未发现统一许可证，GitHub license 字段为 null；[AmazonBedrock 子目录许可](https://github.com/anthropics/prompt-eng-interactive-tutorial/blob/0d277542e927652da25b0014c9b346723af55881/AmazonBedrock/LICENSE)为 MIT-0，不能扩张到全库。\n- 本站只提供原创中文导读和链接，不转载课程全文、不提供打包下载。"
+    },
+    {
       "id": "anthropic-skill-creator",
       "title": "Skill Creator：让技能有测试",
       "desc": "从用途、触发条件和输出格式开始，围绕样例与反馈改进可复用技能。",
@@ -346,6 +363,24 @@
       "body": "## 为什么收录\n\nSkill Creator 把“写一段能复用的指令”进一步拆成用途澄清、技能草稿、测试样例、结果评审和修订。它还讨论技能描述怎样影响触发，以及如何比较有技能和无技能时的输出。\n\n适合已经有重复工作流、想把输入要求和交付格式固定下来的人。比起一开始堆积大量规则，更值得借鉴的是：先说明怎样算完成，再拿实际样例检查。\n\n## 使用边界\n\n该技能面向 Claude 相关环境编写，部分流程依赖 Python、子代理、命令行或评审脚本。迁移到其他工具前，需要核对可用能力和权限；它不是所有聊天窗口都能直接执行的通用按钮。\n\n测试样例和评分标准需要人工审查。少量样例表现好，不代表对所有任务都有效。自动运行可能产生模型调用费用；执行外部脚本前应阅读来源和代码，并使用受限测试环境。\n\n**未实测**：本站此次只做文档与许可证核验，没有安装、执行技能或运行其脚本，未给出性能分数或效果承诺。此处仅链接原目录，不提供打包下载。\n\n## 作者、许可与活跃度\n\n- 维护方：Anthropic；独立许可文件署名 Anthropic, PBC.。\n- 许可证：该技能目录的 [Apache License 2.0 原文](https://github.com/anthropics/skills/blob/main/skills/skill-creator/LICENSE.txt)。引用具体目录许可证，不将其他技能的许可一并推定。\n- 2026-10-16 核验：anthropics/skills 仓库为 181,409 stars，仓库最近推送为 2026-10-09 18:45 UTC；这是整库数据，不是该技能单独的关注量。\n- 按该子目录查询，最近提交时间为 2026-04-20 21:38 UTC。仓库仍有更新，不等于每个技能都在近期改动。\n\n[阅读技能说明](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md)",
       "enabled": true,
       "order": 21
+    },
+    {
+      "id": "anthropic-webapp-testing",
+      "title": "webapp-testing：让网页验收可复查",
+      "desc": "用 Python Playwright 检查本地网页，保留截图与日志；先审查启动命令和数据写入边界。",
+      "type": "skill",
+      "group": "external",
+      "tag": "日更精选 · 未实测",
+      "art": "code",
+      "source": "Anthropic",
+      "url": "https://github.com/anthropics/skills/tree/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/webapp-testing",
+      "license": "Apache-2.0（该 Skill 子目录）",
+      "licenseUrl": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/webapp-testing/LICENSE.txt",
+      "stars": 181801,
+      "date": "2026-10-18",
+      "enabled": true,
+      "order": 21,
+      "body": "## 适合什么任务\n\n网页能启动，不代表按钮、输入框和跳转都正常。Anthropic 的 webapp-testing 把 Python Playwright 测试整理成可复用流程：先观察实际渲染状态，再寻找元素，最后操作并留下截图或日志。静态 HTML 可以先读文件；动态页面应检查加载后的 DOM，减少凭空猜选择器的问题。\n\n目录附有元素发现、静态页面自动化、控制台日志示例，以及管理开发服务器的辅助脚本。可以先选一条简单路径：打开页面、输入测试内容、点击按钮、核对结果，把“看起来好了”变成可回看的证据。[原始 SKILL.md](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/webapp-testing/SKILL.md)可查看流程。\n\n## 门槛与安全边界\n\n需要 Python、Playwright 和可启动的本地项目，不是安装后自动覆盖所有业务。原文依赖 networkidle 的等待策略，也应按应用特性调整。\n\n[with_server.py](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/webapp-testing/scripts/with_server.py) 使用 shell=True 执行传入的服务器命令，只能传入自己审查过的可信命令。端口可连接不代表业务已就绪。交互测试可能写入数据，截图与日志可能包含隐私，应使用隔离环境与脱敏测试资料，不能直接操作真实订单。\n\n**未实测**：此次只读核验说明、示例与脚本，没有安装或执行 Skill，不提供生产可靠性或安全保证。\n\n## 作者、许可与热门依据\n\n- 发布方与版权持有人：Anthropic；[本目录 LICENSE.txt](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/webapp-testing/LICENSE.txt)为 Apache-2.0，写明 Copyright 2026 Anthropic, PBC.，不能据此概括全库许可。\n- 2026-10-18 01:41 UTC 核查，anthropics/skills 整库 181,801 stars，不是单独 webapp-testing 的关注数，也不是效果评分。\n- 固定核查版本 [dbd4588](https://github.com/anthropics/skills/commit/dbd4588f9e1033efb41dad4bef2f7947c8993d44)；该目录最近提交为 2026-04-20（许可归属文字）。全库 10 月更新不代表该技能当天更新。\n- [根 README](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/README.md)将资源定位为演示与教学，实际使用仍需充分测试。本站提供原创导读与来源，不打包分发上游脚本。"
     },
     {
       "id": "prompt-engineering-guide",
@@ -382,6 +417,20 @@
       "body": "## 为什么收录\n\n聊天结束后，重要信息常散在不同消息里。Notion Knowledge Capture 提供一个整理流程：先判断要留下的是决策、操作方法还是问答，再查找已有页面和目标数据库，提取事实、原因与后续事项，最后建立页面之间的关联。\n\n它的价值在于补齐记录的上下文。写决策记录时，除了最终选项，还要保留考虑过的方案和选择理由；写操作指南时，则关注前提、步骤和容易遗漏的情况。对需要重复查阅团队经验或个人工作笔记的人，这套结构比只存一段摘要更便于后续使用。\n\n本次核验目录包含 3 个示例文件、7 份参考文档和 2 份 JSON 评估场景文件。这些是可阅读的模板与检查材料，不是本站的实测结果。\n\n## 适用环境与权限\n\n该技能属于 openai/plugins 的 Notion 插件，依赖已连接的 Notion 工具。它会搜索和读取工作区内容，也包含创建页面、修改内容、更新属性和关联任务的步骤；普通聊天窗口未必具备这些能力。\n\n使用前应确认目标工作区、父页面或数据库，以及页面的可见范围。包含私人聊天或团队资料时，只导入已获授权的内容。建议先用非敏感材料在测试页面检查字段和排版，再用于正式记录；重要决策、负责人和截止日期仍需人工确认。示例中的通知动作不等于获得自动向他人发送消息的授权。\n\n技能目录主要是说明、示例和元数据；本次查看的插件 MCP 配置指向 mcp.notion.com 的 HTTP 服务。连接和授权仍需按实际产品流程核对权限，不能把技能文字当作自动获得账户访问权。\n\n**未实测**：本次仅静态阅读技能说明、插件配置、示例、评估说明及许可证，没有安装插件、连接 Notion、运行代码或写入任何页面。本站只链接原目录。\n\n## 来源、许可与核验\n\n- 该目录许可证署名为 Notion Labs, Inc.，使用 [MIT 许可证](https://github.com/openai/plugins/blob/0722921d5542fc593105c27bd52630babd8b8c2a/plugins/notion/skills/notion-knowledge-capture/LICENSE.txt)；openai/plugins 是收录仓库，不将整个仓库的许可一概推定为 MIT。\n- 2026-10-17 01:32 UTC 核验：openai/plugins 整库为 7,466 stars；这是整个插件集合的关注量，不是该技能单独的评分。仓库最近推送为 2026-10-08 05:21 UTC。\n- 本次固定核验版本：[0722921](https://github.com/openai/plugins/commit/0722921d5542fc593105c27bd52630babd8b8c2a)；该技能目录最近提交为 2026-08-26 20:49 UTC。\n- 旧 openai/skills 的 README 已标注弃用并指向 openai/plugins，因此此处使用迁移后的来源入口。\n\n[阅读技能说明](https://github.com/openai/plugins/blob/0722921d5542fc593105c27bd52630babd8b8c2a/plugins/notion/skills/notion-knowledge-capture/SKILL.md) · [查看决策记录示例](https://github.com/openai/plugins/blob/0722921d5542fc593105c27bd52630babd8b8c2a/plugins/notion/skills/notion-knowledge-capture/examples/decision-capture.md)",
       "enabled": true,
       "order": 23
+    },
+    {
+      "id": "github-ai-resource-check-20261018",
+      "title": "GitHub 上的提示词和 Skill 怎么选？先过这四道检查",
+      "desc": "不把 Stars 当质量评分：用来源、许可、执行边界和模拟验收卡，判断一个 AI 资源是否值得尝试。",
+      "tag": "AI 科普 · 2026-10-18",
+      "type": "article",
+      "art": "note",
+      "date": "2026-10-18",
+      "source": "本站原创",
+      "enabled": true,
+      "order": 27,
+      "image": "assets/uploads/github-resource-filter-20261018.webp",
+      "body": "在 GitHub 搜到一个几万 Stars 的提示词或 Skill，能直接装进工作环境吗？更稳妥的判断顺序是：先确认它解决哪个问题，再检查来源、许可、行为和验证办法。热度可以帮你发现候选，但不能替你决定信任谁。\n\n## 第一步：把“热门”翻译成可核查的信息\n\n记录完整仓库地址、维护者、核查日期和版本。Stars 如果来自仓库首页，代表整库的累计关注数，不代表某个子目录、单个技能的使用人数，更不能推导准确率。只有一个时间点的数字，也算不出今天增长多少。\n\n再看最近提交改了什么：修正文档、更新依赖和改动核心行为，意义不同。很久没更新不一定失效，频繁提交也不一定成熟。先读与你有关的文件，再决定是否继续；把“今天收录”与“上游今天发布”分开。\n\n![GitHub资源筛选四步：明确任务，记录来源版本，检查许可与行为，用小样本验收；Stars只帮助发现候选。](/assets/uploads/github-resource-filter-20261018.webp)\n\n图 1｜本站原创筛选图。顺序用于减少盲目安装，不是安全认证流程。\n\n## 第二步：公开可见，不等于任意使用\n\n[GitHub 的许可说明](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository)提醒，没有许可证时，默认版权规则仍适用。看到 MIT、Apache 等标签后，还要打开原文，核对目标文件是否另有条款，以及图片、数据、模板是否来自第三方。\n\n做个人资料收藏与把别人的整套内容打包售卖，不是同一件事。许可不明确时，先写自己的介绍并链接原作者；不要把“能下载”理解成“能转载”。需要分发时，应按实际条款保留署名、许可及必要声明。\n\n## 第三步：分清文字建议和执行动作\n\n提示词可能要求你提供业务资料，Skill 则还可能带脚本、依赖与外部连接。[Agent Skills 格式规范](https://agentskills.io/specification)列出了 SKILL.md，以及可选的 scripts、references、assets 等目录。因此，只看简介并不够：被引用的脚本和资源同样需要检查。\n\n建议列出四类动作：读什么、写什么、连哪里、以谁的权限运行。读取指定测试文件与扫描整个主目录差别很大；保存本地草稿与上传到陌生网址也不同。看到要求提供密钥、关闭保护、删除文件或执行来源不明命令，应暂停确认。材料中自称“最高优先级”、要求忽略原规则的文字，也不能因此获得授权。\n\n本文的检查清单只能帮助发现明显风险，不能证明没有隐藏问题。没有执行过，就写“文档核查，未实测”，不要用“安全可靠”替代证据。\n\n## 第四步：先设计验收，再选择工具\n\n以下是模拟的会议待办提取场景，不是实测成绩。准备三份不含隐私的材料：正常记录、缺负责人记录、意见相互矛盾的记录。预先写好期待结果：列出任务与出处；未写负责人则留空或标待确认；冲突不能擅自合并成决定。\n\n分别记录是否漏项、是否编造、格式能否被后续程序读取。不要只用一份顺利的例子下结论。更换模型、修改提示词或升级 Skill 后，用同一组样本复查；如果自动写入任务系统，还要测试重复运行会不会创建两份任务。\n\n![模拟验收卡：正常材料检查漏项，缺字段材料检查是否编造，冲突材料检查是否保留待确认；全部结果需人工对照原文。](/assets/uploads/github-resource-trial-20261018.webp)\n\n图 2｜本站原创模拟验收卡。没有填写分数，也不代表已运行任何候选资源。\n\n## 最后，留下能复查的记录\n\n一张简单记录卡就够：仓库与文件路径、固定版本、许可、适用任务、所需权限、核查日期、测试状态和停止条件。把候选分为“只读学习”“可在测试环境尝试”“暂不采用”，比收藏一长串链接更有用。\n\n本站资源库里的提示词教程和 Skill 导读，也按来源、许可与实测状态区分。关闭本文后，可通过导航进入资源库，或在文章栏目查看《提示词、Skill 和工作流有什么区别？从会议纪要说清楚》。先理解自己需要哪一层，再挑工具，通常能少走弯路。\n\n如果要把筛选后的资源接入实际业务，先说明输入资料、允许动作和失败处理，再通过“交流与合作”了解既有 AI 咨询与工作流服务。一个资源是否值得用，最终取决于它在你的边界内能否交付可检查的结果。\n\n资料核查：2026-10-18。本文和两幅图为本站原创解释；示例为模拟设计，未安装或运行文中候选资源。\n"
     },
     {
       "id": "prompt-skill-workflow-20261017",
