@@ -1,0 +1,17 @@
+{
+  "id": "anthropic-prompt-tutorial",
+  "title": "Anthropic 交互式提示词教程",
+  "desc": "用章节练习理解指令、输入资料与输出格式；旧版教材，先核对当前模型兼容性。",
+  "type": "link-prompt",
+  "group": "community",
+  "tag": "日更精选 · 未实测",
+  "art": "note",
+  "source": "Anthropic 及贡献者",
+  "url": "https://github.com/anthropics/prompt-eng-interactive-tutorial",
+  "license": "根目录未见统一许可；仅原创导读与链接",
+  "stars": 38623,
+  "date": "2026-10-18",
+  "enabled": true,
+  "order": 21,
+  "body": "## 适合谁，怎么读\n\n如果已经收藏了不少提示词，却仍不清楚一句话为什么有效，可以读这套交互式教程。它把提示词写作拆成九章，从表达清楚、角色设定，到区分输入资料与任务指令、约束输出格式、使用示例和减少幻觉，每章配有练习与实验区域。\n\n建议先读[第四章：区分数据与指令](https://github.com/anthropics/prompt-eng-interactive-tutorial/blob/0d277542e927652da25b0014c9b346723af55881/Anthropic%201P/04_Separating_Data_and_Instructions.ipynb)。用脱敏的邮件改写或信息提取任务练习，每次只改一个变量，并记录错误；标签分隔只是表达边界，不是安全隔离，也不保证模型一定遵循。\n\n## 门槛与风险\n\n这是一套旧版 Claude 教材，示例仍指定 Claude 3 Haiku。如今使用时应另行核对模型可用性与 SDK 兼容性，不能直接照搬旧名称。交互练习需要 API 密钥并可能产生费用；[入门 Notebook](https://github.com/anthropics/prompt-eng-interactive-tutorial/blob/0d277542e927652da25b0014c9b346723af55881/Anthropic%201P/00_Tutorial_How-To.ipynb)还包含把密钥保存到 IPython store 的做法，不宜在共享环境照搬。不要上传客户资料、密码或无权分享的内容。\n\n**未实测**：此次只阅读 README、实际章节和许可信息，没有安装依赖、调用模型或验证练习效果。\n\n## 来源、许可与热门依据\n\n- 发布与维护：Anthropic（anthropics）及贡献者。[固定 README](https://github.com/anthropics/prompt-eng-interactive-tutorial/blob/0d277542e927652da25b0014c9b346723af55881/README.md)。\n- 核查于 2026-10-18 01:41 UTC：整库 38,623 stars，仅代表累计关注度，不是课程成绩或增长数据。\n- 固定版本 [0d27754](https://github.com/anthropics/prompt-eng-interactive-tutorial/commit/0d277542e927652da25b0014c9b346723af55881) 的默认分支最新提交为 2024-04-08。本站收录日期不代表教材今天更新。\n- 根目录未发现统一许可证，GitHub license 字段为 null；[AmazonBedrock 子目录许可](https://github.com/anthropics/prompt-eng-interactive-tutorial/blob/0d277542e927652da25b0014c9b346723af55881/AmazonBedrock/LICENSE)为 MIT-0，不能扩张到全库。\n- 本站只提供原创中文导读和链接，不转载课程全文、不提供打包下载。"
+}
