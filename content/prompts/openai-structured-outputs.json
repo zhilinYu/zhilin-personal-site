@@ -1,0 +1,18 @@
+{
+  "id": "openai-structured-outputs",
+  "title": "Structured Outputs：把提示词写成输出契约",
+  "desc": "从任务说明到 JSON Schema 与 Pydantic，让信息提取结果更易交接；官方旧版示例，未实测。",
+  "type": "link-prompt",
+  "group": "community",
+  "tag": "日更精选 · 未实测",
+  "art": "code",
+  "source": "OpenAI 及贡献者",
+  "url": "https://github.com/openai/openai-cookbook/blob/5bd6cb40b6b84b69b2032d810610aa85064102df/examples/Structured_Outputs_Intro.ipynb",
+  "license": "MIT",
+  "licenseUrl": "https://github.com/openai/openai-cookbook/blob/5bd6cb40b6b84b69b2032d810610aa85064102df/LICENSE",
+  "stars": 76683,
+  "date": "2026-10-19",
+  "enabled": true,
+  "order": 22,
+  "body": "## 让输出变成可交接的数据\n\n让 AI “返回 JSON”容易，字段齐全、类型稳定却需要明确约定。OpenAI Cookbook 的 [Structured Outputs 入门](https://github.com/openai/openai-cookbook/blob/5bd6cb40b6b84b69b2032d810610aa85064102df/examples/Structured_Outputs_Intro.ipynb)把任务提示词和输出结构放在一起讲：先说明要做什么，再用 JSON Schema 或 Pydantic 定义字段，最后处理返回值。教程包含分步解题、文章摘要和从用户需求提取商品搜索参数三个例子。\n\n工作中可以借用这个思路整理会议纪要：先确定负责人、截止日期、依据等字段，再决定信息缺失时如何表示。这里的业务字段是本站建议，并非上游现成模板。结构约束能帮助程序接收结果，不能证明事实正确；原文也专门处理 refusal，避免把拒答当成正常对象解析。\n\n## 门槛与实测状态\n\n适合愿意读 Python、理解 API 的开发者和自动化使用者。完整运行需要 OpenAI API 账户与密钥，可能产生费用。样例仍指定 gpt-4o-2024-08-06，并使用较早的 SDK 写法；应先核对当前模型及接口文档，不能直接当作最新调用指南。不要上传无权共享的会议原文或客户资料。\n\n**未实测**：本次只读核查原文件、README 和许可，没有运行 Notebook、安装依赖或调用模型。只在聊天框复制提示词，也不会自动获得 API 的结构约束。\n\n## 来源与热度口径\n\n- 发布方：OpenAI 及贡献者；[固定 README](https://github.com/openai/openai-cookbook/blob/5bd6cb40b6b84b69b2032d810610aa85064102df/README.md)。\n- [MIT 许可](https://github.com/openai/openai-cookbook/blob/5bd6cb40b6b84b69b2032d810610aa85064102df/LICENSE)，版权声明为 Copyright (c) 2025 OpenAI；复用时保留相应声明。\n- 2026-10-19 01:50 UTC 核查：整库 76,683 stars，代表累计关注，不是此教程独立星数或近期增速。\n- 目标文件最近提交为 [2026-07-14](https://github.com/openai/openai-cookbook/commit/20793784ac467f06ed67f3e3e9349dc9596894e0)；本站 10 月 19 日收录不代表上游当天更新。固定阅读版本为 5bd6cb4。"
+}
