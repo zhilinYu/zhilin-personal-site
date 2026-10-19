@@ -1,17 +1,18 @@
 {
   "id": "superpowers",
   "title": "Superpowers",
-  "desc": "让需求梳理、计划、实现、调试与验证有明确的工作流程。",
+  "desc": "重点读 brainstorming：澄清真实需求、标注推测、检查交接缺口，再进入计划与实现。",
   "type": "skill",
   "group": "external",
-  "tag": "开源精选",
+  "tag": "日更精选 · 未实测",
   "art": "flow",
-  "source": "obra",
+  "source": "Jesse Vincent（obra）及贡献者",
   "url": "https://github.com/obra/superpowers",
   "license": "MIT",
-  "licenseUrl": "https://github.com/obra/superpowers/blob/main/LICENSE",
-  "stars": 296657,
-  "body": "让需求梳理、计划、实现、调试与验证有明确的工作流程。",
+  "licenseUrl": "https://github.com/obra/superpowers/blob/bb92a77741419a4ab5f06e711a283343f1ada0c3/LICENSE",
+  "stars": 301672,
+  "date": "2026-10-19",
   "enabled": true,
-  "order": 18
+  "order": 18,
+  "body": "## 从模糊想法走到可确认的需求\n\nSuperpowers 是 obra 维护的 AI 编程工作流集合。本次补充阅读其中的 [brainstorming Skill](https://github.com/obra/superpowers/blob/bb92a77741419a4ab5f06e711a283343f1ada0c3/skills/brainstorming/SKILL.md)：先问清用户为什么要做、成功是什么样、有哪些约束，再整理成可交给执行者的描述。它不仅覆盖软件，也把演讲、活动等新计划列为适用场景。\n\n有用的细节是边聊边复述，并把模型的猜测明确标出来。已经清楚的小任务直接做；小改动可以在聊天中确认；较大项目才形成书面设计。文档需交代目标、不做什么、限制条件、用户已决定的做法，以及留给执行者决定的部分。附带的 [builder check](https://github.com/obra/superpowers/blob/bb92a77741419a4ab5f06e711a283343f1ada0c3/skills/brainstorming/builder-check-prompt.md)让另一位审阅者找出真正会改变方案的缺口，适合减少交接后的反复追问。\n\n## 门槛与边界\n\n适合已有 AI 编程助手、经常因需求不清而返工的人。可先把原文当检查清单；完整接入依赖宿主对 Skill、文件和工具的支持，并会引入一整套工作流程。原文有设计确认关口，也允许用户跳过提问，不能据此承诺永远不会误操作。\n\n可选的浏览器可视化功能会启动本地服务；README 披露默认从维护者网站加载标志并传递版本号，可关闭。安装前应审查相关脚本、网络行为和权限，勿把私密资料放进演示页面。\n\n**未实测**：此次只读检查 README、Skill、审阅提示和可视化说明，没有安装、启动服务或验证效果。\n\n## 来源、许可与核查\n\n- 作者与维护：Jesse Vincent（obra）及贡献者；[固定 README](https://github.com/obra/superpowers/blob/bb92a77741419a4ab5f06e711a283343f1ada0c3/README.md)。\n- [MIT 许可](https://github.com/obra/superpowers/blob/bb92a77741419a4ab5f06e711a283343f1ada0c3/LICENSE)，版权声明为 Copyright (c) 2025 Jesse Vincent。\n- 2026-10-19 01:50 UTC 核查：整库 301,672 stars，不是 brainstorming 单项热度，也不代表效果评级。\n- 子目录及 SKILL.md 最近提交为 [2026-10-10 的 v7.0.0](https://github.com/obra/superpowers/commit/bb92a77741419a4ab5f06e711a283343f1ada0c3)。本次更新本站已有条目，保留原 ID，不重复收录。"
 }
