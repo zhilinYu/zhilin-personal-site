@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-19",
+  "checked_at": "2026-10-20",
   "items": [
     {
       "id": "quant-risk",
@@ -386,20 +386,20 @@
     {
       "id": "openai-structured-outputs",
       "title": "Structured Outputs：把提示词写成输出契约",
-      "desc": "从任务说明到 JSON Schema 与 Pydantic，让信息提取结果更易交接；官方旧版示例，未实测。",
+      "desc": "用 JSON Schema 约定输出结构，补上拒答、截断与业务事实检查；官方旧版示例，未实测。",
       "type": "link-prompt",
       "group": "community",
       "tag": "日更精选 · 未实测",
       "art": "code",
       "source": "OpenAI 及贡献者",
-      "url": "https://github.com/openai/openai-cookbook/blob/5bd6cb40b6b84b69b2032d810610aa85064102df/examples/Structured_Outputs_Intro.ipynb",
+      "url": "https://github.com/openai/openai-cookbook/blob/3d3c283b30781a8b9ed5a30b3ea4b587e8507fa7/examples/Structured_Outputs_Intro.ipynb",
       "license": "MIT",
-      "licenseUrl": "https://github.com/openai/openai-cookbook/blob/5bd6cb40b6b84b69b2032d810610aa85064102df/LICENSE",
-      "stars": 76683,
-      "date": "2026-10-19",
+      "licenseUrl": "https://github.com/openai/openai-cookbook/blob/3d3c283b30781a8b9ed5a30b3ea4b587e8507fa7/LICENSE",
+      "stars": 76704,
+      "date": "2026-10-20",
       "enabled": true,
       "order": 22,
-      "body": "## 让输出变成可交接的数据\n\n让 AI “返回 JSON”容易，字段齐全、类型稳定却需要明确约定。OpenAI Cookbook 的 [Structured Outputs 入门](https://github.com/openai/openai-cookbook/blob/5bd6cb40b6b84b69b2032d810610aa85064102df/examples/Structured_Outputs_Intro.ipynb)把任务提示词和输出结构放在一起讲：先说明要做什么，再用 JSON Schema 或 Pydantic 定义字段，最后处理返回值。教程包含分步解题、文章摘要和从用户需求提取商品搜索参数三个例子。\n\n工作中可以借用这个思路整理会议纪要：先确定负责人、截止日期、依据等字段，再决定信息缺失时如何表示。这里的业务字段是本站建议，并非上游现成模板。结构约束能帮助程序接收结果，不能证明事实正确；原文也专门处理 refusal，避免把拒答当成正常对象解析。\n\n## 门槛与实测状态\n\n适合愿意读 Python、理解 API 的开发者和自动化使用者。完整运行需要 OpenAI API 账户与密钥，可能产生费用。样例仍指定 gpt-4o-2024-08-06，并使用较早的 SDK 写法；应先核对当前模型及接口文档，不能直接当作最新调用指南。不要上传无权共享的会议原文或客户资料。\n\n**未实测**：本次只读核查原文件、README 和许可，没有运行 Notebook、安装依赖或调用模型。只在聊天框复制提示词，也不会自动获得 API 的结构约束。\n\n## 来源与热度口径\n\n- 发布方：OpenAI 及贡献者；[固定 README](https://github.com/openai/openai-cookbook/blob/5bd6cb40b6b84b69b2032d810610aa85064102df/README.md)。\n- [MIT 许可](https://github.com/openai/openai-cookbook/blob/5bd6cb40b6b84b69b2032d810610aa85064102df/LICENSE)，版权声明为 Copyright (c) 2025 OpenAI；复用时保留相应声明。\n- 2026-10-19 01:50 UTC 核查：整库 76,683 stars，代表累计关注，不是此教程独立星数或近期增速。\n- 目标文件最近提交为 [2026-07-14](https://github.com/openai/openai-cookbook/commit/20793784ac467f06ed67f3e3e9349dc9596894e0)；本站 10 月 19 日收录不代表上游当天更新。固定阅读版本为 5bd6cb4。"
+      "body": "## 让输出变成可交接的数据\n\n让 AI “返回 JSON”容易，字段齐全、类型稳定却需要明确约定。OpenAI Cookbook 的 [Structured Outputs 入门](https://github.com/openai/openai-cookbook/blob/3d3c283b30781a8b9ed5a30b3ea4b587e8507fa7/examples/Structured_Outputs_Intro.ipynb)把任务提示词和输出结构放在一起讲：先说明要做什么，再用 JSON Schema 或 Pydantic 定义字段，最后处理返回值。教程包含分步解题、文章摘要和从用户需求提取商品搜索参数三个例子。\n\n工作中可以借用这个思路整理会议纪要：先确定负责人、截止日期、依据等字段，再决定信息缺失时如何表示。这里的业务字段是本站建议，并非上游现成模板。结构约束能帮助程序接收结果，不能证明事实正确；原文也专门处理 refusal，避免把拒答当成正常对象解析。\n\n## 2026-10-20 补充：接入前的检查顺序\n\n先检查接口是否完整返回、是否拒答，再校验 JSON 与 Schema，最后核对业务事实。官方当前指南明确：拒答或输出上限可能让正常结构无法返回，结构化结果本身也仍可能有内容错误。可以把“负责人不存在、日期冲突、原文没给信息”分别设为人工确认条件，而不是自动补齐。\n\nJSON mode 侧重生成合法 JSON，不能代替 Schema 约束；Structured Outputs 也只支持规定范围内的 JSON Schema。请先核对当前 API 与模型兼容性，不要把聊天提示词中的“请返回 JSON”当成接口级保证。详见 [官方结构化输出指南](https://developers.openai.com/api/docs/guides/structured-outputs)。\n\n以上为本站使用边界补充，并非上游教程今天新增；本次仍未运行示例。\n\n## 门槛与实测状态\n\n适合愿意读 Python、理解 API 的开发者和自动化使用者。完整运行需要 OpenAI API 账户与密钥，可能产生费用。样例仍指定 gpt-4o-2024-08-06，并使用较早的 SDK 写法；应先核对当前模型及接口文档，不能直接当作最新调用指南。不要上传无权共享的会议原文或客户资料。\n\n**未实测**：本次只读核查原文件、README 和许可，没有运行 Notebook、安装依赖或调用模型。只在聊天框复制提示词，也不会自动获得 API 的结构约束。\n\n## 来源与热度口径\n\n- 发布方：OpenAI 及贡献者；[固定 README](https://github.com/openai/openai-cookbook/blob/3d3c283b30781a8b9ed5a30b3ea4b587e8507fa7/README.md)。\n- [MIT 许可](https://github.com/openai/openai-cookbook/blob/3d3c283b30781a8b9ed5a30b3ea4b587e8507fa7/LICENSE)，版权声明为 Copyright (c) 2025 OpenAI；复用时保留相应声明。\n- 2026-10-20 01:41 UTC 核查：整库 76,704 stars，代表累计关注，不是此教程独立星数或近期增速。仓库最近推送为 2026-10-19 18:31 UTC，但不能据此推定本教程近期更新。\n- 目标文件最近提交为 [2026-07-14](https://github.com/openai/openai-cookbook/commit/20793784ac467f06ed67f3e3e9349dc9596894e0)；本站 10 月 19 日收录、10 月 20 日补充验收说明，不代表上游当天更新。固定阅读版本为 3d3c283。"
     },
     {
       "id": "prompt-engineering-guide",
@@ -436,6 +436,20 @@
       "body": "## 为什么收录\n\n聊天结束后，重要信息常散在不同消息里。Notion Knowledge Capture 提供一个整理流程：先判断要留下的是决策、操作方法还是问答，再查找已有页面和目标数据库，提取事实、原因与后续事项，最后建立页面之间的关联。\n\n它的价值在于补齐记录的上下文。写决策记录时，除了最终选项，还要保留考虑过的方案和选择理由；写操作指南时，则关注前提、步骤和容易遗漏的情况。对需要重复查阅团队经验或个人工作笔记的人，这套结构比只存一段摘要更便于后续使用。\n\n本次核验目录包含 3 个示例文件、7 份参考文档和 2 份 JSON 评估场景文件。这些是可阅读的模板与检查材料，不是本站的实测结果。\n\n## 适用环境与权限\n\n该技能属于 openai/plugins 的 Notion 插件，依赖已连接的 Notion 工具。它会搜索和读取工作区内容，也包含创建页面、修改内容、更新属性和关联任务的步骤；普通聊天窗口未必具备这些能力。\n\n使用前应确认目标工作区、父页面或数据库，以及页面的可见范围。包含私人聊天或团队资料时，只导入已获授权的内容。建议先用非敏感材料在测试页面检查字段和排版，再用于正式记录；重要决策、负责人和截止日期仍需人工确认。示例中的通知动作不等于获得自动向他人发送消息的授权。\n\n技能目录主要是说明、示例和元数据；本次查看的插件 MCP 配置指向 mcp.notion.com 的 HTTP 服务。连接和授权仍需按实际产品流程核对权限，不能把技能文字当作自动获得账户访问权。\n\n**未实测**：本次仅静态阅读技能说明、插件配置、示例、评估说明及许可证，没有安装插件、连接 Notion、运行代码或写入任何页面。本站只链接原目录。\n\n## 来源、许可与核验\n\n- 该目录许可证署名为 Notion Labs, Inc.，使用 [MIT 许可证](https://github.com/openai/plugins/blob/0722921d5542fc593105c27bd52630babd8b8c2a/plugins/notion/skills/notion-knowledge-capture/LICENSE.txt)；openai/plugins 是收录仓库，不将整个仓库的许可一概推定为 MIT。\n- 2026-10-17 01:32 UTC 核验：openai/plugins 整库为 7,466 stars；这是整个插件集合的关注量，不是该技能单独的评分。仓库最近推送为 2026-10-08 05:21 UTC。\n- 本次固定核验版本：[0722921](https://github.com/openai/plugins/commit/0722921d5542fc593105c27bd52630babd8b8c2a)；该技能目录最近提交为 2026-08-26 20:49 UTC。\n- 旧 openai/skills 的 README 已标注弃用并指向 openai/plugins，因此此处使用迁移后的来源入口。\n\n[阅读技能说明](https://github.com/openai/plugins/blob/0722921d5542fc593105c27bd52630babd8b8c2a/plugins/notion/skills/notion-knowledge-capture/SKILL.md) · [查看决策记录示例](https://github.com/openai/plugins/blob/0722921d5542fc593105c27bd52630babd8b8c2a/plugins/notion/skills/notion-knowledge-capture/examples/decision-capture.md)",
       "enabled": true,
       "order": 23
+    },
+    {
+      "id": "structured-output-checks-20261020",
+      "title": "AI 输出 JSON 为什么还会出错？结构化输出的三层验收",
+      "desc": "区分格式、业务事实与执行权限，用模拟会议任务说明如何处理空值、异常与待确认项。",
+      "tag": "AI 科普 · 2026-10-20",
+      "type": "article",
+      "art": "note",
+      "date": "2026-10-20",
+      "source": "本站原创",
+      "enabled": true,
+      "order": 25,
+      "image": "assets/uploads/structured-output-gates-20261020.webp",
+      "body": "AI 按要求返回了 JSON，为什么自动化流程还是出错？常见原因是：程序能读懂格式，却读到了错误的金额、遗漏的条件，或一条未经确认的行动。本文回答“如何让 AI 输出更可靠地交给程序”，用三层验收把这些问题拆开。\n\n下面的会议任务提取案例与图示均为模拟设计，没有调用模型跑分，也不代表某个产品的实测表现。\n\n## 第一层：格式能不能被读取\n\nJSON 是一种组织数据的格式，可以把任务名称、负责人、日期放进固定字段。只在提示词里写“请输出 JSON”，仍可能得到解释段落、代码围栏或不一致的字段名。\n\n支持结构化输出的接口，可以让模型在指定 JSON Schema 的约束下生成结果。Schema 可以理解为数据表的字段规则，例如“负责人允许为空”“优先级只能取三个选项”。[OpenAI 官方指南](https://developers.openai.com/api/docs/guides/structured-outputs)区分了 JSON mode 与 Structured Outputs：前者侧重有效 JSON，后者按支持的 Schema 约束结构。具体可用范围要核对所选模型和接口，不能把旧教程参数直接套进任何产品。\n\n![三层验收示意：格式层检查JSON与字段，业务层检查事实与规则，执行层检查授权；每层不通过都进入待处理，不直接执行。](/assets/uploads/structured-output-gates-20261020.webp)\n\n图 1｜本站原创。结构化输出帮助第一层，业务事实和执行权限仍需单独检查。\n\n程序还要识别拒绝、截断、超时等异常，再决定是否解析。收到异常时保留状态和原因，别用一个空对象假装成功。Schema 应提前验证是否属于接口支持的范围；不受支持的规则可能直接引起请求错误。\n\n## 第二层：内容是否符合业务事实\n\n假设原始记录只有：“周五前做初稿，负责人还没定。”模型返回负责人为“张三”，即使字段类型完全正确，结果也已经失真。\n\n因此，规则要同时写进提示词与验收逻辑：没有依据的负责人为空；每个任务保留对应原文；相对日期缺少会议日期或时区时，不擅自换成绝对日期。日期格式正确，不代表日期推导正确。原文与结果有冲突，应标记待确认，而不是选一个看起来合理的答案。\n\n字段设计要给“不知道”留位置。可以约定 owner 为字符串或空值，并另设 review_reason 解释缺口。这个约定需要转成具体接口支持的 Schema，文章中的字段只用于解释，不是可直接运行的配置。\n\n对于金额、数量等字段，再加可重复的业务检查：币种是否存在，单位是否一致，分项合计是否吻合。模型提供的“置信度高”不能替代这些检查，检查也不能证明所有事实都真实。\n\n![模拟会议记录“周五前做初稿，负责人未定”：负责人字段保持空值，原文保留，日期等待会议日期与时区确认；结果进入人工复核，而非直接创建任务。](/assets/uploads/structured-output-example-20261020.webp)\n\n图 2｜本站原创模拟例子。缺少依据时保留空值和原因，比自动补齐更便于交接。\n\n## 第三层：允许执行，才进入下一步\n\n“抽取到一个任务”和“获得创建任务的许可”是两件事。第一版工作流可以只生成预览，展示原文、结构化字段和待确认项；通过审核后，再按已授予的权限写入系统。\n\n输出里即使出现“立即发送邮件”，也不能把它当成用户授权。外部文档和模型结果都是需要处理的数据，不应自行提升为控制指令。接收方、数据范围与动作边界，应由可信的业务配置或明确授权决定。涉及客户资料时，先确认发送到模型服务的范围，不把整份资料默认上传。\n\n## 用小样本找到真实薄弱点\n\n先准备十条脱敏或虚构样本，覆盖信息齐全、负责人缺失、相对日期、相互矛盾和无关文本。给每条写好期望字段与应该转人工的条件，再测试不同提示词；不要只挑最顺利的一条展示。\n\n分别记录结构通过率、字段正确率、需要人工处理的比例，以及耗时和费用。它们回答不同问题：结构全通过，事实仍可能出错；转人工减少，也可能只是系统漏报缺口。修改提示词或切换模型后，用同一批样本回归，并补充新发现的失败案例。这里给的是评测方法，没有宣称任何准确率。\n\n关闭文章后，可在[提示词资源区](https://zhilin.club/#prompts)查看已收录的 Structured Outputs 教程，再到[Skills 区](https://zhilin.club/#skills)了解 Skill Creator 的测试思路。需要接入业务系统时，可从站内“交流与合作”沟通既有 AI 咨询或工作流搭建服务，先定义失败如何处理，再讨论自动化范围。\n\n参考：[JSON Schema 官方入门](https://json-schema.org/learn/getting-started-step-by-step)与上述 OpenAI 官方指南。核查日期：2026-10-20。本文与两图为本站原创，示例为模拟，未进行模型或资源安装实测。\n"
     },
     {
       "id": "ai-context-pack-20261019",
