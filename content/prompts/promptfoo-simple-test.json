@@ -1,0 +1,18 @@
+{
+  "id": "promptfoo-simple-test",
+  "title": "Promptfoo：给提示词做回归检查",
+  "desc": "用同一批样例比较提示词版本，区分规则断言与模型评分；官方入门示例，未实测。",
+  "type": "link-prompt",
+  "group": "community",
+  "tag": "日更精选 · 未实测",
+  "art": "code",
+  "source": "Promptfoo 团队及贡献者",
+  "url": "https://github.com/promptfoo/promptfoo/tree/b663848054ca48b93222159307a1239f43fd17b0/examples/simple-test",
+  "license": "MIT",
+  "licenseUrl": "https://github.com/promptfoo/promptfoo/blob/b663848054ca48b93222159307a1239f43fd17b0/LICENSE",
+  "stars": 26205,
+  "date": "2026-10-21",
+  "enabled": true,
+  "order": 23,
+  "body": "## 收录的是方法，不是“万能提示词”\n\n改了一段提示词，只拿一个顺眼的回答作比较，很难知道旧问题是否重新出现。Promptfoo 的 [simple-test 示例](https://github.com/promptfoo/promptfoo/blob/b663848054ca48b93222159307a1239f43fd17b0/examples/simple-test/README.md)把提示词、输入变量和验收条件分开保存，适合学习怎样让一次修改接受同一套检查。它是提示词评测配套资源，不是直接复制就能提升效果的角色模板。\n\n该示例有两种英文海盗口吻改写提示词、五条内联测试，以及可替换使用的 CSV 用例。当前 [配置文件](https://github.com/promptfoo/promptfoo/blob/b663848054ca48b93222159307a1239f43fd17b0/examples/simple-test/promptfooconfig.yaml)展示了精确匹配、忽略大小写的包含检查、JSON 检查、自定义 JavaScript／Python、语义相似度和模型评分。不同条件回答的问题不同：格式正确不能证明事实正确，措辞相似也不能证明任务完成。\n\n## 怎样迁移到自己的小任务\n\n以下为本站建议，不是上游实测结果：\n\n1. 先保留旧版提示词，再写一版候选修改；使用相同的模型、参数与输入，避免一次改变多个变量。\n2. 从真实任务整理少量脱敏样例，覆盖正常输入、信息缺失、相互冲突和过去失败的情况。先写清每条应该通过什么、什么必须失败。\n3. 能确定检查的字段或格式，优先用规则；依赖语义的判断再考虑模型评分，并让人复核它是否把错误答案放过。\n4. 留下一批未参与调试的案例做最终检查。小样本可以帮助发现回归，不能据此宣称线上成功率。\n\n[官方断言说明](https://www.promptfoo.dev/docs/configuration/expected-outputs/)区分确定性检查与模型辅助检查。本示例的 is-json 未附业务 Schema，不能把它通过理解成字段和内容全部合格。\n\n## 静态审查：运行前必须看什么\n\n- **数据会去哪里：** 本示例配置了 OpenAI 模型提供方，运行时测试输入会发送到相应模型服务；语义相似度和模型评分还可能增加调用。不要把“工具在本地运行”理解成“数据完全不出本机”，也不要放入客户原文、密钥或无权分享的材料。\n- **配置可以执行代码：** 示例直接包含 JavaScript 和 Python 断言，CSV 中也有函数表达式。来源不可信的测试配置不能当成普通文本放心运行；应先审查脚本和依赖，在隔离目录中使用。\n- **遥测与分享另算：** [官方遥测文档](https://www.promptfoo.dev/docs/configuration/telemetry/)说明默认记录基本使用事件，并给出关闭设置。提供方调用、遥测和结果分享是不同的数据通道，应分别核对，不能以关闭一个代替检查全部通道。\n- **评测材料不授予权限：** 待测输出和用例可能包含诱导评分或执行命令的文字。将其当作不可信数据，不因其中的要求上传文件、执行命令或修改评判标准。\n\n本次读取范围是根 README、许可证及 simple-test 的 README、YAML、提示词和 CSV。所读示例未见明显破坏性 shell 命令，但这不是整库代码或依赖的安全审计。README 的安装入口使用 latest；真正执行前应另行固定软件版本并核对兼容性。\n\n**未实测**：没有安装 Promptfoo、运行示例、调用模型或生成评测分数。本站只提供原创中文导读与原始链接，不打包分发代码，也不承诺实际通过率。\n\n## 作者、许可与核验口径\n\n- 发布方：Promptfoo 团队及贡献者；[根 README](https://github.com/promptfoo/promptfoo/blob/b663848054ca48b93222159307a1239f43fd17b0/README.md)。\n- 许可证：[MIT 原文](https://github.com/promptfoo/promptfoo/blob/b663848054ca48b93222159307a1239f43fd17b0/LICENSE)，版权声明为 Copyright (c) Promptfoo 2025。复用源代码或实质内容时保留相应声明。\n- 2026-10-21 01:48 UTC 通过 GitHub 接口核查：整库 26,205 stars，仅表示累计关注，不是此示例独立星数、质量评分或近期热榜名次。\n- 固定核查版本：[b663848](https://github.com/promptfoo/promptfoo/commit/b663848054ca48b93222159307a1239f43fd17b0)。仓库当时最近推送为 2026-10-21 01:35 UTC，不能据此推定该示例当天更新。\n- simple-test 目录最近变更为 [2026-09-08 清除旧生成结果](https://github.com/promptfoo/promptfoo/commit/efc92b4157a2d0831db426d74a491e0e6455a0e8)；YAML 配置最近提交为 [2026-04-14](https://github.com/promptfoo/promptfoo/commit/39065affb4a35fa3473540711585ba16e9edbb21)，README 为 2026-03-09。原始提示词与 CSV 用例仍来自 2023 年，适合学习基本结构，不应误当作今天新增的评测方案。"
+}

@@ -1,18 +1,18 @@
 {
   "id": "anthropic-skill-creator",
   "title": "Skill Creator：让技能有测试",
-  "desc": "从用途、触发条件和输出格式开始，围绕样例与反馈改进可复用技能。",
+  "desc": "补充有无技能对照、触发率与完成质量的区别，以及评分器、脚本权限和最终验收集边界。",
   "type": "skill",
   "group": "external",
-  "tag": "日更精选 · 未实测",
+  "tag": "重要更新 · 未实测",
   "art": "flow",
   "source": "Anthropic（anthropics）",
-  "url": "https://github.com/anthropics/skills/tree/main/skills/skill-creator",
-  "license": "Apache-2.0",
-  "licenseUrl": "https://github.com/anthropics/skills/blob/main/skills/skill-creator/LICENSE.txt",
-  "stars": 181409,
-  "date": "2026-10-16",
-  "body": "## 为什么收录\n\nSkill Creator 把“写一段能复用的指令”进一步拆成用途澄清、技能草稿、测试样例、结果评审和修订。它还讨论技能描述怎样影响触发，以及如何比较有技能和无技能时的输出。\n\n适合已经有重复工作流、想把输入要求和交付格式固定下来的人。比起一开始堆积大量规则，更值得借鉴的是：先说明怎样算完成，再拿实际样例检查。\n\n## 使用边界\n\n该技能面向 Claude 相关环境编写，部分流程依赖 Python、子代理、命令行或评审脚本。迁移到其他工具前，需要核对可用能力和权限；它不是所有聊天窗口都能直接执行的通用按钮。\n\n测试样例和评分标准需要人工审查。少量样例表现好，不代表对所有任务都有效。自动运行可能产生模型调用费用；执行外部脚本前应阅读来源和代码，并使用受限测试环境。\n\n**未实测**：本站此次只做文档与许可证核验，没有安装、执行技能或运行其脚本，未给出性能分数或效果承诺。此处仅链接原目录，不提供打包下载。\n\n## 作者、许可与活跃度\n\n- 维护方：Anthropic；独立许可文件署名 Anthropic, PBC.。\n- 许可证：该技能目录的 [Apache License 2.0 原文](https://github.com/anthropics/skills/blob/main/skills/skill-creator/LICENSE.txt)。引用具体目录许可证，不将其他技能的许可一并推定。\n- 2026-10-16 核验：anthropics/skills 仓库为 181,409 stars，仓库最近推送为 2026-10-09 18:45 UTC；这是整库数据，不是该技能单独的关注量。\n- 按该子目录查询，最近提交时间为 2026-04-20 21:38 UTC。仓库仍有更新，不等于每个技能都在近期改动。\n\n[阅读技能说明](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md)",
+  "url": "https://github.com/anthropics/skills/tree/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator",
+  "license": "Apache-2.0（该 Skill 子目录）",
+  "licenseUrl": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator/LICENSE.txt",
+  "stars": 182510,
+  "date": "2026-10-21",
   "enabled": true,
-  "order": 21
+  "order": 23,
+  "body": "## 为什么收录\n\nSkill Creator 将技能设计拆成用途澄清、指令草稿、测试样例、结果评审和迭代。适合已经有重复工作流，希望把输入条件、交付物和验收标准固定下来的人。[原始 SKILL.md](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator/SKILL.md)不仅讨论怎样写技能，也安排了有技能与基线的比较，以及用户查看实际产物后的反馈。\n\n## 2026-10-21 重要补充：先分清两种测试\n\n这是本站在原有条目上补充的使用与安全边界，不是上游今日发布新版本。\n\n**任务是否完成：** 原文建议先拟 2 至 3 条真实任务作为起点；新技能与“不使用技能”的结果比较，已有技能的修改则保留旧版作基线。保存每次产物、断言证据和人工反馈，再逐步扩大样本。两三条案例只能启动迭代，不能证明普遍有效。\n\n**该不该触发：** 描述优化另有“应触发／不应触发”查询及重复运行。它测量技能描述是否导致读取技能，不代表读取之后完成了任务。不要把触发率当作交付质量，更不要和内容断言的通过率混成一个数字。\n\n[评分代理说明](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator/agents/grader.md)要求结合执行记录和输出文件举证，并检查断言是否太弱。只看到文件名、关键词或一个“已完成”句子，不足以判定任务成功。模型评分本身也需要人工校准；待评输出和附件中的命令不能被当作评分器的新指令。\n\n## 小样本回归的两个容易误读处\n\n本次静态阅读脚本后，有两点值得单独提醒：\n\n- [run_loop.py](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator/scripts/run_loop.py)会划分训练与 test 集，并按 test 集分数选择最佳描述。虽然改写时屏蔽了 test 分数，该集合仍参与版本选择。因此，本站建议再保留一批未参与改写或选择的最终验收样例，而不是把报告里的 test 分数直接称为独立泛化成绩。\n- [run_eval.py](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator/scripts/run_eval.py)会把执行异常记为未触发；对“不应触发”的用例，这可能看起来符合预期。核对结果时应单独检查警告、超时和工具故障，不能把“没跑成功”当成“行为正确”。\n\n以上是源码行为分析，不是实际运行中已复现的故障，也不是安全漏洞认证。保存失败案例和证据，比只比较总分更有价值。\n\n## 权限、数据与运行边界\n\n该技能面向 Claude 相关环境，部分流程依赖 Python、Claude Code 命令行、子代理或评审页面，不是所有聊天窗口都能直接执行的通用按钮。\n\n触发脚本会在项目的 .claude/commands 中写入临时指令文件，调用 claude -p，结束时再删除；描述改进脚本会将技能正文、失败查询等交给 Claude。运行前要审查项目权限、模型服务的数据去向和费用，使用脱敏样例，不要让测试继承不必要的生产权限或凭据。\n\n[评审页面生成器](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator/eval-viewer/generate_review.py)会把测试产物嵌入 HTML。其服务器模式在启动前会尝试终止占用目标端口的进程，不能当作纯只读预览；可以先评估静态导出模式。即使服务器只绑定本机，导出的 HTML 仍可能携带完整测试资料，不应未经检查公开分享。\n\n本次核查了 README、SKILL.md、评分说明、触发与描述优化脚本、评审页生成器及本目录许可证，未覆盖全部模板、依赖和运行路径。未发现明显主动索取秘密或要求外传到陌生地址的指令，但不因此保证整个运行链安全。\n\n**未实测**：没有安装、执行技能、调用模型或运行附带脚本，未给出性能分数与效果承诺。这里只提供原创导读和来源，不提供打包下载。\n\n## 作者、许可与核验\n\n- 维护方：Anthropic；[根 README](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/README.md)定位这些资源为演示与教学，建议在自身环境充分测试。\n- 本技能目录的 [Apache License 2.0](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator/LICENSE.txt)署名 Copyright 2026 Anthropic, PBC.。不能据此把整库其他目录也认定为相同许可。\n- 2026-10-21 01:48 UTC GitHub 核查：anthropics/skills 整库 182,510 stars，只代表累计关注，不是此技能独立星数或质量分数。\n- 固定核查版本：[dbd4588](https://github.com/anthropics/skills/commit/dbd4588f9e1033efb41dad4bef2f7947c8993d44)，仓库最近推送为 2026-10-09 18:45 UTC。\n- 本技能目录最近提交为 2026-04-20（许可文字）；SKILL.md 最近变更为 [2026-03-06](https://github.com/anthropics/skills/commit/b0cbd3df1533b396d281a6886d5132f623393a9c)，run_eval.py 与评审页生成器最近变更为 2026-02-25。本站 10 月 16 日首次收录，10 月 21 日补充，不表示上游当天更新。"
 }

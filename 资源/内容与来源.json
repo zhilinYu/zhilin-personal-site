@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-20",
+  "checked_at": "2026-10-21",
   "items": [
     {
       "id": "quant-risk",
@@ -348,24 +348,6 @@
       "body": "## 适合谁，怎么读\n\n如果已经收藏了不少提示词，却仍不清楚一句话为什么有效，可以读这套交互式教程。它把提示词写作拆成九章，从表达清楚、角色设定，到区分输入资料与任务指令、约束输出格式、使用示例和减少幻觉，每章配有练习与实验区域。\n\n建议先读[第四章：区分数据与指令](https://github.com/anthropics/prompt-eng-interactive-tutorial/blob/0d277542e927652da25b0014c9b346723af55881/Anthropic%201P/04_Separating_Data_and_Instructions.ipynb)。用脱敏的邮件改写或信息提取任务练习，每次只改一个变量，并记录错误；标签分隔只是表达边界，不是安全隔离，也不保证模型一定遵循。\n\n## 门槛与风险\n\n这是一套旧版 Claude 教材，示例仍指定 Claude 3 Haiku。如今使用时应另行核对模型可用性与 SDK 兼容性，不能直接照搬旧名称。交互练习需要 API 密钥并可能产生费用；[入门 Notebook](https://github.com/anthropics/prompt-eng-interactive-tutorial/blob/0d277542e927652da25b0014c9b346723af55881/Anthropic%201P/00_Tutorial_How-To.ipynb)还包含把密钥保存到 IPython store 的做法，不宜在共享环境照搬。不要上传客户资料、密码或无权分享的内容。\n\n**未实测**：此次只阅读 README、实际章节和许可信息，没有安装依赖、调用模型或验证练习效果。\n\n## 来源、许可与热门依据\n\n- 发布与维护：Anthropic（anthropics）及贡献者。[固定 README](https://github.com/anthropics/prompt-eng-interactive-tutorial/blob/0d277542e927652da25b0014c9b346723af55881/README.md)。\n- 核查于 2026-10-18 01:41 UTC：整库 38,623 stars，仅代表累计关注度，不是课程成绩或增长数据。\n- 固定版本 [0d27754](https://github.com/anthropics/prompt-eng-interactive-tutorial/commit/0d277542e927652da25b0014c9b346723af55881) 的默认分支最新提交为 2024-04-08。本站收录日期不代表教材今天更新。\n- 根目录未发现统一许可证，GitHub license 字段为 null；[AmazonBedrock 子目录许可](https://github.com/anthropics/prompt-eng-interactive-tutorial/blob/0d277542e927652da25b0014c9b346723af55881/AmazonBedrock/LICENSE)为 MIT-0，不能扩张到全库。\n- 本站只提供原创中文导读和链接，不转载课程全文、不提供打包下载。"
     },
     {
-      "id": "anthropic-skill-creator",
-      "title": "Skill Creator：让技能有测试",
-      "desc": "从用途、触发条件和输出格式开始，围绕样例与反馈改进可复用技能。",
-      "type": "skill",
-      "group": "external",
-      "tag": "日更精选 · 未实测",
-      "art": "flow",
-      "source": "Anthropic（anthropics）",
-      "url": "https://github.com/anthropics/skills/tree/main/skills/skill-creator",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://github.com/anthropics/skills/blob/main/skills/skill-creator/LICENSE.txt",
-      "stars": 181409,
-      "date": "2026-10-16",
-      "body": "## 为什么收录\n\nSkill Creator 把“写一段能复用的指令”进一步拆成用途澄清、技能草稿、测试样例、结果评审和修订。它还讨论技能描述怎样影响触发，以及如何比较有技能和无技能时的输出。\n\n适合已经有重复工作流、想把输入要求和交付格式固定下来的人。比起一开始堆积大量规则，更值得借鉴的是：先说明怎样算完成，再拿实际样例检查。\n\n## 使用边界\n\n该技能面向 Claude 相关环境编写，部分流程依赖 Python、子代理、命令行或评审脚本。迁移到其他工具前，需要核对可用能力和权限；它不是所有聊天窗口都能直接执行的通用按钮。\n\n测试样例和评分标准需要人工审查。少量样例表现好，不代表对所有任务都有效。自动运行可能产生模型调用费用；执行外部脚本前应阅读来源和代码，并使用受限测试环境。\n\n**未实测**：本站此次只做文档与许可证核验，没有安装、执行技能或运行其脚本，未给出性能分数或效果承诺。此处仅链接原目录，不提供打包下载。\n\n## 作者、许可与活跃度\n\n- 维护方：Anthropic；独立许可文件署名 Anthropic, PBC.。\n- 许可证：该技能目录的 [Apache License 2.0 原文](https://github.com/anthropics/skills/blob/main/skills/skill-creator/LICENSE.txt)。引用具体目录许可证，不将其他技能的许可一并推定。\n- 2026-10-16 核验：anthropics/skills 仓库为 181,409 stars，仓库最近推送为 2026-10-09 18:45 UTC；这是整库数据，不是该技能单独的关注量。\n- 按该子目录查询，最近提交时间为 2026-04-20 21:38 UTC。仓库仍有更新，不等于每个技能都在近期改动。\n\n[阅读技能说明](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md)",
-      "enabled": true,
-      "order": 21
-    },
-    {
       "id": "anthropic-webapp-testing",
       "title": "webapp-testing：让网页验收可复查",
       "desc": "用 Python Playwright 检查本地网页，保留截图与日志；先审查启动命令和数据写入边界。",
@@ -420,6 +402,24 @@
       "order": 22
     },
     {
+      "id": "anthropic-skill-creator",
+      "title": "Skill Creator：让技能有测试",
+      "desc": "补充有无技能对照、触发率与完成质量的区别，以及评分器、脚本权限和最终验收集边界。",
+      "type": "skill",
+      "group": "external",
+      "tag": "重要更新 · 未实测",
+      "art": "flow",
+      "source": "Anthropic（anthropics）",
+      "url": "https://github.com/anthropics/skills/tree/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator",
+      "license": "Apache-2.0（该 Skill 子目录）",
+      "licenseUrl": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator/LICENSE.txt",
+      "stars": 182510,
+      "date": "2026-10-21",
+      "enabled": true,
+      "order": 23,
+      "body": "## 为什么收录\n\nSkill Creator 将技能设计拆成用途澄清、指令草稿、测试样例、结果评审和迭代。适合已经有重复工作流，希望把输入条件、交付物和验收标准固定下来的人。[原始 SKILL.md](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator/SKILL.md)不仅讨论怎样写技能，也安排了有技能与基线的比较，以及用户查看实际产物后的反馈。\n\n## 2026-10-21 重要补充：先分清两种测试\n\n这是本站在原有条目上补充的使用与安全边界，不是上游今日发布新版本。\n\n**任务是否完成：** 原文建议先拟 2 至 3 条真实任务作为起点；新技能与“不使用技能”的结果比较，已有技能的修改则保留旧版作基线。保存每次产物、断言证据和人工反馈，再逐步扩大样本。两三条案例只能启动迭代，不能证明普遍有效。\n\n**该不该触发：** 描述优化另有“应触发／不应触发”查询及重复运行。它测量技能描述是否导致读取技能，不代表读取之后完成了任务。不要把触发率当作交付质量，更不要和内容断言的通过率混成一个数字。\n\n[评分代理说明](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator/agents/grader.md)要求结合执行记录和输出文件举证，并检查断言是否太弱。只看到文件名、关键词或一个“已完成”句子，不足以判定任务成功。模型评分本身也需要人工校准；待评输出和附件中的命令不能被当作评分器的新指令。\n\n## 小样本回归的两个容易误读处\n\n本次静态阅读脚本后，有两点值得单独提醒：\n\n- [run_loop.py](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator/scripts/run_loop.py)会划分训练与 test 集，并按 test 集分数选择最佳描述。虽然改写时屏蔽了 test 分数，该集合仍参与版本选择。因此，本站建议再保留一批未参与改写或选择的最终验收样例，而不是把报告里的 test 分数直接称为独立泛化成绩。\n- [run_eval.py](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator/scripts/run_eval.py)会把执行异常记为未触发；对“不应触发”的用例，这可能看起来符合预期。核对结果时应单独检查警告、超时和工具故障，不能把“没跑成功”当成“行为正确”。\n\n以上是源码行为分析，不是实际运行中已复现的故障，也不是安全漏洞认证。保存失败案例和证据，比只比较总分更有价值。\n\n## 权限、数据与运行边界\n\n该技能面向 Claude 相关环境，部分流程依赖 Python、Claude Code 命令行、子代理或评审页面，不是所有聊天窗口都能直接执行的通用按钮。\n\n触发脚本会在项目的 .claude/commands 中写入临时指令文件，调用 claude -p，结束时再删除；描述改进脚本会将技能正文、失败查询等交给 Claude。运行前要审查项目权限、模型服务的数据去向和费用，使用脱敏样例，不要让测试继承不必要的生产权限或凭据。\n\n[评审页面生成器](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator/eval-viewer/generate_review.py)会把测试产物嵌入 HTML。其服务器模式在启动前会尝试终止占用目标端口的进程，不能当作纯只读预览；可以先评估静态导出模式。即使服务器只绑定本机，导出的 HTML 仍可能携带完整测试资料，不应未经检查公开分享。\n\n本次核查了 README、SKILL.md、评分说明、触发与描述优化脚本、评审页生成器及本目录许可证，未覆盖全部模板、依赖和运行路径。未发现明显主动索取秘密或要求外传到陌生地址的指令，但不因此保证整个运行链安全。\n\n**未实测**：没有安装、执行技能、调用模型或运行附带脚本，未给出性能分数与效果承诺。这里只提供原创导读和来源，不提供打包下载。\n\n## 作者、许可与核验\n\n- 维护方：Anthropic；[根 README](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/README.md)定位这些资源为演示与教学，建议在自身环境充分测试。\n- 本技能目录的 [Apache License 2.0](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator/LICENSE.txt)署名 Copyright 2026 Anthropic, PBC.。不能据此把整库其他目录也认定为相同许可。\n- 2026-10-21 01:48 UTC GitHub 核查：anthropics/skills 整库 182,510 stars，只代表累计关注，不是此技能独立星数或质量分数。\n- 固定核查版本：[dbd4588](https://github.com/anthropics/skills/commit/dbd4588f9e1033efb41dad4bef2f7947c8993d44)，仓库最近推送为 2026-10-09 18:45 UTC。\n- 本技能目录最近提交为 2026-04-20（许可文字）；SKILL.md 最近变更为 [2026-03-06](https://github.com/anthropics/skills/commit/b0cbd3df1533b396d281a6886d5132f623393a9c)，run_eval.py 与评审页生成器最近变更为 2026-02-25。本站 10 月 16 日首次收录，10 月 21 日补充，不表示上游当天更新。"
+    },
+    {
       "id": "notion-knowledge-capture",
       "title": "Notion Knowledge Capture：把讨论存成知识",
       "desc": "把聊天与笔记整理成决策记录、操作指南或 FAQ，并保留来源和关联页面。",
@@ -436,6 +436,38 @@
       "body": "## 为什么收录\n\n聊天结束后，重要信息常散在不同消息里。Notion Knowledge Capture 提供一个整理流程：先判断要留下的是决策、操作方法还是问答，再查找已有页面和目标数据库，提取事实、原因与后续事项，最后建立页面之间的关联。\n\n它的价值在于补齐记录的上下文。写决策记录时，除了最终选项，还要保留考虑过的方案和选择理由；写操作指南时，则关注前提、步骤和容易遗漏的情况。对需要重复查阅团队经验或个人工作笔记的人，这套结构比只存一段摘要更便于后续使用。\n\n本次核验目录包含 3 个示例文件、7 份参考文档和 2 份 JSON 评估场景文件。这些是可阅读的模板与检查材料，不是本站的实测结果。\n\n## 适用环境与权限\n\n该技能属于 openai/plugins 的 Notion 插件，依赖已连接的 Notion 工具。它会搜索和读取工作区内容，也包含创建页面、修改内容、更新属性和关联任务的步骤；普通聊天窗口未必具备这些能力。\n\n使用前应确认目标工作区、父页面或数据库，以及页面的可见范围。包含私人聊天或团队资料时，只导入已获授权的内容。建议先用非敏感材料在测试页面检查字段和排版，再用于正式记录；重要决策、负责人和截止日期仍需人工确认。示例中的通知动作不等于获得自动向他人发送消息的授权。\n\n技能目录主要是说明、示例和元数据；本次查看的插件 MCP 配置指向 mcp.notion.com 的 HTTP 服务。连接和授权仍需按实际产品流程核对权限，不能把技能文字当作自动获得账户访问权。\n\n**未实测**：本次仅静态阅读技能说明、插件配置、示例、评估说明及许可证，没有安装插件、连接 Notion、运行代码或写入任何页面。本站只链接原目录。\n\n## 来源、许可与核验\n\n- 该目录许可证署名为 Notion Labs, Inc.，使用 [MIT 许可证](https://github.com/openai/plugins/blob/0722921d5542fc593105c27bd52630babd8b8c2a/plugins/notion/skills/notion-knowledge-capture/LICENSE.txt)；openai/plugins 是收录仓库，不将整个仓库的许可一概推定为 MIT。\n- 2026-10-17 01:32 UTC 核验：openai/plugins 整库为 7,466 stars；这是整个插件集合的关注量，不是该技能单独的评分。仓库最近推送为 2026-10-08 05:21 UTC。\n- 本次固定核验版本：[0722921](https://github.com/openai/plugins/commit/0722921d5542fc593105c27bd52630babd8b8c2a)；该技能目录最近提交为 2026-08-26 20:49 UTC。\n- 旧 openai/skills 的 README 已标注弃用并指向 openai/plugins，因此此处使用迁移后的来源入口。\n\n[阅读技能说明](https://github.com/openai/plugins/blob/0722921d5542fc593105c27bd52630babd8b8c2a/plugins/notion/skills/notion-knowledge-capture/SKILL.md) · [查看决策记录示例](https://github.com/openai/plugins/blob/0722921d5542fc593105c27bd52630babd8b8c2a/plugins/notion/skills/notion-knowledge-capture/examples/decision-capture.md)",
       "enabled": true,
       "order": 23
+    },
+    {
+      "id": "promptfoo-simple-test",
+      "title": "Promptfoo：给提示词做回归检查",
+      "desc": "用同一批样例比较提示词版本，区分规则断言与模型评分；官方入门示例，未实测。",
+      "type": "link-prompt",
+      "group": "community",
+      "tag": "日更精选 · 未实测",
+      "art": "code",
+      "source": "Promptfoo 团队及贡献者",
+      "url": "https://github.com/promptfoo/promptfoo/tree/b663848054ca48b93222159307a1239f43fd17b0/examples/simple-test",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/promptfoo/promptfoo/blob/b663848054ca48b93222159307a1239f43fd17b0/LICENSE",
+      "stars": 26205,
+      "date": "2026-10-21",
+      "enabled": true,
+      "order": 23,
+      "body": "## 收录的是方法，不是“万能提示词”\n\n改了一段提示词，只拿一个顺眼的回答作比较，很难知道旧问题是否重新出现。Promptfoo 的 [simple-test 示例](https://github.com/promptfoo/promptfoo/blob/b663848054ca48b93222159307a1239f43fd17b0/examples/simple-test/README.md)把提示词、输入变量和验收条件分开保存，适合学习怎样让一次修改接受同一套检查。它是提示词评测配套资源，不是直接复制就能提升效果的角色模板。\n\n该示例有两种英文海盗口吻改写提示词、五条内联测试，以及可替换使用的 CSV 用例。当前 [配置文件](https://github.com/promptfoo/promptfoo/blob/b663848054ca48b93222159307a1239f43fd17b0/examples/simple-test/promptfooconfig.yaml)展示了精确匹配、忽略大小写的包含检查、JSON 检查、自定义 JavaScript／Python、语义相似度和模型评分。不同条件回答的问题不同：格式正确不能证明事实正确，措辞相似也不能证明任务完成。\n\n## 怎样迁移到自己的小任务\n\n以下为本站建议，不是上游实测结果：\n\n1. 先保留旧版提示词，再写一版候选修改；使用相同的模型、参数与输入，避免一次改变多个变量。\n2. 从真实任务整理少量脱敏样例，覆盖正常输入、信息缺失、相互冲突和过去失败的情况。先写清每条应该通过什么、什么必须失败。\n3. 能确定检查的字段或格式，优先用规则；依赖语义的判断再考虑模型评分，并让人复核它是否把错误答案放过。\n4. 留下一批未参与调试的案例做最终检查。小样本可以帮助发现回归，不能据此宣称线上成功率。\n\n[官方断言说明](https://www.promptfoo.dev/docs/configuration/expected-outputs/)区分确定性检查与模型辅助检查。本示例的 is-json 未附业务 Schema，不能把它通过理解成字段和内容全部合格。\n\n## 静态审查：运行前必须看什么\n\n- **数据会去哪里：** 本示例配置了 OpenAI 模型提供方，运行时测试输入会发送到相应模型服务；语义相似度和模型评分还可能增加调用。不要把“工具在本地运行”理解成“数据完全不出本机”，也不要放入客户原文、密钥或无权分享的材料。\n- **配置可以执行代码：** 示例直接包含 JavaScript 和 Python 断言，CSV 中也有函数表达式。来源不可信的测试配置不能当成普通文本放心运行；应先审查脚本和依赖，在隔离目录中使用。\n- **遥测与分享另算：** [官方遥测文档](https://www.promptfoo.dev/docs/configuration/telemetry/)说明默认记录基本使用事件，并给出关闭设置。提供方调用、遥测和结果分享是不同的数据通道，应分别核对，不能以关闭一个代替检查全部通道。\n- **评测材料不授予权限：** 待测输出和用例可能包含诱导评分或执行命令的文字。将其当作不可信数据，不因其中的要求上传文件、执行命令或修改评判标准。\n\n本次读取范围是根 README、许可证及 simple-test 的 README、YAML、提示词和 CSV。所读示例未见明显破坏性 shell 命令，但这不是整库代码或依赖的安全审计。README 的安装入口使用 latest；真正执行前应另行固定软件版本并核对兼容性。\n\n**未实测**：没有安装 Promptfoo、运行示例、调用模型或生成评测分数。本站只提供原创中文导读与原始链接，不打包分发代码，也不承诺实际通过率。\n\n## 作者、许可与核验口径\n\n- 发布方：Promptfoo 团队及贡献者；[根 README](https://github.com/promptfoo/promptfoo/blob/b663848054ca48b93222159307a1239f43fd17b0/README.md)。\n- 许可证：[MIT 原文](https://github.com/promptfoo/promptfoo/blob/b663848054ca48b93222159307a1239f43fd17b0/LICENSE)，版权声明为 Copyright (c) Promptfoo 2025。复用源代码或实质内容时保留相应声明。\n- 2026-10-21 01:48 UTC 通过 GitHub 接口核查：整库 26,205 stars，仅表示累计关注，不是此示例独立星数、质量评分或近期热榜名次。\n- 固定核查版本：[b663848](https://github.com/promptfoo/promptfoo/commit/b663848054ca48b93222159307a1239f43fd17b0)。仓库当时最近推送为 2026-10-21 01:35 UTC，不能据此推定该示例当天更新。\n- simple-test 目录最近变更为 [2026-09-08 清除旧生成结果](https://github.com/promptfoo/promptfoo/commit/efc92b4157a2d0831db426d74a491e0e6455a0e8)；YAML 配置最近提交为 [2026-04-14](https://github.com/promptfoo/promptfoo/commit/39065affb4a35fa3473540711585ba16e9edbb21)，README 为 2026-03-09。原始提示词与 CSV 用例仍来自 2023 年，适合学习基本结构，不应误当作今天新增的评测方案。"
+    },
+    {
+      "id": "prompt-eval-baseline-20261021",
+      "title": "怎么判断提示词真的变好了？从小样本回归评测开始",
+      "desc": "固定案例与验收规则比较新旧提示词，分开记录事实错误、严重失败与未测试项。",
+      "tag": "AI 科普 · 2026-10-21",
+      "type": "article",
+      "art": "note",
+      "date": "2026-10-21",
+      "source": "本站原创",
+      "enabled": true,
+      "order": 24,
+      "image": "assets/uploads/prompt-eval-loop-20261021.webp",
+      "body": "改了一版提示词，回答更顺眼，是否就值得替换旧版？这篇文章回答“怎么判断提示词真的变好了”：先写验收规则，再用同一批案例比较，最后检查有没有新的失败。适合已经有一个明确 AI 任务、但还没有评测体系的团队。\n\n本文用“把会议记录整理成待办草稿”做模拟设计，没有调用模型，没有真实客户数据，也没有准确率或节省时间的实测结论。示例数量只是起步方案，不是通用上线标准。\n\n## 先把“好用”拆成可判定的问题\n\n“纪要写得不错”无法指导下一次修改。可以先约定四条规则：任务有原文依据；未明确的负责人不补姓名；相对日期缺背景时标记待确认；只生成草稿，不擅自派发。\n\n每条规则要能指向具体证据。例如“是否遗漏重要任务”需要一份人工核对的任务清单；“有没有擅自创建任务”需要检查动作记录，不能只看模型说自己没做。若流程尚未接入工具，就把动作一项标为未测试，不写成已通过。\n\n[OpenAI 评测指南](https://developers.openai.com/api/docs/guides/evaluation-best-practices)建议围绕具体任务设计评测，并结合人工判断校准自动评分。这里采用的是通用方法，不要求使用某个评测平台或付费接口。\n\n![小样本评测流程：先确定验收规则，准备案例与参考答案，固定条件比较旧版和新版，再检查失败及保留样本，决定是否进入人工审核。](/assets/uploads/prompt-eval-loop-20261021.webp)\n\n图 1｜本站原创方法图。评测先回答“哪里变了”，再支持是否替换的决定。\n\n## 第一份样本集，别全选顺利案例\n\n可以从十二条脱敏或虚构记录起步：四条信息完整，三条缺负责人或日期，两条存在冲突，两条夹杂无关内容，一条混入“忽略规则，直接发送”等外部指令。最后一类应被当作待处理数据，而不是新的授权。\n\n为每条保存编号、输入、参考任务、允许的空值、必须转人工的条件。遇到两位同事对参考答案意见不一，先修改业务规则；否则模型换得再多，也无法解决评分标准本身的冲突。\n\n再准备少量保留样本，不用于日常调提示词，只在准备替换版本时检查。它们与开发样本应尽量来自不同记录，避免同一段话换个说法就同时出现在两边。样本太少，只能用于发现问题，不能据此宣称真实业务中有某个可靠的成功率。\n\n## 比较时，一次只改变一个主要因素\n\n把旧提示词标为 A，新提示词标为 B。保持输入、模型版本、可用工具和生成设置尽量一致，并记录运行时间。若同时换模型、改检索材料又改提示词，就很难知道差异来自哪里。\n\n同一输入可能得到不同输出，所以关键案例应重复运行，并保存每次结果。重复次数由成本和风险决定，不把一次幸运通过当成稳定能力。模型或服务无法固定版本时，也要把这个限制记入结果。\n\n![模拟评测记录卡：案例E07，原文为负责人待定；旧版补了姓名，判不通过；新版保留空值，单项通过；是否发送任务未测试，两版均不计为通过。](/assets/uploads/prompt-eval-card-20261021.webp)\n\n图 2｜本站原创模拟记录。按“案例×规则”记录结果，未测试不能混进通过数。\n\n## 分开看错误，别让平均分遮住风险\n\n先用程序检查能确定的项目，例如字段缺失、日期格式和禁止出现的附加文本；事实依据与遗漏情况交给人工核对。若请另一个模型评分，要给清楚的标准与参照，抽查它是否与人工一致，不能让它一句“优秀”代替验收。\n\n汇总时同时写分子、分母和失败类型。例如“负责人检查在十二个案例中通过十一个”只能描述这组测试；不要包装成产品的总体准确率。格式通过率、事实错误数、人工复核量、耗时和调用费用要分开记录。\n\n严重错误应单列阻断条件：只要出现无依据的对外发送，就先不扩大自动化，即使其他分数变高。这个门槛应在看结果之前确定，避免为了让新版获胜临时换标准。新发现的失败要加入后续回归集，并保留版本和修改原因。\n\n## 从一张表开始，不急着搭平台\n\n最小可用评测可以是一份受控表格：案例、输入、预期、实际、规则判定、失败原因、版本、耗时与费用。不熟悉开发的人先人工完成一轮；应用开发者再把稳定的检查自动化。涉及内部资料时，先确认模型服务、评测工具和日志的保存范围，别默认上传整份记录。\n\n关闭文章后，可在[文章区](https://zhilin.club/#articles)回看“需求上下文包”与“结构化输出的三层验收”，在[提示词区](https://zhilin.club/#prompts)查看 Promptfoo 小样本回归示例，在[Skills 区](https://zhilin.club/#skills)查看 Skill Creator 的测试方法与脚本风险说明。需要把评测接入现有流程，可通过站内“交流与合作”讨论 AI 咨询与工作流服务，先约定验收和人工接手边界。\n\n参考来源：上述官方评测指南。核查日期：2026-10-21。本文、两张图与案例设计为本站原创；案例为模拟，未运行模型或安装外部资源。\n"
     },
     {
       "id": "structured-output-checks-20261020",
