@@ -72,7 +72,8 @@ function card(item,arts) {
   const kind=item.image?'image':(item.art||'note');
   const art=item.image?`<img src="${escape(item.image.replace(/^\//,''))}" alt="" loading="lazy">`:(arts[kind]||arts.note||'<div class="paper-art"><span>Build.</span><i></i><i></i></div>');
   const source=item.url?`<a class="source-link" href="${escape(item.url)}" target="_blank" rel="noopener noreferrer" aria-label="查看 ${escape(item.title)} 的来源">${escape(item.source||'来源')} ↗</a>`:`<span>${escape(item.source||'志林整理')}</span>`;
-  return `<article class="resource-card reveal" data-kind="${escape(kind)}"><button class="resource-main" data-open="${escape(item.id)}"><span class="card-eyebrow">${escape(item.tag||'')}</span><h3>${escape(item.title)}</h3><p>${escape(item.desc)}</p><span class="card-cta">查看详情 <i>↗</i></span><span class="card-art" aria-hidden="true">${art}</span></button><footer><span>${escape(item.price||item.license||item.version||'')}</span>${source}</footer></article>`;
+  const searchable=[item.title,item.desc,item.tag,item.group].filter(Boolean).join(' ').toLocaleLowerCase('zh-CN');
+  return `<article class="resource-card reveal" data-resource-card data-group="${escape(item.group||'')}" data-kind="${escape(kind)}" data-search="${escape(searchable)}"><button type="button" class="resource-main" data-open="${escape(item.id)}"><span class="card-eyebrow">${escape(item.tag||'')}</span><h3>${escape(item.title)}</h3><p>${escape(item.desc)}</p><span class="card-cta">查看详情 <i>↗</i></span><span class="card-art" aria-hidden="true">${art}</span></button><footer><span>${escape(item.price||item.license||item.version||'')}</span>${source}</footer></article>`;
 }
 function groups(items,definitions,arts) {
   return definitions.map(([group,title,description])=>{
@@ -85,16 +86,18 @@ function atomicWrite(target,data) {
 }
 export function buildSite(root=ROOT) {
   const raw=loadCatalog(root).filter(x=>x.enabled);const arts=readJSON(path.join(root,'templates/art.json'));
-  const items=raw.map(x=>{
+  // Article source files remain validated and editable, but articles are currently
+  // archived from every public front-end data and navigation surface.
+  const publicRaw=raw.filter(x=>x.type!=='article');
+  const items=publicRaw.map(x=>{
     const sku=paymentSku(x);
     return {...x,...(sku?{sku,price:displayPrice(SHOP_CATALOG[sku].amount)}:{}),detail:x.body??x.detail??'',bodyHtml:md.render(x.body??x.detail??'')};
   });
   const shop=Object.entries(SHOP_CATALOG).map(([sku,entry])=>({sku,...entry,sellable:items.some(x=>x.sku===sku),title:items.find(x=>x.sku===sku)?.title||entry.name}));
-  const prompts=items.filter(x=>collections.prompts.includes(x.type));const skills=items.filter(x=>collections.skills.includes(x.type));const articles=items.filter(x=>x.type==='article');
+  const prompts=items.filter(x=>collections.prompts.includes(x.type));const skills=items.filter(x=>collections.skills.includes(x.type));
   const sections={
     PROMPTS:groups(prompts,[['stock','AI 选股研究',`${prompts.filter(x=>x.group==='stock').length} 个提示词`],['community','创作与生图','开源灵感与可复用的方法']],arts),
     SKILLS:groups(skills,[['own','我的开源 Skills','zhilinYu / 已公开发布'],['local','本地定制','按真实工作流整理'],['external','开源社区','优秀方法，注明来源']],arts),
-    ARTICLES:`<div class="article-list">${articles.map(x=>`<article class="article-row reveal"><button data-open="${escape(x.id)}"><span>${escape(x.tag||x.date||'文章')}</span><h3>${escape(x.title)}</h3><p>${escape(x.desc)}</p><i>↗</i></button></article>`).join('')}</div>`,
     DATA:JSON.stringify(items).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029')
   };
   let output=fs.readFileSync(path.join(root,'templates/index.html'),'utf8');
@@ -103,7 +106,7 @@ export function buildSite(root=ROOT) {
   }
   output=output.replace('<!-- CMS:SHOP -->',()=>JSON.stringify(shop).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029'));
   atomicWrite(path.join(root,'index.html'),output);
-  atomicWrite(path.join(root,'资源/内容与来源.json'),JSON.stringify({checked_at:new Date().toISOString().slice(0,10),items:raw},null,2)+'\n');
+  atomicWrite(path.join(root,'资源/内容与来源.json'),JSON.stringify({checked_at:new Date().toISOString().slice(0,10),items:publicRaw},null,2)+'\n');
   return {items,output};
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)) {
