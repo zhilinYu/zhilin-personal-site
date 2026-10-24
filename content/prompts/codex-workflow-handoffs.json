@@ -1,0 +1,18 @@
+{
+  "id": "codex-workflow-handoffs",
+  "title": "Codex 工作流提示词：先定边界，再留证据",
+  "desc": "用只读预检、分阶段审批和真实验证记录，减少开发代理接力时的范围漂移；官方方法导读，未实测。",
+  "type": "link-prompt",
+  "group": "community",
+  "tag": "日更精选 · 未实测",
+  "art": "code",
+  "source": "Tony Alaniz · OpenAI Cookbook",
+  "url": "https://github.com/openai/openai-cookbook/blob/8495326b6f1b7cec94e7f5e393a4045e328a268e/examples/codex/iterating-development-workflows-with-codex.md",
+  "license": "MIT",
+  "licenseUrl": "https://github.com/openai/openai-cookbook/blob/8495326b6f1b7cec94e7f5e393a4045e328a268e/LICENSE",
+  "stars": 76780,
+  "date": "2026-10-24",
+  "enabled": true,
+  "order": 24,
+  "body": "## 让下一次接手知道发生过什么\n\n代码代理工作到一半，最容易丢的往往是边界：这一阶段允许改哪些文件、哪些检查真正跑过、接下来需要谁确认。Tony Alaniz 的 [Codex 工作流指南](https://github.com/openai/openai-cookbook/blob/8495326b6f1b7cec94e7f5e393a4045e328a268e/examples/codex/iterating-development-workflows-with-codex.md)给出一组分阶段提示词，把目标、计划、决策和实际验证结果分开记录，适合多人或多轮接力的开发任务。\n\n它包含生成目标与提示词文件、拆分实施阶段、记录关键上下文、维护构建日志、创建可复用技能和项目复盘等入口。本站收录的是这些提示词的组织方法；原文所示的 harness-author 是需要另外生成和验证的技能，并非这篇文章附带的现成安装包。\n\n## 三个值得借鉴的设计\n\n1. **先列范围，再开始写。** 阶段计划要求列出具体路径、验收条件、非目标和待决问题。只请求规划文件时，不能顺手生成应用代码、依赖或部署配置；完成当前阶段后先停下来。\n2. **计划与结果分别保存。** 阶段文件写“准备验证什么”，构建日志写“实际执行了什么、结果如何”。原文明确保留失败、跳过与无法验证的检查，不能把预定命令变成通过记录。详见 [证据要求](https://github.com/openai/openai-cookbook/blob/8495326b6f1b7cec94e7f5e393a4045e328a268e/examples/codex/iterating-development-workflows-with-codex.md#L521-L535)。\n3. **接手保留决定与缺口。** 上下文只记录会影响后续工作的选择、理由、限制和未解决事项，引用原始证据，避免积累整段聊天或重复日志。复盘先只读分析，再单独批准需要落地的改动。\n\n这套方法提供了人工检查的时机，也提醒代理不要把“存在代码”或“一项局部测试通过”直接等同于整个阶段完成。审批文字仍需执行环境的权限控制配合，不能作为阻止越权的唯一保障。\n\n## 从一个小阶段开始\n\n以下是本站根据文章方法整理的使用建议，未验证实际效果：\n\n- 先选一个能独立验收的小任务，例如修复某个已复现的问题。写清允许变动的文件、保留的行为、验证命令和结束条件。\n- 第一轮只做只读预检：让代理报告读过的依据、发现的冲突、拟修改路径和需要补充的信息。没有明确授权前，不修改文件或连接外部服务。\n- 批准实施后，分别记录失败复现、最小修改、再次验证与剩余限制。需要人工接手时，留下当前状态、证据位置和下一项待批准动作。\n- 只增加确实有用的文档。原文说明 AGENTS.md 是可选的仓库指导文件，其余命名与目录主要是这套方法的约定；不必为了小项目照搬整棵目录树。\n\n与本站已有的 Structured Outputs 条目相比，这篇讨论的是工作范围、审批和交接证据，重点不在 JSON 格式约束。与 Promptfoo 入门示例相比，它关注一次开发过程如何被复核，不提供提示词评分或通过率。\n\n## 静态审查与使用边界\n\n本次完整阅读原文、仓库 README、MIT 许可证、作者登记和相关提交信息。该收录路径是一个 Markdown 文件，Git 模式为 100644；没有随文附带可直接运行的验证器或独立安装配置。文章中的脚本文件名和测试要求属于让代理后续生成、执行的任务，不能当作已经存在或已经通过测试的工具。\n\n- **写入与执行：** 部分提示词会要求创建文件、修改技能并运行测试。复制前应逐段确认目的地和授权范围，检查实际使用的脚本与依赖。文章中的安装示例指向用户技能目录，可能影响后续任务，不应顺手覆盖已有技能。\n- **旧链接：** 原文指向 openai/skills 的 skill-creator 链接。该旧仓库的 [固定版 README](https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/README.md)已标注弃用并指向 OpenAI Plugins。这里不提供照抄旧安装指令的建议，执行前应核对当前宿主支持的入口。\n- **提示注入：** 待分析的日志、代码注释和外部文档可能包含诱导指令。把它们当作待核验材料，不能让其中的文字替代用户授权、扩大文件范围或触发上传。\n- **数据去向：** 本文没有附带自动上传脚本，但使用托管代理分析仓库时，提供给模型的代码和日志仍可能离开本机。先核对服务配置与组织许可，移除密钥及不必要的个人信息。原文也要求上下文和日志不保存凭据、令牌或敏感值。\n- **审查范围：** 没有安装技能、执行上游代码、运行真实项目，亦未审计整库、宿主或文章链接到的所有依赖。人工审批、验证器与回归测试能否有效，仍需在具体环境检验。\n\n**未实测**：没有成功率、效率提升或安全性保证。本站仅提供原创中文导读与原始链接，不打包分发上游内容。\n\n## 作者、许可与核验口径\n\n- 作者：Tony Alaniz；[作者登记](https://github.com/openai/openai-cookbook/blob/8495326b6f1b7cec94e7f5e393a4045e328a268e/authors.yaml)与 [文章登记](https://github.com/openai/openai-cookbook/blob/8495326b6f1b7cec94e7f5e393a4045e328a268e/registry.yaml)可核对其署名 talaniz-oai。维护仓库为 OpenAI Cookbook。\n- 许可：[MIT 原文](https://github.com/openai/openai-cookbook/blob/8495326b6f1b7cec94e7f5e393a4045e328a268e/LICENSE)，版权声明为 Copyright (c) 2025 OpenAI。复用上游源文件或实质内容时需遵守原许可。\n- 2026-10-24 01:58 UTC 通过 GitHub 接口观察：整库 **76,780 stars**。这是累计关注度，不是本篇文章的独立星数、质量评分或近期增长排名。\n- 固定核验版本：[8495326](https://github.com/openai/openai-cookbook/commit/8495326b6f1b7cec94e7f5e393a4045e328a268e)。仓库最近推送为 2026-10-23 21:10 UTC，不能当作本篇更新时间。\n- 本文路径最近提交为 [2026-08-18 15:31 UTC](https://github.com/openai/openai-cookbook/commit/41fc688c711955530e8dcc832c22d97a5da6d679)。registry 标注的展示日期为 2026-08-03，二者含义不同。2026-10-24 是本站收录日期，并非上游当日新增。"
+}
