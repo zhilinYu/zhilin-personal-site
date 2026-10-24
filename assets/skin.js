@@ -5,7 +5,8 @@
   const catalog = new Map(content.map((item) => [item.id, item]));
   const tabs = [...document.querySelectorAll("[data-tab]")];
   const panels = [...document.querySelectorAll('[role="tabpanel"]')];
-  const aliases = { me: "about", consulting: "collaborate" };
+  const tabIds = tabs.map((tab) => tab.dataset.tab);
+  const pageAnchorIds = [...document.querySelectorAll("[data-page-anchor]")].map((anchor) => anchor.id);
   const tabRail = document.querySelector(".tabs");
   const nextTabs = document.querySelector(".tabs-next");
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -22,8 +23,9 @@
   tabRail?.addEventListener("scroll", updateTabHint, { passive: true });
 
   function setTab(requested, writeHash = false) {
-    const resolved = aliases[requested] || requested;
-    const id = tabs.some((tab) => tab.dataset.tab === resolved) ? resolved : "prompts";
+    const route = window.ZhilinNavigation.resolveHash(requested, tabIds, pageAnchorIds);
+    if (route.type === "anchor") return;
+    const id = route.id;
     tabs.forEach((tab) => {
       const active = tab.dataset.tab === id;
       tab.setAttribute("aria-selected", String(active));
@@ -31,13 +33,11 @@
     });
     panels.forEach((panel) => { panel.hidden = panel.id !== `panel-${id}`; });
 
-    // Old article hashes and removed article IDs must not expose archived content.
-    if (writeHash || (location.hash && location.hash.slice(1) !== id)) {
-      history.replaceState(null, "", `#${id}`);
-    }
+    // Legacy article hashes resolve to prompts; real page anchors remain untouched.
+    if (writeHash || route.replaceHash) history.replaceState(null, "", route.hash);
     if (writeHash) {
       tabs.find((tab) => tab.dataset.tab === id)?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "instant" });
-    } else if (location.hash && (!tabs.some((tab) => tab.dataset.tab === resolved) || requested === id)) {
+    } else if (location.hash) {
       document.getElementById(id)?.scrollIntoView({ block: "start", behavior: "instant" });
     }
     updateTabHint();

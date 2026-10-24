@@ -156,7 +156,6 @@ html[data-theme="graphite"] .hero-primary{color:#14190f}
  .page,html[data-theme="tech"] .page,html[data-theme="paper"] .page,html[data-theme="graphite"] .page{width:calc(100% - 36px)}
  .site-header{height:auto;min-height:76px;align-items:flex-start;padding:16px 0;flex-wrap:wrap}
  .header-links{gap:10px;flex-wrap:wrap;justify-content:flex-end;font-size:10px}
- .header-links>a:first-child{display:none}
  .theme-picker{gap:5px}
  .theme-picker select{padding:7px 23px 7px 9px;background-position:calc(100% - 10px) 11px,calc(100% - 6px) 11px}
  .hero,html[data-theme="tech"] .hero,html[data-theme="paper"] .hero,html[data-theme="graphite"] .hero{grid-template-columns:minmax(0,1fr) minmax(115px,.52fr);gap:10px;min-height:400px;padding:34px 0 48px}
