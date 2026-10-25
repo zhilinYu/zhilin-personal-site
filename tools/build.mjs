@@ -3,6 +3,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import MarkdownIt from 'markdown-it';
 import {SHOP_CATALOG,displayPrice,paymentSku} from './shop-catalog.mjs';
+import {versionStaticAssets} from './asset-versions.mjs';
 
 export const ROOT=fileURLToPath(new URL('../',import.meta.url));
 const collections={articles:['article'],prompts:['open-prompt','paid-prompt','link-prompt'],skills:['skill','local-skill']};
@@ -160,6 +161,7 @@ export function buildSite(root=ROOT) {
     const marker=`<!-- CMS:${key} -->`;if(!output.includes(marker))throw Error(`模板缺少 ${key}`);output=output.split(marker).join(value);
   }
   output=output.replace('<!-- CMS:SHOP -->',()=>JSON.stringify(shop).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029'));
+  output=versionStaticAssets(output,root,'index.html');
   atomicWrite(path.join(root,'index.html'),output);
   atomicWrite(path.join(root,'资源/内容与来源.json'),JSON.stringify({checked_at:new Date().toISOString().slice(0,10),items:publicRaw},null,2)+'\n');
   return {items,output};
