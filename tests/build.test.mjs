@@ -15,7 +15,7 @@ function fixture(t, item = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'zhilin-build-'));
   t.after(() => fs.rmSync(root, {recursive:true, force:true}));
   for (const dir of ['templates','content/articles','content/prompts','content/skills','assets/uploads','资源']) fs.mkdirSync(path.join(root,dir),{recursive:true});
-  fs.writeFileSync(path.join(root,'templates/index.html'), '<html><!-- CMS:PROMPTS --><!-- CMS:SKILLS --><script id="site-data" type="application/json"><!-- CMS:DATA --></script></html>');
+  fs.writeFileSync(path.join(root,'templates/index.html'), '<html><!-- CMS:UPDATE_DATE --><!-- CMS:RESOURCE_COUNT --><!-- CMS:PROMPT_COUNT --><!-- CMS:SKILL_COUNT --><!-- CMS:PATHS --><!-- CMS:LATEST --><!-- CMS:RESOURCE_FILTERS --><!-- CMS:RESOURCE_CARDS --><!-- CMS:PROJECTS --><!-- CMS:SERVICES --><script id="site-data" type="application/json"><!-- CMS:DATA --></script><script id="shop-catalog" type="application/json"><!-- CMS:SHOP --></script></html>');
   fs.writeFileSync(path.join(root,'templates/fixed-catalog.json'),'[]');
   fs.writeFileSync(path.join(root,'templates/art.json'),'{}');
   fs.writeFileSync(path.join(root,'content/articles/archived.json'),JSON.stringify({id:'archived-article',title:'仅归档文章标题',desc:'仅用于验证文章源文件保留',tag:'文章',type:'article',body:'# 归档正文\n\n不进入前台数据',enabled:true,order:0}));
