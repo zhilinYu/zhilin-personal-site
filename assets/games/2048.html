@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080e15"><title>2048 · 志林的小游戏</title>
+  <script src="theme.js"></script><link rel="stylesheet" href="../creative-space.css"><link rel="stylesheet" href="games.css">
+</head>
+<body class="game-page">
+  <main class="play-app" data-game="2048">
+    <header class="play-topbar"><a class="play-brand" href="../../index.html" data-theme-handoff><span class="brand-mark">志</span><span>AI 实践工作台 <small>/ 小游戏</small></span></a><div class="play-actions"><label class="theme-picker"><span>主题</span><select data-theme-select aria-label="选择网站主题"><option value="tech">科技蓝</option><option value="fresh">小清新</option><option value="paper">暖白纸感</option><option value="graphite">石墨暗色</option></select></label><button class="play-button" type="button" data-fullscreen>⛶ <span>全屏</span></button></div></header>
+    <section class="game-main" aria-labelledby="game-title">
+      <div class="game-heading"><div><p class="section-kicker">01 / MERGE</p><h1 id="game-title">2048</h1><p>滑动或使用方向键，让相同数字合并。</p></div><div class="score-stack"><div><span>分数</span><b data-score>0</b></div><button class="play-button" type="button" data-restart>重新开始 ↻</button></div></div>
+      <div class="game-board-2048" data-board aria-label="2048 游戏棋盘"></div>
+      <div class="game-toolbar"><p data-status aria-live="polite">方向键、WASD 或滑动棋盘来移动。</p><button class="play-button" type="button" data-howto>玩法说明</button></div>
+      <div class="howto-panel" data-howto-panel hidden>把相同数字推到一起即可合并。每次移动后会出现一个新数字；合并得分会累计。键盘支持方向键与 WASD，也可以在棋盘上滑动。</div>
+      <div class="touch-pad" aria-label="触屏方向控制"><button type="button" data-move="up" aria-label="向上">↑</button><div><button type="button" data-move="left" aria-label="向左">←</button><button type="button" data-move="down" aria-label="向下">↓</button><button type="button" data-move="right" aria-label="向右">→</button></div></div>
+      <footer class="play-footer"><a href="../../index.html" data-theme-handoff>← 返回首页</a><span>独立编写的本地试玩</span></footer>
+    </section>
+  </main>
+  <script src="games.js"></script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 # 志林个人网站
 
-四主题资源首页，重点呈现提示词、Skills、项目与服务；文章源文件继续保存在 `content/articles/`，当前不进入首页、前台数据或公开内容盘点。简历继续由独立页面提供。微信 Native 支付沿用既有服务、商户协议和服务端价格。
+四主题 AI 创意空间首页，游戏卡片和独立试玩页位于提示词与 Skills 资源索引之前；Mac 工具、项目、服务和简短个人介绍也保留在首页。文章源文件仍保存在 `content/articles/`，但不进入首页、前台数据或公开内容盘点。详细简历继续由独立页面提供。微信 Native 支付沿用既有服务、商户协议和服务端价格。
 
 ## 开发与验证
 
@@ -28,8 +28,8 @@ npm run preview:payment
 
 ## 源码和发布
 
-- `content/`：后台编辑的公开 JSON，收费条目仅含介绍；`templates/`：页面与固定栏目。
-- `tools/build.mjs`：生成根目录 `index.html`；`tools/export.mjs`：导出 `deployment/site/`，只含页面、公开资源、后台与简历。生成包不提交 Git。
+- `content/`：后台编辑的公开 JSON，收费条目仅含介绍；`templates/`：页面与固定栏目。页面有科技蓝、小清新、暖白纸感、石墨四套布局。
+- `tools/build.mjs`：按当前内容生成根目录 `index.html`；`tools/export.mjs`：导出 `deployment/site/`，只含页面、公开资源、后台与简历。生成包不提交 Git。游戏页面和脚本在 `assets/games/`，随站点公开资源导出。
 - `payment/`、`deploy/`：沿用既有支付、私有交付和发布备份门禁；私有配置、订单库、商品 ZIP 均不进入 Git 或静态发布包。
 - `.github/workflows/verify-site.yml`：分支和 PR 仅测试构建，不接触服务器或部署凭据。
 - `.github/workflows/content-deploy.yml`：沿用已上线 CMS 的静态发布流程，只发布公开内容，不重启支付服务。
@@ -46,3 +46,7 @@ npm run preview:payment
 CMS 已在既有生产站接入，可编辑文章、提示词和 Skills，默认草稿不公开。本次保留现有 OAuth 服务与固定账号校验、`public_repo` 范围、回调协议和受限配置，不创建凭证或扩大权限。
 
 `deployment/` 下的 YAML 是接入示例，实际工作流位于 `.github/workflows/`。CMS 原有生产验收记录保留；本次仅做非交易检查，不重新授权账号或创建订单。真实支付验收仍待另行授权。
+
+## 小游戏来源
+
+主页的 2048 与“方块时间”使用 `assets/games/` 下独立编写的本地代码，没有从参考站或上游游戏仓库复制代码、品牌或素材。页面中固定版本链接只说明玩法参考和许可证：Gabriele Cirulli 的 2048（MIT）与 Dionysis Zindros 的 canvas-tetris（MIT）。更多说明见 [`assets/games/README.md`](assets/games/README.md)。

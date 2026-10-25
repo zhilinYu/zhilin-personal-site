@@ -68,18 +68,63 @@ export function loadCatalog(root=ROOT) {
   }
   return items.sort((a,b)=>(a.order??0)-(b.order??0)||a.id.localeCompare(b.id));
 }
+function category(item) {
+  if(collections.prompts.includes(item.type))return 'prompt';
+  if(collections.skills.includes(item.type))return 'skill';
+  if(item.type==='product')return 'project';
+  if(item.type==='service')return 'service';
+  return 'resource';
+}
+function categoryLabel(item) {
+  const typeLabels={'open-prompt':'开源提示词','paid-prompt':'付费提示词','link-prompt':'提示词资源',skill:'Skill','local-skill':'本地 Skill',product:'项目',service:'服务'};
+  return typeLabels[item.type]||item.tag||'资源';
+}
 function card(item,arts) {
   const kind=item.image?'image':(item.art||'note');
   const art=item.image?`<img src="${escape(item.image.replace(/^\//,''))}" alt="" loading="lazy">`:(arts[kind]||arts.note||'<div class="paper-art"><span>Build.</span><i></i><i></i></div>');
   const source=item.url?`<a class="source-link" href="${escape(item.url)}" target="_blank" rel="noopener noreferrer" aria-label="查看 ${escape(item.title)} 的来源">${escape(item.source||'来源')} ↗</a>`:`<span>${escape(item.source||'志林整理')}</span>`;
-  const searchable=[item.title,item.desc,item.tag,item.group].filter(Boolean).join(' ').toLocaleLowerCase('zh-CN');
-  return `<article class="resource-card reveal" data-resource-card data-group="${escape(item.group||'')}" data-kind="${escape(kind)}" data-search="${escape(searchable)}"><button type="button" class="resource-main" data-open="${escape(item.id)}"><span class="card-eyebrow">${escape(item.tag||'')}</span><h3>${escape(item.title)}</h3><p>${escape(item.desc)}</p><span class="card-cta">查看详情 <i>↗</i></span><span class="card-art" aria-hidden="true">${art}</span></button><footer><span>${escape(item.price||item.license||item.version||'')}</span>${source}</footer></article>`;
+  const searchable=[item.title,item.desc,item.tag,item.group,item.source,item.license].filter(Boolean).join(' ').toLocaleLowerCase('zh-CN');
+  return `<article class="resource-card reveal" data-resource-card data-group="${category(item)}" data-kind="${escape(kind)}" data-search="${escape(searchable)}"><button type="button" class="resource-main" data-open="${escape(item.id)}"><span class="card-top"><span class="card-type">${escape(categoryLabel(item))}</span><span class="card-price">${escape(item.price||item.license||item.version||'')}</span></span><h3>${escape(item.title)}</h3><p>${escape(item.desc)}</p><span class="card-bottom"><span class="card-source">${escape(item.source||'志林整理')}</span><span class="card-open">查看详情 ↗</span></span><span class="card-art" aria-hidden="true">${art}</span></button><footer>${source}</footer></article>`;
 }
-function groups(items,definitions,arts) {
-  return definitions.map(([group,title,description])=>{
-    const rows=items.filter(x=>x.group===group);if(!rows.length)return '';
-    return `<div class="group-head reveal"><h3>${title}</h3><span>${description}</span></div><div class="resource-grid">${rows.map(x=>card(x,arts)).join('')}</div>`;
-  }).join('')||'<p class="empty-content">内容整理中。</p>';
+function pathCard(title,count,detail,href,filter='') {
+  const filterAttribute=filter?` data-filter-link="${filter}"`:'';
+  return `<a class="path-card" href="${href}"${filterAttribute}><span class="path-count">${String(count).padStart(2,'0')}</span><span class="path-name">${escape(title)}</span><span class="path-detail">${escape(detail)}</span></a>`;
+}
+function latestRows(items) {
+  const dated=items.filter(item=>/^\d{4}-\d{2}-\d{2}$/.test(item.date||'')).sort((a,b)=>b.date.localeCompare(a.date)||a.id.localeCompare(b.id)).slice(0,4);
+  if(!dated.length)return '<p class="empty-state">最近更新会显示在这里。</p>';
+  return dated.map(item=>`<button class="latest-row" type="button" data-open="${escape(item.id)}"><span class="latest-date">${escape(item.date.replaceAll('-','.'))}</span><span class="latest-copy"><strong>${escape(item.title)}</strong><span>${escape(item.desc||'')}</span></span><span class="latest-type">${escape(categoryLabel(item))}</span><span class="latest-arrow">↗</span></button>`).join('');
+}
+function resourceFilters(items) {
+  const definitions=[['all','全部'],['prompt','提示词'],['skill','Skills'],['project','项目'],['service','服务']];
+  return definitions.map(([value,label])=>{
+    const count=value==='all'?items.length:items.filter(item=>category(item)===value).length;
+    return `<button class="filter-button" type="button" data-filter-value="${value}" aria-pressed="${value==='all'}">${label}<span class="filter-count">${count}</span></button>`;
+  }).join('');
+}
+function resourcePaths(items) {
+  const prompts=items.filter(item=>collections.prompts.includes(item.type)).length;
+  const skills=items.filter(item=>collections.skills.includes(item.type)).length;
+  const projects=items.filter(item=>item.type==='product').length;
+  const services=items.filter(item=>item.type==='service').length;
+  const definitions=[
+    ['小游戏','2','独立编写 · 可试玩','#play'],
+    ['提示词',prompts,'从问题到可复用指令','#library','prompt'],
+    ['Skills',skills,'工作流与扩展能力','#library','skill'],
+    ['项目',projects,'正在介绍的产品','#library','project'],
+    ['服务',services,'应用开发与咨询','#library','service'],
+    ['Mac 工具','8','精选软件官方入口','#mac-tools'],
+    ['关于志林','AI','独立 AI 顾问','#about'],
+  ];
+  return definitions.map(([title,count,detail,href,filter])=>pathCard(title,count,detail,href,filter)).join('');
+}
+function projectCards(items) {
+  if(!items.length)return '<p class="empty-state">项目资料整理中。</p>';
+  return items.map(item=>`<article class="project-card"><p class="section-kicker">${escape(item.tag||'PRODUCT')}</p><h3>${escape(item.title)}</h3><p>${escape(item.desc||'')}</p><button class="text-link" type="button" data-open="${escape(item.id)}">查看介绍 <span>↗</span></button>${item.id==='zinhua-miniapp'?'<small class="project-status">小程序介绍与咨询入口；本站没有可直接游玩的版本。</small>':''}</article>`).join('');
+}
+function serviceCards(items) {
+  if(!items.length)return '<p class="empty-state">服务资料整理中。</p>';
+  return items.map(item=>`<article class="service-card"><span class="section-kicker">${escape(item.tag||'SERVICE')}</span><h3>${escape(item.title)}</h3><p>${escape(item.desc||'')}</p><button class="text-link" type="button" data-open="${escape(item.id)}">了解详情 <span>↗</span></button></article>`).join('');
 }
 function atomicWrite(target,data) {
   fs.mkdirSync(path.dirname(target),{recursive:true});const tmp=target+'.tmp';fs.writeFileSync(tmp,data);fs.renameSync(tmp,target);
@@ -95,14 +140,24 @@ export function buildSite(root=ROOT) {
   });
   const shop=Object.entries(SHOP_CATALOG).map(([sku,entry])=>({sku,...entry,sellable:items.some(x=>x.sku===sku),title:items.find(x=>x.sku===sku)?.title||entry.name}));
   const prompts=items.filter(x=>collections.prompts.includes(x.type));const skills=items.filter(x=>collections.skills.includes(x.type));
+  const promptCount=prompts.length,skillCount=skills.length;
+  const latestDate=items.filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x.date||'')).map(x=>x.date).sort().at(-1)||'';
   const sections={
-    PROMPTS:groups(prompts,[['stock','AI 选股研究',`${prompts.filter(x=>x.group==='stock').length} 个提示词`],['community','创作与生图','开源灵感与可复用的方法']],arts),
-    SKILLS:groups(skills,[['own','我的开源 Skills','zhilinYu / 已公开发布'],['local','本地定制','按真实工作流整理'],['external','开源社区','优秀方法，注明来源']],arts),
+    UPDATE_DATE:escape(latestDate.replaceAll('-','.')),
+    RESOURCE_COUNT:String(items.length),
+    PROMPT_COUNT:String(promptCount),
+    SKILL_COUNT:String(skillCount),
+    PATHS:resourcePaths(items),
+    LATEST:latestRows(items),
+    RESOURCE_FILTERS:resourceFilters(items),
+    RESOURCE_CARDS:items.map(x=>card(x,arts)).join(''),
+    PROJECTS:projectCards(items.filter(x=>x.type==='product')),
+    SERVICES:serviceCards(items.filter(x=>x.type==='service')),
     DATA:JSON.stringify(items).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029')
   };
   let output=fs.readFileSync(path.join(root,'templates/index.html'),'utf8');
   for(const [key,value] of Object.entries(sections)) {
-    const marker=`<!-- CMS:${key} -->`;if(!output.includes(marker))throw Error(`模板缺少 ${key}`);output=output.replace(marker,()=>value);
+    const marker=`<!-- CMS:${key} -->`;if(!output.includes(marker))throw Error(`模板缺少 ${key}`);output=output.split(marker).join(value);
   }
   output=output.replace('<!-- CMS:SHOP -->',()=>JSON.stringify(shop).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029'));
   atomicWrite(path.join(root,'index.html'),output);
