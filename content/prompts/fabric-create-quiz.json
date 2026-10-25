@@ -1,0 +1,18 @@
+{
+  "id": "fabric-create-quiz",
+  "title": "Create Quiz：按学习目标出复习题",
+  "desc": "先写主题、学习目标与学习者水平，再生成留空答案的复习问题；不是自动阅卷或知识正确性保证。",
+  "type": "link-prompt",
+  "group": "community",
+  "tag": "日更精选 · 未实测",
+  "art": "note",
+  "source": "Marc Andreu · Fabric",
+  "url": "https://github.com/danielmiessler/Fabric/tree/f16de16827ae23e4bb9aa35c2e4b690d40c5907c/data/patterns/create_quiz",
+  "license": "MIT",
+  "licenseUrl": "https://github.com/danielmiessler/Fabric/blob/f16de16827ae23e4bb9aa35c2e4b690d40c5907c/LICENSE",
+  "stars": 44413,
+  "date": "2026-10-25",
+  "enabled": true,
+  "order": 25,
+  "body": "## 把“帮我复习”变成可检查的目标\n\n看过一篇材料，不等于能独立解释其中的概念。Fabric 的 [create_quiz 提示词](https://github.com/danielmiessler/Fabric/blob/f16de16827ae23e4bb9aa35c2e4b690d40c5907c/data/patterns/create_quiz/system.md)把主题、学习目标和学习者水平分开，让模型围绕每个目标生成最多三道复习问题，并把答案留空。它适合准备自测问题，不是现成题库，也没有自动评分功能。\n\n[作者说明](https://github.com/danielmiessler/Fabric/blob/f16de16827ae23e4bb9aa35c2e4b690d40c5907c/data/patterns/create_quiz/README.md)要求输入主题与学习目标。原提示词未指定水平时，会默认面向大学高年级学生或行业专业人士；日常入门学习最好主动改成自己的程度。文件中的“专家”角色设定并不能证明生成的题目或知识准确。\n\n## 比直接要十道题更值得借用的部分\n\n它把题目按学习目标分组，方便反查每道题为什么存在。例如，同样学习一种工具，“说出用途”“解释限制”“判断什么时候不该用”是不同目标，不应全变成术语记忆题。\n\n以下为本站建议，不是上游已验证的效果：\n\n1. 选一小段公开或有权使用的材料，写出两到三个具体目标。目标要能检查，例如能区分两个概念，而不是笼统地写“掌握全部内容”。\n2. 明确学习者水平、输出语言和本轮范围。原文没有保证只依据提供的资料出题；若不希望引入外部知识，应另加来源限制，并让每道题指出对应材料位置。\n3. 先保留空白答案，自行作答，再对照教材或可靠原文复核。需要参考答案时另开一步，并要求区分依据充分、资料缺失和仍需核实的内容。\n4. 检查题目是否真正覆盖目标，有没有重复或超纲。只有材料不足、无需出满三题时，不必为了数量硬凑。\n\n它默认生成开放式复习问题，不承诺选择题、考试难度校准或学习成效。原提示词同时要求不回答问题、在版式中保留 Answer 行，正确理解是给学习者留填写位置，不是把漏答当作模型故障。\n\n## 门槛与安全边界\n\n这是两个 Markdown 文件组成的提示词目录，不必先安装 Fabric 才能阅读和改写。上游 [README 的 Patterns 说明](https://github.com/danielmiessler/Fabric/blob/f16de16827ae23e4bb9aa35c2e4b690d40c5907c/README.md#just-use-the-patterns)也支持直接使用提示词。实际表现取决于模型、输入材料和修改方式；本次未验证任何特定客户端的兼容性。\n\n本次完整阅读目录内 README.md、system.md、根 LICENSE，并检查根 README 中的使用与安装说明：\n\n- 本目录没有可执行脚本，也没有要求删除文件、改系统权限或把内容上传到某个固定地址。但把材料粘贴到在线模型，仍会交给所选服务处理，应先确认允许的数据范围。\n- 目录 README 有读取剪贴板并传给 Fabric 的命令示例。若剪贴板里混有客户信息、凭据或无关内容，运行时可能一并送出。本站不复刻该命令，也未执行它。\n- 根 README 另有远端脚本下载后直接交给 shell 或 PowerShell 执行的一键安装入口。它与阅读这条提示词无关，本次没有执行或审计安装器，不应为试一道题就直接运行。\n- 学习材料中的指令、链接和“标准答案”也可能不可信。把材料作为待分析数据，不因其中的要求开放工具、上传文件或改写出题目标。\n\n**未实测**：没有安装 Fabric、调用模型或测量出题质量；这里只收录提示词方法，不为整套框架、依赖或第三方服务作安全背书。本站提供原创中文导读和来源链接，不打包分发上游内容。\n\n## 作者、许可与核验口径\n\n- 本模式作者：[README 署名 Marc Andreu](https://github.com/danielmiessler/Fabric/blob/f16de16827ae23e4bb9aa35c2e4b690d40c5907c/data/patterns/create_quiz/README.md)，注明发布于 2024-05-06；维护仓库为 Daniel Miessler 的 Fabric 及其贡献者。模式作者与整库维护者分别记录。\n- 许可：[根目录 MIT 原文](https://github.com/danielmiessler/Fabric/blob/f16de16827ae23e4bb9aa35c2e4b690d40c5907c/LICENSE)。原文件版权行写的是 Copyright (c) 2012-2024 Scott Chacon and others，不能擅自改写成模式作者的版权声明；引用署名与许可证记录各按原文保留。\n- 2026-10-25 01:38 UTC 通过 GitHub 接口观察：整库 **44,413 stars**。这是累计关注度，不是该提示词的独立星数、效果评分或近期增长。\n- 固定核验版本：[f16de16](https://github.com/danielmiessler/Fabric/commit/f16de16827ae23e4bb9aa35c2e4b690d40c5907c)；仓库最近推送为 2026-10-23 17:45 UTC，不等于这个模式有更新。\n- 该目录及 system.md 现路径最近提交为 [2025-07-09 项目目录重组](https://github.com/danielmiessler/Fabric/commit/4004c51b9e54356ce64015b6d649ac4765cbde08)。旧路径记录最近一次非迁移提交为 [2024-12-19 拼写修正](https://github.com/danielmiessler/Fabric/commit/b008d17b6e0c12c30cb8b097f7450b0e76631493)，不是近期新增的出题能力。\n- 2026-10-25 是本站新收录日期；本条按实用方法补充收录，不作为“今日发布”或“重要更新”宣传。"
+}
