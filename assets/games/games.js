@@ -88,7 +88,6 @@
       const direction = DIRS[event.key];
       if (!direction || event.target.matches("select,input,textarea")) return;
       if (event.key.startsWith("Arrow")) event.preventDefault();
-      if (event.target.matches("button")) return;
       move(direction);
     });
     board.addEventListener("touchstart", (event) => { const t = event.changedTouches[0]; startX = t.clientX; startY = t.clientY; }, { passive: true });
@@ -150,7 +149,11 @@
     };
     const renderNext = () => {
       const preview = app.querySelector("[data-next]");
-      const set = new Set(next.cells.map(([x,y]) => `${x+1},${y+1}`));
+      const minX = Math.min(...next.cells.map(([x])=>x)), maxX = Math.max(...next.cells.map(([x])=>x));
+      const minY = Math.min(...next.cells.map(([,y])=>y)), maxY = Math.max(...next.cells.map(([,y])=>y));
+      const offsetX = Math.floor((4-(maxX-minX+1))/2)-minX;
+      const offsetY = Math.floor((4-(maxY-minY+1))/2)-minY;
+      const set = new Set(next.cells.map(([x,y]) => `${x+offsetX},${y+offsetY}`));
       preview.innerHTML = Array.from({length:16}, (_, i) => {
         const x = i % 4, y = Math.floor(i / 4), filled = set.has(`${x},${y}`);
         return `<i${filled ? ` class="filled" style="background:var(--piece-${next.color})"` : ""}></i>`;
@@ -211,8 +214,9 @@
       const keys = { ArrowLeft: "left", ArrowRight: "right", ArrowDown: "down", ArrowUp: "rotate", " ": "drop" };
       const action = keys[event.key];
       if (!action || event.target.matches("select,input,textarea")) return;
-      if (event.key.startsWith("Arrow") || (event.key === " " && !event.target.matches("button"))) event.preventDefault();
-      if (event.target.matches("button")) return;
+      const buttonFocused = event.target.matches("button");
+      if (event.key.startsWith("Arrow") || (event.key === " " && !buttonFocused)) event.preventDefault();
+      if (buttonFocused && event.key === " ") return;
       if (event.repeat && action === "drop") return;
       move(action);
     });

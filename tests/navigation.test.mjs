@@ -50,6 +50,44 @@ test('homepage honors a theme passed back from a game when localStorage is unava
   assert.equal(document.documentElement.dataset.theme,'paper');
 });
 
+test('homepage theme changes replace a stale game query and survive refresh',()=>{
+  const template=fs.readFileSync(path.join(project,'templates/index.html'),'utf8');
+  const bootstrap=template.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+  const skin=fs.readFileSync(path.join(project,'assets/skin.js'),'utf8');
+  let currentUrl=new URL('https://zhilin.club/index.html?source=game&theme=paper#about');
+  const stored=new Map([['zhilin-site-theme','paper']]);
+
+  function loadHome(){
+    const select={value:'tech',listeners:{},addEventListener(type,callback){(this.listeners[type] ||= []).push(callback);}};
+    const root={dataset:{theme:'tech'}};
+    const meta={content:''};
+    const document={
+      documentElement:root,
+      getElementById(id){return id==='site-data'?{textContent:'[]'}:null;},
+      querySelector(selector){return selector==='meta[name="theme-color"]'?meta:null;},
+      querySelectorAll(selector){return selector==='[data-page-anchor]'?[{id:'about'}]:selector==='[data-theme-select]'?[select]:[];},
+      addEventListener(){}
+    };
+    const location={get href(){return currentUrl.href;},get pathname(){return currentUrl.pathname;},get search(){return currentUrl.search;},get hash(){return currentUrl.hash;}};
+    const history={replaceState(_state,_title,url){currentUrl=new URL(url,currentUrl);}};
+    const window={ZhilinNavigation:{resolveHash(hash,anchors){const id=String(hash||'').replace(/^#/,'');return anchors.includes(id)?{type:'anchor',id,hash:`#${id}`,replaceHash:false}:{type:'fallback',id:'library',hash:'#library',replaceHash:!!id};}}};
+    const context={document,window,location,history,URL,URLSearchParams,localStorage:{getItem:key=>stored.get(key)||null,setItem:(key,value)=>stored.set(key,value)},matchMedia:()=>({matches:true}),addEventListener(){}};
+    vm.runInNewContext(bootstrap,context);
+    vm.runInNewContext(skin,context);
+    return {root,select};
+  }
+
+  const home=loadHome();
+  assert.equal(home.root.dataset.theme,'paper');
+  home.select.value='fresh';
+  home.select.listeners.change[0]();
+  assert.equal(home.root.dataset.theme,'fresh');
+  assert.equal(currentUrl.searchParams.get('theme'),'fresh');
+  assert.equal(currentUrl.searchParams.get('source'),'game');
+  assert.equal(currentUrl.hash,'#about');
+  assert.equal(loadHome().root.dataset.theme,'fresh');
+});
+
 test('standalone games have an explicit return-home link and shared theme handoff',()=>{
   for(const filename of ['2048.html','tetris.html']){
     const page=fs.readFileSync(path.join(project,'assets/games',filename),'utf8');

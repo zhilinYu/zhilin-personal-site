@@ -81,6 +81,11 @@
     if (persist) {
       try { localStorage.setItem(themeKey, theme); } catch { /* Keep the selected theme for this page. */ }
     }
+    const currentUrl = new URL(location.href);
+    if (currentUrl.searchParams.has("theme")) {
+      currentUrl.searchParams.set("theme", theme);
+      try { history.replaceState(null, "", `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`); } catch { /* Keep the saved theme if URL updates are unavailable. */ }
+    }
   }
   document.querySelectorAll("[data-theme-select]").forEach((select) => {
     select.addEventListener("change", () => applyTheme(select.value));

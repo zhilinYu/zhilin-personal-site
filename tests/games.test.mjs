@@ -16,7 +16,7 @@ class Element {
   querySelectorAll(selector) { return selector==='[data-move]' ? this.moves || [] : []; }
 }
 
-function gameHarness(kind) {
+function gameHarness(kind, randomValue=kind==='tetris'?.2:0) {
   const board=new Element(),score=new Element(),status=new Element(),lines=new Element(),next=new Element();
   const fullscreen=new Element(),howto=new Element(),howtoPanel=new Element(),restart=new Element(),pause=new Element();
   const moveButtons=kind==='2048'?['up','left','down','right'].map(move=>new Element({move})):
@@ -30,7 +30,7 @@ function gameHarness(kind) {
   const documentListeners={};
   const document={fullscreenElement:null,hidden:false,documentElement:{},querySelector(selector){return selector==='.play-app'?app:null;},addEventListener(type,callback){(documentListeners[type] ||= []).push(callback);}};
   let timerId=0;const intervals=new Map();
-  const math=Object.create(Math); math.random=()=>kind==='tetris'?.2:0;
+  const math=Object.create(Math); math.random=()=>randomValue;
   const context={document,Math:math,setInterval(callback){const id=++timerId;intervals.set(id,callback);return id;},clearInterval(id){intervals.delete(id);},console};
   vm.runInNewContext(fs.readFileSync(path.join(project,'assets/games/games.js'),'utf8'),context);
   return {app,board,score,status,lines,next,moveButtons,documentListeners,restart,pause,document,intervals};
@@ -86,11 +86,22 @@ test('2048 initializes a board and direction-key input merges equal tiles',()=>{
   assert.equal(game.score.textContent,'4');
 });
 
-test('2048 consumes arrow-key page scrolling without moving when a button has focus',()=>{
+test('2048 arrow keys still control the board after a button is focused',()=>{
+  const game=gameHarness('2048');
+  const initial=game.board.innerHTML;
+  game.restart.fire('click');
+  let prevented=false;
+  game.documentListeners.keydown[0]({key:'ArrowLeft',target:{matches:selector=>selector==='button'},preventDefault(){prevented=true;}});
+  assert.equal(prevented,true);
+  assert.notEqual(game.board.innerHTML,initial);
+  assert.match(game.board.innerHTML,/data-value="4"/);
+});
+
+test('2048 leaves arrow keys available to focused form controls',()=>{
   const game=gameHarness('2048');
   const initial=game.board.innerHTML;let prevented=false;
-  game.documentListeners.keydown[0]({key:'ArrowDown',target:{matches:selector=>selector.includes('button')},preventDefault(){prevented=true;}});
-  assert.equal(prevented,true);
+  game.documentListeners.keydown[0]({key:'ArrowRight',target:{matches:selector=>selector==='select,input,textarea'},preventDefault(){prevented=true;}});
+  assert.equal(prevented,false);
   assert.equal(game.board.innerHTML,initial);
 });
 
@@ -101,6 +112,12 @@ test('block game initializes its 10 by 20 board and drop input advances play',()
   game.moveButtons.find(button=>button.dataset.move==='drop').fire('click');
   assert.equal((game.board.innerHTML.match(/class="tetris-cell/g)||[]).length,200);
   assert.ok(Number(game.score.textContent)>0);
+});
+
+test('block preview centers the long piece and shows all four cells',()=>{
+  const game=gameHarness('tetris',0);
+  const filledIndices=[...game.next.innerHTML.matchAll(/<i class="filled"/g)].map(match=>[...game.next.innerHTML.slice(0,match.index).matchAll(/<i(?:\s|>)/g)].length);
+  assert.deepEqual(filledIndices,[4,5,6,7]);
 });
 
 test('block game pauses, resumes, stops in background, and restart clears the board',()=>{
@@ -116,13 +133,16 @@ test('block game pauses, resumes, stops in background, and restart clears the bo
   assert.equal(game.pause.textContent,'继续');
   assert.equal(game.pause.attributes['aria-pressed'],'true');
   const pausedBoard=game.board.innerHTML;
-  game.documentListeners.keydown[0]({key:'ArrowLeft',target:{matches:()=>false},preventDefault(){}});
+  const focusedButton={matches:selector=>selector==='button'};
+  game.documentListeners.keydown[0]({key:'ArrowLeft',target:focusedButton,preventDefault(){}});
   assert.equal(game.board.innerHTML,pausedBoard,'paused input must not move pieces');
 
   game.pause.fire('click');
   assert.equal(game.intervals.size,1);
   assert.equal(game.pause.textContent,'暂停');
   assert.equal(game.pause.attributes['aria-pressed'],'false');
+  game.documentListeners.keydown[0]({key:'ArrowLeft',target:focusedButton,preventDefault(){}});
+  assert.notEqual(game.board.innerHTML,pausedBoard,'keyboard movement must resume while the continue button remains focused');
 
   game.document.hidden=true;
   game.documentListeners.visibilitychange[0]();
@@ -166,10 +186,15 @@ test('block game ignores repeated hard-drop input and stops accepting moves afte
   assert.equal(game.intervals.size,1);
 });
 
-test('block game consumes arrow-key page scrolling without moving a focused control',()=>{
+test('block game arrow keys still control the board after restart focus and preserve Space button activation',()=>{
   const game=gameHarness('tetris');let prevented=false;
   const initial=game.board.innerHTML;
-  game.documentListeners.keydown[0]({key:'ArrowRight',repeat:false,target:{matches:selector=>selector.includes('button')},preventDefault(){prevented=true;}});
+  game.restart.fire('click');
+  const focusedButton={matches:selector=>selector==='button'};
+  game.documentListeners.keydown[0]({key:'ArrowRight',repeat:false,target:focusedButton,preventDefault(){prevented=true;}});
   assert.equal(prevented,true);
-  assert.equal(game.board.innerHTML,initial);
+  assert.notEqual(game.board.innerHTML,initial);
+  let spacePrevented=false;
+  game.documentListeners.keydown[0]({key:' ',repeat:false,target:focusedButton,preventDefault(){spacePrevented=true;}});
+  assert.equal(spacePrevented,false,'Space remains available for the focused button native action');
 });
