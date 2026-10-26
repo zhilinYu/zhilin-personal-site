@@ -8,6 +8,7 @@ import {versionStaticAssets} from './asset-versions.mjs';
 export const ROOT=fileURLToPath(new URL('../',import.meta.url));
 const collections={articles:['article'],prompts:['open-prompt','paid-prompt','link-prompt'],skills:['skill','local-skill']};
 const textFields=['title','desc','tag','body','prompt','source','license','price','version','image','url','licenseUrl','attachment','date','sku'];
+const homepageTypes=new Set(['open-prompt','paid-prompt','link-prompt','skill','local-skill','service']);
 const md=new MarkdownIt({html:false,linkify:false,breaks:true});
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const readJSON=p=>JSON.parse(fs.readFileSync(p,'utf8'));
@@ -40,7 +41,9 @@ export function validateItem(root,item,kind) {
   if(kind==='skills'&&!['own','local','external'].includes(item.group))throw Error(`${item.id} 分类无效`);
   if(item.type==='paid-prompt'&&(item.prompt?.trim()||item.attachment))throw Error('付费提示词不能包含公开全文或附件');
   paymentSku(item);
-  if(item.attachment&&kind!=='skills')throw Error('附件只能用于公开 Skills');
+  const freeQuantPrompt=item.id==='quant-risk'&&kind==='prompts'&&item.type==='open-prompt';
+  if(item.attachment&&kind!=='skills'&&!freeQuantPrompt)throw Error('附件只能用于公开 Skills 或已核验的量化风控免费下载');
+  if(freeQuantPrompt&&(item.price||item.sku))throw Error('公开量化风控提示词不能保留价格或支付 SKU');
   if(item.attachment&&!item.attachment.replace(/^\//,'').startsWith('assets/uploads/'))throw Error('附件只能放在公开上传目录');
   https(item.url,'来源链接');https(item.licenseUrl,'许可链接');
   asset(root,item.image,'图片',['.png','.jpg','.jpeg','.webp','.gif'],2*1024*1024);
@@ -77,6 +80,7 @@ function category(item) {
   return 'resource';
 }
 function categoryLabel(item) {
+  if(item.id==='quant-risk'&&item.type==='open-prompt'&&item.attachment)return '免费提示词';
   const typeLabels={'open-prompt':'开源提示词','paid-prompt':'付费提示词','link-prompt':'提示词资源',skill:'Skill','local-skill':'本地 Skill',product:'项目',service:'服务'};
   return typeLabels[item.type]||item.tag||'资源';
 }
@@ -97,7 +101,7 @@ function latestRows(items) {
   return dated.map(item=>`<button class="latest-row" type="button" data-open="${escape(item.id)}"><span class="latest-date">${escape(item.date.replaceAll('-','.'))}</span><span class="latest-copy"><strong>${escape(item.title)}</strong><span>${escape(item.desc||'')}</span></span><span class="latest-type">${escape(categoryLabel(item))}</span><span class="latest-arrow">↗</span></button>`).join('');
 }
 function resourceFilters(items) {
-  const definitions=[['all','全部'],['prompt','提示词'],['skill','Skills'],['project','项目'],['service','服务']];
+  const definitions=[['all','全部'],['prompt','提示词'],['skill','Skills']];
   return definitions.map(([value,label])=>{
     const count=value==='all'?items.length:items.filter(item=>category(item)===value).length;
     return `<button class="filter-button" type="button" data-filter-value="${value}" aria-pressed="${value==='all'}">${label}<span class="filter-count">${count}</span></button>`;
@@ -132,27 +136,24 @@ function atomicWrite(target,data) {
 }
 export function buildSite(root=ROOT) {
   const raw=loadCatalog(root).filter(x=>x.enabled);const arts=readJSON(path.join(root,'templates/art.json'));
-  // Article source files remain validated and editable, but articles are currently
-  // archived from every public front-end data and navigation surface.
-  const publicRaw=raw.filter(x=>x.type!=='article');
+  // Archived sources stay validated; quant-risk is public only with its verified free attachment.
+  const publicRaw=raw.filter(x=>homepageTypes.has(x.type)&&(x.id!=='quant-risk'||(x.type==='open-prompt'&&x.attachment)));
   const items=publicRaw.map(x=>{
     const sku=paymentSku(x);
     return {...x,...(sku?{sku,price:displayPrice(SHOP_CATALOG[sku].amount)}:{}),detail:x.body??x.detail??'',bodyHtml:md.render(x.body??x.detail??'')};
   });
   const shop=Object.entries(SHOP_CATALOG).map(([sku,entry])=>({sku,...entry,sellable:items.some(x=>x.sku===sku),title:items.find(x=>x.sku===sku)?.title||entry.name}));
   const prompts=items.filter(x=>collections.prompts.includes(x.type));const skills=items.filter(x=>collections.skills.includes(x.type));
+  const resources=items.filter(x=>x.type!=='service');
   const promptCount=prompts.length,skillCount=skills.length;
   const latestDate=items.filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x.date||'')).map(x=>x.date).sort().at(-1)||'';
   const sections={
     UPDATE_DATE:escape(latestDate.replaceAll('-','.')),
-    RESOURCE_COUNT:String(items.length),
+    RESOURCE_COUNT:String(resources.length),
     PROMPT_COUNT:String(promptCount),
     SKILL_COUNT:String(skillCount),
-    PATHS:resourcePaths(items),
-    LATEST:latestRows(items),
-    RESOURCE_FILTERS:resourceFilters(items),
-    RESOURCE_CARDS:items.map(x=>card(x,arts)).join(''),
-    PROJECTS:projectCards(items.filter(x=>x.type==='product')),
+    RESOURCE_FILTERS:resourceFilters(resources),
+    RESOURCE_CARDS:resources.map(x=>card(x,arts)).join(''),
     SERVICES:serviceCards(items.filter(x=>x.type==='service')),
     DATA:JSON.stringify(items).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029')
   };

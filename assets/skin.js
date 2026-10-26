@@ -114,6 +114,7 @@
     const download = dialog.querySelector(".dialog-download");
     download.hidden = !item.attachment;
     download.href = item.attachment?.replace(/^\//, "") || "#";
+    download.textContent = item.id === "quant-risk" ? "下载提示词 ZIP ↓" : "下载 Skill ZIP ↓";
     promptBox.hidden = !item.prompt;
     promptBox.value = item.prompt || "";
     copyButton.hidden = !item.prompt;

@@ -15,7 +15,7 @@ function deferred() {
 function response(data, status = 200) {
   return { ok: status < 400, status, json: async () => data, blob: async () => new Blob(['test']) };
 }
-function harness({ purchases = [], fetchOrder, available = true, storageFails = false } = {}) {
+function harness({ purchases = [], fetchOrder, available = true, storageFails = false, nonSellableSkus = [] } = {}) {
   const elements = new Map();
   function element(id) {
     if (elements.has(id)) return elements.get(id);
@@ -35,7 +35,7 @@ function harness({ purchases = [], fetchOrder, available = true, storageFails = 
     elements.set(id, el);
     return el;
   }
-  const shop = ['quant-risk', 'trend-leader', 'hot-money', 'countertrend', 'limit-up-pullback', 'research-bundle'].map(sku => ({sku, title:sku, amount:sku === 'research-bundle' ? 3990 : 990, sellable:sku !== 'research-bundle'}));
+  const shop = ['quant-risk', 'trend-leader', 'hot-money', 'countertrend', 'limit-up-pullback', 'research-bundle'].map(sku => ({sku, title:sku, amount:sku === 'research-bundle' ? 3990 : 990, sellable:sku !== 'research-bundle' && !nonSellableSkus.includes(sku)}));
   element('shop-catalog').textContent = JSON.stringify(shop);
   const buyButtons = shop.filter(item => item.sellable).map(item => {
     const button = element('buy-' + item.sku); button.dataset.buySku = item.sku; return button;
@@ -345,4 +345,23 @@ test('confirmed refunded order is retained in history and a new purchase uses a 
   const posts=page.requests.filter(x=>x.url==='/api/shop/orders');
   assert.equal(posts.length,1);assert.notEqual(posts[0].options.headers['Idempotency-Key'],old);
   assert.equal(page.saved().find(x=>x.token===old).status,'REFUNDED');
+});
+
+
+test('non-sellable quant-risk stays recoverable from existing purchase history', async () => {
+  const page = harness({
+    nonSellableSkus: ['quant-risk'],
+    purchases: [{ sku:'quant-risk', token:'a'.repeat(64), id:'old-quant-order', created:Date.now() }],
+    fetchOrder: url => Promise.resolve(response({ status:'PAID' })),
+  });
+
+  page.element('myPurchases').click();
+  assert.equal(page.element('purchaseList').children.length, 1);
+  await page.element('purchaseList').children[0].click();
+  await flush();
+
+  assert.equal(page.element('checkoutTitle').textContent, 'quant-risk');
+  assert.equal(page.requests.filter(request => request.url === '/api/shop/orders').length, 0);
+  assert.ok(page.requests.some(request => request.url === '/api/shop/orders/old-quant-order'));
+  assert.equal(page.element('checkoutDownload').hidden, false);
 });
