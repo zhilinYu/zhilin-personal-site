@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="tech">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1320">
+  <meta name="description" content="志林的 AI 创意空间：实用提示词、Skills、独立小游戏与 Mac 工具。">
+  <title>志林 · AI 创意空间</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%2369d9ee'/%3E%3Ctext x='7' y='29' font-size='24' font-family='sans-serif' fill='%23071116'%3E志%3C/text%3E%3C/svg%3E">
+  <script>(()=>{const allowed=["tech","fresh","paper","graphite"];const query=new URLSearchParams(location.search).get("theme");let theme=allowed.includes(query)?query:"";try{const saved=localStorage.getItem("zhilin-site-theme");if(!theme&&allowed.includes(saved))theme=saved}catch{}if(theme)document.documentElement.dataset.theme=theme})()</script>
+  <link rel="stylesheet" href="assets/skin.css">
+  <link rel="stylesheet" href="assets/creative-space.css">
+</head>
+<body>
+  <div class="site-shell" id="top" data-page-anchor>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="志林 AI 创意空间首页">
+        <span class="brand-mark">志</span>
+        <span class="brand-name">志林 <span>/ AI WORKSPACE</span></span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">目录 <span>＋</span></button>
+      <nav class="main-nav" id="main-nav" aria-label="主导航">
+        <a href="#play">小游戏</a>
+        <a href="#latest">最近更新</a>
+        <a href="#library">资源</a>
+        <a href="#mac-tools">Mac 工具</a>
+        <a href="#projects">项目</a>
+        <a href="#services">服务</a>
+        <a href="#about">关于</a>
+        <label class="theme-picker"><span>主题</span><select data-theme-select aria-label="选择网站主题"><option value="tech">科技蓝</option><option value="fresh">小清新</option><option value="paper">暖白纸感</option><option value="graphite">石墨暗色</option></select></label>
+      </nav>
+      <a class="header-contact" href="mailto:yuzhilinvip@163.com?subject=%E6%83%B3%E8%81%8A%E8%81%8A%E4%B8%80%E4%B8%AA%E9%97%AE%E9%A2%98">联系志林 <span>↗</span></a>
+    </header>
+
+    <main>
+      <section class="hero" data-page-anchor id="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="hero-kicker">AI 创意空间 <span>/</span> BUILD WITH AI</p>
+          <h1 id="hero-title"><span>把 AI 想法</span><span class="headline-outline">变成实用工具</span></h1>
+          <p class="hero-description">我是志林，独立 AI 顾问，专注 AI 应用开发、实用工具和工作流。</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#play">先玩一会 <span>↓</span></a>
+            <a class="text-link" href="#library">找到一份资源 <span>↗</span></a>
+          </div>
+        </div>
+        <aside class="update-panel" aria-label="最近资源更新">
+          <div class="panel-topline"><span class="status-dot"></span><span>WORKSPACE / LIVE</span><span class="panel-date"><!-- CMS:UPDATE_DATE --></span></div>
+          <div class="panel-number"><!-- CMS:RESOURCE_COUNT --></div>
+          <div class="panel-label">可探索的实用资源</div>
+          <div class="panel-update"><b><!-- CMS:PROMPT_COUNT --></b><span>项提示词</span><i></i><b><!-- CMS:SKILL_COUNT --></b><span>项 Skills</span></div>
+          <div class="panel-ring" aria-hidden="true"></div>
+        </aside>
+      </section>
+
+      <section class="path-section" id="start" data-page-anchor aria-labelledby="path-title">
+        <div class="section-heading section-heading-compact">
+          <div><p class="section-kicker">START HERE / 01</p><h2 id="path-title">从你想找的内容开始</h2></div>
+          <p class="section-note">七个入口，直接进入你关心的地方。</p>
+        </div>
+        <div class="path-grid" id="path-grid" aria-label="内容分类"><!-- CMS:PATHS --></div>
+      </section>
+
+      <section class="play-section" id="play" data-page-anchor aria-labelledby="play-title">
+        <div class="section-heading">
+          <div><p class="section-kicker">PLAY & CREATE / 02</p><h2 id="play-title">来点小小的创造。</h2></div>
+          <p class="section-note">两款独立编写的小游戏，另有一张实用资源入口。点卡片即可开始或继续探索。</p>
+        </div>
+        <div class="games-grid">
+          <article class="game-card-wrap">
+            <a class="game-card game-2048" href="assets/games/2048.html">
+              <div class="game-card-head"><div><p class="section-kicker">MERGE / 01</p><h3>2048</h3></div><span class="game-index">PLAY</span></div>
+              <div class="game-card-body">
+                <div class="game-art game-art-2048" aria-hidden="true"><span>2</span><span>4</span><span>8</span><span>16</span></div>
+                <div class="game-card-copy"><p class="game-description">滑动或按方向键，让相同数字合并。一步一步，把数字推到 2048。</p><span class="game-inputs"><span>键盘</span><span>触屏滑动</span></span><span class="button button-primary game-start">开始试玩 <span>↗</span></span></div>
+              </div>
+            </a>
+            <div class="game-source"><span>玩法参考</span><a href="https://github.com/gabrielecirulli/2048/tree/478b6ec346e3787f589e4af751378d06ded4cbbc" target="_blank" rel="noopener noreferrer">Gabriele Cirulli · MIT ↗</a></div>
+          </article>
+          <article class="game-card-wrap">
+            <a class="game-card game-tetris" href="assets/games/tetris.html">
+              <div class="game-card-head"><div><p class="section-kicker">DROP / 02</p><h3>方块时间</h3></div><span class="game-index">PLAY</span></div>
+              <div class="game-card-body">
+                <div class="game-art game-art-tetris" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                <div class="game-card-copy"><p class="game-description">旋转、移动、消行。给落下的方块找位置，清出一整行。</p><span class="game-inputs"><span>键盘</span><span>屏幕按钮</span></span><span class="button button-primary game-start">开始试玩 <span>↗</span></span></div>
+              </div>
+            </a>
+            <div class="game-source"><span>玩法参考</span><a href="https://github.com/dionyziz/canvas-tetris/tree/4e497d1c858914f0a1f0818698029d1c7dad090b" target="_blank" rel="noopener noreferrer">Dionysis Zindros · MIT ↗</a></div>
+          </article>
+          <article class="game-card-wrap">
+            <a class="game-card game-ideas" href="#library" data-filter-link="all">
+              <div class="game-card-head"><div><p class="section-kicker">PROMPTS × SKILLS / 03</p><h3>把灵感变成下一步。</h3></div><span class="game-index">EXPLORE</span></div>
+              <div class="game-card-body">
+                <div class="idea-art" aria-hidden="true"><span>想法</span><i>→</i><span>工具</span></div>
+                <div class="game-card-copy"><p class="game-description">从提示词与 Skills 中找一个可复用的方法，让正在做的事继续向前。</p><span class="game-inputs"><span><!-- CMS:PROMPT_COUNT --> 项提示词</span><span><!-- CMS:SKILL_COUNT --> 项 Skills</span></span><span class="button button-primary game-start">打开资源索引 <span>↗</span></span></div>
+              </div>
+            </a>
+            <div class="game-source"><span>资源入口</span><a href="#library" data-filter-link="all">浏览本站内容 ↗</a></div>
+          </article>
+        </div>
+        <p class="source-note">小游戏玩法由志林独立编写。来源链接仅用于说明玩法参考及其许可证，不表示本站集成上游代码、素材或品牌。</p>
+      </section>
+
+      <section class="latest-section" id="latest" data-page-anchor aria-labelledby="latest-title">
+        <div class="section-heading">
+          <div><p class="section-kicker">FRESH FROM THE DESK / 03</p><h2 id="latest-title">最近添了什么</h2></div>
+          <a class="section-link" href="#library" data-filter-link="all">查看全部资源 <span>↗</span></a>
+        </div>
+        <div class="latest-list"><!-- CMS:LATEST --></div>
+      </section>
+
+      <section class="library-section" id="library" data-page-anchor aria-labelledby="library-title">
+        <div class="section-heading library-heading">
+          <div><p class="section-kicker">THE INDEX / 04</p><h2 id="library-title">资源索引</h2></div>
+          <p class="section-note">提示词、Skills、项目与服务在同一目录中筛选。</p>
+          <button class="purchase-history" type="button" id="myPurchases">我的购买 ↗</button>
+        </div>
+        <div class="library-controls" id="library-controls" data-library-filter="library">
+          <div class="filter-list" id="filter-list" role="group" aria-label="筛选资源类别"><!-- CMS:RESOURCE_FILTERS --></div>
+          <label class="search-box"><span aria-hidden="true">⌕</span><input id="search-input" type="search" data-search-input placeholder="搜索标题或关键词" aria-label="搜索提示词、Skills、项目与服务"></label>
+        </div>
+        <p class="result-line" id="result-line" aria-live="polite"></p>
+        <div class="resource-grid" id="resource-grid"><!-- CMS:RESOURCE_CARDS --></div>
+        <button class="load-more" id="load-more" type="button" hidden>继续展开 <span>↓</span></button>
+        <p class="library-note">卡片详情保留本站内容、来源、许可与既有价格字段。</p>
+      </section>
+
+      <section class="mac-section" id="mac-tools" data-page-anchor aria-labelledby="mac-title">
+        <div class="section-heading">
+          <div><p class="section-kicker">MAC TOOLBOX / 05</p><h2 id="mac-title">Mac 工具箱</h2></div>
+          <p class="section-note">只提供产品官方入口和许可证信息，不分发安装包。</p>
+        </div>
+        <div class="mac-grid">
+          <article class="mac-card"><div class="mac-card-top"><span class="section-kicker">MAC / TOOL</span><span class="mac-license">GPL-2.0-or-later</span></div><h3>OBS Studio</h3><p>组合屏幕、摄像头与声音，录制教程或直播。</p><a href="https://obsproject.com/" target="_blank" rel="noopener noreferrer">官网入口 ↗</a></article>
+          <article class="mac-card"><div class="mac-card-top"><span class="section-kicker">MAC / TOOL</span><span class="mac-license">Apache-2.0</span></div><h3>LocalSend</h3><p>在同一局域网内，跨设备发送文件。</p><a href="https://localsend.org/" target="_blank" rel="noopener noreferrer">官网入口 ↗</a></article>
+          <article class="mac-card"><div class="mac-card-top"><span class="section-kicker">MAC / TOOL</span><span class="mac-license">MIT</span></div><h3>Stats</h3><p>在菜单栏查看处理器、内存和网络负载。</p><a href="https://github.com/exelban/stats" target="_blank" rel="noopener noreferrer">官网入口 ↗</a></article>
+          <article class="mac-card"><div class="mac-card-top"><span class="section-kicker">MAC / TOOL</span><span class="mac-license">BSD-3-Clause</span></div><h3>KeyCastr</h3><p>演示时把按键输入显示在屏幕上。</p><a href="https://github.com/keycastr/keycastr" target="_blank" rel="noopener noreferrer">官网入口 ↗</a></article>
+          <article class="mac-card"><div class="mac-card-top"><span class="section-kicker">MAC / TOOL</span><span class="mac-license">GPL-3.0</span></div><h3>Loop</h3><p>用快捷键或环形菜单整理窗口位置。</p><a href="https://github.com/MrKai77/Loop" target="_blank" rel="noopener noreferrer">官网入口 ↗</a></article>
+          <article class="mac-card"><div class="mac-card-top"><span class="section-kicker">MAC / TOOL</span><span class="mac-license">BSD-3-Clause</span></div><h3>Snapzy</h3><p>用于截图标注和屏幕录制。</p><a href="https://snapzy.app/" target="_blank" rel="noopener noreferrer">官网入口 ↗</a><a href="https://github.com/duongductrong/Snapzy/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">许可 ↗</a></article>
+          <article class="mac-card"><div class="mac-card-top"><span class="section-kicker">MAC / TOOL</span><span class="mac-license">商业软件</span></div><h3>Shottr</h3><p>截图支持长截图、OCR 与像素测量。</p><a href="https://shottr.cc/" target="_blank" rel="noopener noreferrer">官网入口 ↗</a></article>
+          <article class="mac-card"><div class="mac-card-top"><span class="section-kicker">MAC / TOOL</span><span class="mac-license">Apple 许可</span></div><h3>SF Symbols</h3><p>为 Apple 平台界面查找系统符号并预览。</p><a href="https://developer.apple.com/sf-symbols/" target="_blank" rel="noopener noreferrer">官网入口 ↗</a></article>
+        </div>
+        <p class="mac-credit">软件说明和许可标记来自原预览整理；官网信息可能更新，请以官方页面为准。</p>
+      </section>
+
+      <section class="project-section" id="projects" data-page-anchor aria-labelledby="project-title">
+        <div class="section-heading">
+          <div><p class="section-kicker">THINGS I BUILD / 06</p><h2 id="project-title">从一个想法，到一个入口</h2></div>
+          <p class="section-note">志林正在维护和介绍的项目。</p>
+        </div>
+        <div class="project-grid"><!-- CMS:PROJECTS --></div>
+      </section>
+
+      <section class="services-section" id="services" data-page-anchor aria-labelledby="service-title">
+        <div class="section-heading">
+          <div><p class="section-kicker">WORK TOGETHER / 07</p><h2 id="service-title">需要一起解决什么？</h2></div>
+          <p class="section-note">服务条目沿用站点现有介绍和咨询入口。</p>
+        </div>
+        <div class="service-grid"><!-- CMS:SERVICES --></div>
+      </section>
+
+      <section class="about-section" id="about" data-page-anchor aria-labelledby="about-title">
+        <div class="about-number">08 <span>/ ABOUT</span></div>
+        <div class="about-copy">
+          <h2 id="about-title">保持好奇，动手做出来。</h2>
+          <p>我是志林，独立 AI 顾问，专注 AI 应用开发、实用工具和工作流。</p>
+        </div>
+      </section>
+
+      <section class="contact-section" id="contact" data-page-anchor aria-labelledby="contact-title">
+        <p class="section-kicker">SAY HELLO</p>
+        <h2 id="contact-title">从一个具体问题开始。</h2>
+        <a class="button button-primary" href="mailto:yuzhilinvip@163.com?subject=%E6%83%B3%E8%81%8A%E8%81%8A%E4%B8%80%E4%B8%AA%E9%97%AE%E9%A2%98">写邮件给志林 <span>↗</span></a>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a class="brand footer-brand" href="#top"><span class="brand-mark">志</span><span class="brand-name">志林 <span>/ AI WORKSPACE</span></span></a>
+      <div class="footer-links"><a href="mailto:yuzhilinvip@163.com">Email ↗</a><a href="https://github.com/zhilinYu" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="assets/source-licenses.txt" target="_blank" rel="noopener noreferrer">来源与许可 ↗</a></div>
+      <p>© 2026 喻志林 · 灵机派 <span>AI 创意空间</span> <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">渝ICP备2026011149号</a></p>
+    </footer>
+  </div>
+<dialog id="detail" aria-labelledby="detail-title"><button class="dialog-close" aria-label="关闭详情">×</button><span class="dialog-eyebrow"></span><h2 id="detail-title"></h2><p class="dialog-description"></p><div class="dialog-detail markdown-body"></div><textarea class="prompt-content" readonly aria-label="完整提示词" hidden></textarea><div class="dialog-source" hidden><span></span><a class="origin-link" target="_blank" rel="noopener noreferrer">原仓库 ↗</a><a class="license-link" target="_blank" rel="noopener noreferrer">许可 ↗</a></div><div class="dialog-actions"><a class="dialog-download" download hidden>下载 Skill ZIP ↓</a><button id="copy-prompt" hidden>复制提示词</button><button id="detailBuy" type="button" data-buy-sku="" disabled hidden>购买暂未开放</button><a class="dialog-action" href="mailto:yuzhilinvip@163.com">联系志林 ↗</a></div><p class="dialog-status" role="status" aria-live="polite"></p></dialog><dialog class="checkout-dialog" id="checkoutDialog" aria-labelledby="checkoutTitle"><button class="dialog-close" type="button" id="checkoutClose" aria-label="关闭支付窗口">×</button><span class="dialog-eyebrow">致凌工作室 · 微信支付</span><h2 id="checkoutTitle">微信扫码购买</h2><p class="checkout-price" id="checkoutPrice"></p><p id="checkoutStatus" role="status" aria-live="polite"></p><img class="checkout-qr" id="checkoutQr" alt="本订单微信付款二维码" width="240" height="240" hidden><p class="checkout-order" id="checkoutOrder"></p><div class="dialog-actions"><button type="button" id="checkoutDownload" hidden>下载完整文档</button><button type="button" id="checkoutRefresh" hidden>查询付款状态</button></div><div id="purchaseList" hidden></div><p class="checkout-help" id="checkoutHelp">请使用手机微信扫描电脑上的二维码。手机浏览器可保存二维码后，在微信扫一扫中从相册识别。购买记录保存在当前浏览器；关闭窗口不会取消订单，可从“我的购买”继续查询。请保留订单号，以便售后查询。</p><p class="checkout-help">订单及退款咨询：<a href="mailto:yuzhilinvip@163.com">yuzhilinvip@163.com</a></p></dialog><script id="shop-catalog" type="application/json"><!-- CMS:SHOP --></script><script id="site-data" type="application/json"><!-- CMS:DATA --></script><script src="assets/navigation.js"></script><script src="assets/skin.js"></script><script src="assets/checkout.js"></script></body></html>

@@ -9,7 +9,7 @@ const project = fileURLToPath(new URL('../', import.meta.url));
 const sandbox = {module:{exports:{}}};
 vm.runInNewContext(fs.readFileSync(path.join(project,'assets/navigation.js'),'utf8'), sandbox);
 const {resolveHash} = sandbox.module.exports;
-const pageAnchors = ['top','hero','start','play','latest','library','mac-tools','projects','services','about','contact'];
+const pageAnchors = ['top','hero','library','play','services'];
 const result = (hash) => JSON.parse(JSON.stringify(resolveHash(hash,pageAnchors)));
 
 test('valid page anchors, including home and the library, remain unchanged',()=>{
@@ -18,21 +18,28 @@ test('valid page anchors, including home and the library, remain unchanged',()=>
   }
 });
 
-test('removed article slugs and unknown hashes fall back to the resource index',()=>{
-  for(const hash of ['#articles','#workflow-retry-recovery-20261024','#unknown-route']){
+test('hidden articles, projects and tools hashes fall back to the resource index',()=>{
+  for(const hash of ['#articles','#workflow-retry-recovery-20261024','#projects','#latest','#mac-tools','#about','#unknown-route']){
     assert.deepEqual(result(hash),{type:'fallback',id:'library',hash:'#library',replaceHash:true});
   }
 });
 
-test('creative-space layout offers real game pages before the searchable resource library',()=>{
+test('homepage navigation keeps prompts, Skills, games and services with the brief introduction',()=>{
   const template=fs.readFileSync(path.join(project,'templates/index.html'),'utf8');
-  assert.ok(template.indexOf('id="play"') < template.indexOf('id="latest"'));
-  assert.ok(template.indexOf('id="latest"') < template.indexOf('id="library"'));
-  assert.match(template,/<a class="game-card game-2048" href="assets\/games\/2048\.html">/);
-  assert.match(template,/<a class="game-card game-tetris" href="assets\/games\/tetris\.html">/);
-  assert.match(template,/<section class="services-section" id="services" data-page-anchor/);
+  assert.match(template,/<a href="#library" data-filter-link="prompt">提示词<\/a>/);
+  assert.match(template,/<a href="#library" data-filter-link="skill">Skills<\/a>/);
   assert.match(template,/<div class="site-shell" id="top" data-page-anchor>/);
+  assert.match(template,/<section class="library-section" id="library" data-page-anchor/);
+  assert.doesNotMatch(template,/id="(?:latest|mac-tools|projects|about|contact)"/);
+  assert.doesNotMatch(template,/href="#(?:latest|mac-tools|projects|about|contact)"/);
+  assert.match(template,/href="#play"/);
+  assert.match(template,/href="#services"/);
+  assert.match(template,/assets\/games\/2048\.html/);
+  assert.match(template,/assets\/games\/tetris\.html/);
   assert.doesNotMatch(template,/tab-articles|panel-articles|CMS:ARTICLES|#articles/);
+  assert.match(template,/id="myPurchases"/);
+  const footer=template.match(/<footer class="site-footer">([\s\S]*?)<\/footer>/)?.[1]||'';
+  assert.doesNotMatch(footer,/mailto:|github\.com|source-licenses/);
 });
 
 test('homepage keeps the short biography without exposing a full-resume entry',()=>{
@@ -54,7 +61,7 @@ test('homepage theme changes replace a stale game query and survive refresh',()=
   const template=fs.readFileSync(path.join(project,'templates/index.html'),'utf8');
   const bootstrap=template.match(/<script>([\s\S]*?)<\/script>/)?.[1];
   const skin=fs.readFileSync(path.join(project,'assets/skin.js'),'utf8');
-  let currentUrl=new URL('https://zhilin.club/index.html?source=game&theme=paper#about');
+  let currentUrl=new URL('https://zhilin.club/index.html?source=game&theme=paper#library');
   const stored=new Map([['zhilin-site-theme','paper']]);
 
   function loadHome(){
@@ -65,7 +72,7 @@ test('homepage theme changes replace a stale game query and survive refresh',()=
       documentElement:root,
       getElementById(id){return id==='site-data'?{textContent:'[]'}:null;},
       querySelector(selector){return selector==='meta[name="theme-color"]'?meta:null;},
-      querySelectorAll(selector){return selector==='[data-page-anchor]'?[{id:'about'}]:selector==='[data-theme-select]'?[select]:[];},
+      querySelectorAll(selector){return selector==='[data-page-anchor]'?[{id:'top'},{id:'hero'},{id:'library'}]:selector==='[data-theme-select]'?[select]:[];},
       addEventListener(){}
     };
     const location={get href(){return currentUrl.href;},get pathname(){return currentUrl.pathname;},get search(){return currentUrl.search;},get hash(){return currentUrl.hash;}};
@@ -84,15 +91,18 @@ test('homepage theme changes replace a stale game query and survive refresh',()=
   assert.equal(home.root.dataset.theme,'fresh');
   assert.equal(currentUrl.searchParams.get('theme'),'fresh');
   assert.equal(currentUrl.searchParams.get('source'),'game');
-  assert.equal(currentUrl.hash,'#about');
+  assert.equal(currentUrl.hash,'#library');
   assert.equal(loadHome().root.dataset.theme,'fresh');
 });
 
-test('standalone games have an explicit return-home link and shared theme handoff',()=>{
+test('standalone games remain reachable and keep their return-home and theme handoff',()=>{
   for(const filename of ['2048.html','tetris.html']){
     const page=fs.readFileSync(path.join(project,'assets/games',filename),'utf8');
     assert.match(page,/<a href="\.\.\/\.\.\/index\.html" data-theme-handoff>← 返回首页<\/a>/);
   }
+  const template=fs.readFileSync(path.join(project,'templates/index.html'),'utf8');
+  assert.match(template,/assets\/games\/2048\.html/);
+  assert.match(template,/assets\/games\/tetris\.html/);
   const theme=fs.readFileSync(path.join(project,'assets/games/theme.js'),'utf8');
   assert.match(theme,/zhilin-site-theme/);
   assert.match(theme,/data-theme-handoff/);

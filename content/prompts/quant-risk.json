@@ -1,15 +1,14 @@
 {
   "id": "quant-risk",
   "title": "量化风控",
-  "desc": "从市场开关、硬性筛选到评分与风险边界，建立结构化研究流程。",
-  "type": "paid-prompt",
+  "desc": "从市场开关、硬性筛选到评分与风险边界，建立结构化研究流程；不含行情、股票名单或个股推荐，不保证收益。",
+  "type": "open-prompt",
   "group": "stock",
-  "tag": "研究提示词",
-  "price": "¥9.9",
+  "tag": "研究提示词 · 免费下载",
   "image": "assets/quant-risk.webp",
+  "attachment": "assets/uploads/quant-risk-313f8fbe0f009b820caf4c3f3f096d870dcff6647f577b31c1895772e5768d75.zip",
   "source": "志林整理",
-  "body": "内容包括筛选规则、观察步骤与风险边界。请使用可靠数据核验结论；数据不足时停止生成具体价位。",
+  "body": "内容包括筛选规则、观察步骤、评分、仓位与止损边界。ZIP 不含行情、股票名单或个股推荐；请自行提供可靠数据，输出不保证收益。",
   "enabled": true,
-  "order": 0,
-  "sku": "quant-risk"
+  "order": 0
 }

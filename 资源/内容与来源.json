@@ -4,17 +4,16 @@
     {
       "id": "quant-risk",
       "title": "量化风控",
-      "desc": "从市场开关、硬性筛选到评分与风险边界，建立结构化研究流程。",
-      "type": "paid-prompt",
+      "desc": "从市场开关、硬性筛选到评分与风险边界，建立结构化研究流程；不含行情、股票名单或个股推荐，不保证收益。",
+      "type": "open-prompt",
       "group": "stock",
-      "tag": "研究提示词",
-      "price": "¥9.9",
+      "tag": "研究提示词 · 免费下载",
       "image": "assets/quant-risk.webp",
+      "attachment": "assets/uploads/quant-risk-313f8fbe0f009b820caf4c3f3f096d870dcff6647f577b31c1895772e5768d75.zip",
       "source": "志林整理",
-      "body": "内容包括筛选规则、观察步骤与风险边界。请使用可靠数据核验结论；数据不足时停止生成具体价位。",
+      "body": "内容包括筛选规则、观察步骤、评分、仓位与止损边界。ZIP 不含行情、股票名单或个股推荐；请自行提供可靠数据，输出不保证收益。",
       "enabled": true,
-      "order": 0,
-      "sku": "quant-risk"
+      "order": 0
     },
     {
       "id": "trend-leader",
@@ -585,17 +584,6 @@
       "order": 100000
     },
     {
-      "id": "blue-tuanzi",
-      "title": "蓝团子",
-      "desc": "接入微信的 AI 私人助理：交流、记忆与定时任务，放在日常使用的入口里。",
-      "type": "product",
-      "image": "assets/blue-tuanzi.png",
-      "tag": "AI PRIVATE ASSISTANT",
-      "detail": "每位用户使用专属助理运行时，微信承载实际聊天。小程序管理服务、接入微信、定时任务与账号设置。\n\n可联系我了解产品与体验方式。",
-      "enabled": true,
-      "order": 100000
-    },
-    {
       "id": "deep-community",
       "title": "灵机共创社群",
       "desc": "和开发者、创作者与产品实践者深入交流，讨论作品与合作。",
@@ -658,17 +646,6 @@
       "tag": "工作流设计 · 按需求报价",
       "art": "flow",
       "detail": "确定输入、处理步骤、工具连接、输出和异常恢复方式。",
-      "enabled": true,
-      "order": 100000
-    },
-    {
-      "id": "zinhua-miniapp",
-      "title": "三张牌好友局",
-      "desc": "和朋友创建房间、邀请入局，在小程序里体验多人实时对局。",
-      "type": "product",
-      "art": "game",
-      "tag": "ZINHUA MINIAPP",
-      "detail": "微信原生小程序，采用服务端权威判定与实时房间同步。包含房间管理、实时发牌、状态同步、积分排名与断线重连。\n\n积分仅用于娱乐记分，不具备兑现、交易或提现功能。",
       "enabled": true,
       "order": 100000
     }

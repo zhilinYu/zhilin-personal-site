@@ -21,14 +21,15 @@ test('price changes, unknown SKU and remapping existing products fail closed',()
   assert.throws(()=>paymentSku({...paid,type:'open-prompt',sku:'quant-risk'}),/只有收费/);
   assert.equal(paymentSku({id:'future-content',type:'paid-prompt'}),null);
 });
-test('selected site keeps five existing products and recovery metadata for bundle',()=>{
+test('homepage keeps other paid products and exposes quant-risk as a verified free download',()=>{
   const {items,output}=buildSite(root);
   const paid=items.filter(x=>x.type==='paid-prompt');
-  assert.equal(paid.length,5);assert.ok(paid.every(x=>x.sku===x.id&&x.price==='¥9.9'&&!x.prompt&&!x.attachment));
+  assert.equal(paid.length,4);assert.ok(paid.every(x=>x.sku===x.id&&x.price==='¥9.9'&&!x.prompt&&!x.attachment));
   const shop=JSON.parse(output.match(/<script id="shop-catalog" type="application\/json">([\s\S]*?)<\/script>/)[1]);
-  assert.equal(shop.filter(x=>x.sellable).length,5);
+  assert.equal(shop.filter(x=>x.sellable).length,4);
+  const quant=shop.find(x=>x.sku==='quant-risk');
+  assert.equal(quant.title,'量化风控');assert.equal(quant.amount,990);assert.equal(quant.sellable,false);
   assert.equal(shop.find(x=>x.sku==='research-bundle').amount,3990);
   assert.equal(shop.find(x=>x.sku==='research-bundle').sellable,false);
   assert.match(output,/id="myPurchases"/);assert.match(output,/id="detailBuy"/);
-  assert.ok(fs.existsSync(path.join(root,'assets/hero-mint-bluecat.png')));
 });
