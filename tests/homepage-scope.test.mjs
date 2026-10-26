@@ -17,6 +17,8 @@ test('homepage keeps prompts, Skills, games and services while preserving purcha
   const testRoot=fs.mkdtempSync(path.join(os.tmpdir(),'zhilin-home-scope-'));
   t.after(()=>fs.rmSync(testRoot,{recursive:true,force:true}));
   for(const name of ['assets','content','templates','资源'])fs.cpSync(path.join(root,name),path.join(testRoot,name),{recursive:true});
+  fs.writeFileSync(path.join(testRoot,'content/prompts/additional-prompt.json'),JSON.stringify({id:'additional-prompt',title:'新增研究提示词',desc:'验证后续内容发布',type:'open-prompt',group:'community',enabled:true,order:1}));
+  fs.writeFileSync(path.join(testRoot,'content/articles/additional-article.json'),JSON.stringify({id:'additional-article',title:'新增文章',desc:'验证文章保留源文件',type:'article',enabled:true,body:'归档内容'}));
   const quantPath = path.join(root, 'content/prompts/quant-risk.json');
   const quantBefore = fs.readFileSync(quantPath, 'utf8');
   const {items, output} = buildSite(testRoot);
@@ -35,7 +37,8 @@ test('homepage keeps prompts, Skills, games and services while preserving purcha
   assert.equal(quant.sku, undefined, 'the public prompt cannot start an order');
   assert.ok(data.some(item => item.id === 'fabric-extract-wisdom'), 'latest main prompt is retained');
   assert.ok(data.some(item => item.id === 'anthropic-doc-coauthoring'), 'latest main Skill is retained');
-  assert.equal(fs.readdirSync(path.join(root, 'content/articles')).filter(file => file.endsWith('.json')).length, 15, 'article source files remain intact');
+  const originalArticleCount=fs.readdirSync(path.join(root,'content/articles')).filter(file=>file.endsWith('.json')).length;
+  assert.equal(fs.readdirSync(path.join(testRoot,'content/articles')).filter(file=>file.endsWith('.json')).length,originalArticleCount+1,'existing and newly added article source files remain intact');
   assert.ok(fs.existsSync(quantPath), 'the original quant-risk content source remains in the repository');
   assert.equal(fs.readFileSync(quantPath, 'utf8'), quantBefore, 'the original quant-risk source is not rewritten');
 
@@ -53,7 +56,8 @@ test('homepage keeps prompts, Skills, games and services while preserving purcha
   assert.match(output,/id="play"/);
   assert.match(output,/id="services"/);
   assert.match(output,/data-open="app-development"/);
-  assert.equal([...output.matchAll(/data-resource-card/g)].length,34,'the resource index remains prompts and Skills only');
+  assert.ok(data.some(item=>item.id==='additional-prompt'),'new prompts can still publish');
+  assert.equal([...output.matchAll(/data-resource-card/g)].length,data.filter(item=>item.type!=='service').length,'the resource index contains all prompts and Skills, including later additions');
   const archived=fs.readFileSync(path.join(root,'templates/archive/homepage-full.html'),'utf8');
   assert.match(archived,/id="mac-tools"/);
   assert.match(archived,/id="projects"/);
