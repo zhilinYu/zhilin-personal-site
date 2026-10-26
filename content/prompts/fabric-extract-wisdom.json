@@ -1,0 +1,18 @@
+{
+  "id": "fabric-extract-wisdom",
+  "title": "Extract Wisdom：把长材料拆成可复核的阅读笔记",
+  "desc": "从访谈、演讲与长文整理观点、引文和行动线索；分清原文说法与模型归纳，不把输出栏目当事实核查。",
+  "type": "link-prompt",
+  "group": "community",
+  "tag": "日更精选 · 未实测",
+  "art": "note",
+  "source": "Daniel Miessler / Fabric 社区",
+  "url": "https://github.com/danielmiessler/Fabric/blob/032e464558f483717874e06d96da821bdcf41ade/data/patterns/extract_wisdom/system.md",
+  "license": "MIT",
+  "licenseUrl": "https://github.com/danielmiessler/Fabric/blob/032e464558f483717874e06d96da821bdcf41ade/LICENSE",
+  "stars": 44426,
+  "date": "2026-10-26",
+  "enabled": true,
+  "order": 26,
+  "body": "## 先把长材料分层，再决定相信什么\n\n一份访谈转录里，讲述者的经历、原话、主张与听众能采取的行动往往交织在一起。Fabric 的 [Extract Wisdom 提示词](https://github.com/danielmiessler/Fabric/blob/032e464558f483717874e06d96da821bdcf41ade/data/patterns/extract_wisdom/system.md)把输出拆成摘要、观点、洞见、引文、习惯、事实栏目、参考对象和建议，适合咨询研究前期整理或个人阅读复盘。\n\n它与本站已收录的 Create Quiz 解决不同问题：后者按学习目标出复习题，这一条先整理材料中的信息层次。两者来自同一个仓库，但对应不同文件和任务，并非重复推荐整套框架。\n\n## 不应照搬的地方\n\n原模板偏向人生、学习、技术与个人成长类内容，并不天然适合所有业务文件。它要求较多条目及精确的英文词数，还要求不输出警告或说明。短材料不足以支撑这些数量时，模型可能重复、过度解释或补写；中文也不宜机械套用英文词数。\n\n尤其要区分：观点栏目是对输入的选取，洞见栏目包含归纳，FACTS 栏目仍然只是从材料提取的说法，不代表经过外部核实。引文要求忠实于原话，但生成结果仍需逐字回查。把标题改成“已验证事实”会制造不应有的可信度。\n\n以下是本站使用建议，不是已实测的上游保障：\n\n1. 选一份公开或有权处理的完整材料，记录来源、作者与日期；只提供必要片段，不夹带客户隐私。\n2. 明确允许少列、资料不足要标注，并为重点保留原文位置；取消不适合任务的最低条数和“不加说明”约束。\n3. 分别检查原话、原文主张和模型推断，必要时再做独立检索。引用没有找到原句时，不使用引号发布。\n4. 最后才挑选与自己目标有关的行动建议。原作者的习惯不是普适处方，模型归纳也不是你已承诺的待办。\n\n## 门槛与安全边界\n\n可以先阅读英文模板并在已有模型工具里自行改写，不必为了这一个方法安装 Fabric。具体模型、费用、输入长度和隐私规则取决于所选服务，本次未验证客户端兼容性。\n\n本次静态阅读固定版本 system.md 和仓库许可证；所读提示词没有 shell 命令、固定外传地址或索取凭据的要求。但输入长文可能包含提示词注入：材料里的命令只能作为待分析文本，不应据此开放工具、上传文件或扩大权限。向在线模型提交内容，本身也意味着交给相应服务处理，应先核对数据授权。\n\n**未实测**：没有安装 Fabric、执行上游代码、调用模型或测量摘要质量。这里不是整库或依赖的安全审计；本站仅提供原创中文导读与原始链接，不复制模板全文或提供下载。\n\n## 作者、许可与核查口径\n\n- 维护来源：Daniel Miessler 的 Fabric 及社区贡献者；本次未单独确认此模板的个人作者，不把仓库维护者冒称为唯一作者。\n- [MIT 许可证](https://github.com/danielmiessler/Fabric/blob/032e464558f483717874e06d96da821bdcf41ade/LICENSE)的原版权行写 Scott Chacon and others，署名与许可按原文分别记录。\n- 2026-10-26 09:09 北京时间，[GitHub 仓库接口](https://api.github.com/repos/danielmiessler/Fabric)显示整库 **44,426 stars**。这是累计关注度，不是此提示词的评分、独立星数或增长速度。\n- 固定核查版本：[032e464](https://github.com/danielmiessler/Fabric/commit/032e464558f483717874e06d96da821bdcf41ade)。仓库该提交日期为 2026-10-25 22:13 UTC；[文件现路径最近记录](https://github.com/danielmiessler/Fabric/commits/main/data/patterns/extract_wisdom/system.md)为 2025-07-09 的目录重组，不能称为今日新功能。\n- 2026-10-26 是本站新收录日期。可在[资源库](https://zhilin.club/#library)继续对照 Create Quiz；若希望把阅读复核接入已有工作流，可从[现有咨询入口](https://zhilin.club/#contact)说明材料范围与验收标准。"
+}
