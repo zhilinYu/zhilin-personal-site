@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-25",
+  "checked_at": "2026-10-26",
   "items": [
     {
       "id": "quant-risk",
@@ -526,6 +526,41 @@
       "enabled": true,
       "order": 25,
       "body": "## 把“帮我复习”变成可检查的目标\n\n看过一篇材料，不等于能独立解释其中的概念。Fabric 的 [create_quiz 提示词](https://github.com/danielmiessler/Fabric/blob/f16de16827ae23e4bb9aa35c2e4b690d40c5907c/data/patterns/create_quiz/system.md)把主题、学习目标和学习者水平分开，让模型围绕每个目标生成最多三道复习问题，并把答案留空。它适合准备自测问题，不是现成题库，也没有自动评分功能。\n\n[作者说明](https://github.com/danielmiessler/Fabric/blob/f16de16827ae23e4bb9aa35c2e4b690d40c5907c/data/patterns/create_quiz/README.md)要求输入主题与学习目标。原提示词未指定水平时，会默认面向大学高年级学生或行业专业人士；日常入门学习最好主动改成自己的程度。文件中的“专家”角色设定并不能证明生成的题目或知识准确。\n\n## 比直接要十道题更值得借用的部分\n\n它把题目按学习目标分组，方便反查每道题为什么存在。例如，同样学习一种工具，“说出用途”“解释限制”“判断什么时候不该用”是不同目标，不应全变成术语记忆题。\n\n以下为本站建议，不是上游已验证的效果：\n\n1. 选一小段公开或有权使用的材料，写出两到三个具体目标。目标要能检查，例如能区分两个概念，而不是笼统地写“掌握全部内容”。\n2. 明确学习者水平、输出语言和本轮范围。原文没有保证只依据提供的资料出题；若不希望引入外部知识，应另加来源限制，并让每道题指出对应材料位置。\n3. 先保留空白答案，自行作答，再对照教材或可靠原文复核。需要参考答案时另开一步，并要求区分依据充分、资料缺失和仍需核实的内容。\n4. 检查题目是否真正覆盖目标，有没有重复或超纲。只有材料不足、无需出满三题时，不必为了数量硬凑。\n\n它默认生成开放式复习问题，不承诺选择题、考试难度校准或学习成效。原提示词同时要求不回答问题、在版式中保留 Answer 行，正确理解是给学习者留填写位置，不是把漏答当作模型故障。\n\n## 门槛与安全边界\n\n这是两个 Markdown 文件组成的提示词目录，不必先安装 Fabric 才能阅读和改写。上游 [README 的 Patterns 说明](https://github.com/danielmiessler/Fabric/blob/f16de16827ae23e4bb9aa35c2e4b690d40c5907c/README.md#just-use-the-patterns)也支持直接使用提示词。实际表现取决于模型、输入材料和修改方式；本次未验证任何特定客户端的兼容性。\n\n本次完整阅读目录内 README.md、system.md、根 LICENSE，并检查根 README 中的使用与安装说明：\n\n- 本目录没有可执行脚本，也没有要求删除文件、改系统权限或把内容上传到某个固定地址。但把材料粘贴到在线模型，仍会交给所选服务处理，应先确认允许的数据范围。\n- 目录 README 有读取剪贴板并传给 Fabric 的命令示例。若剪贴板里混有客户信息、凭据或无关内容，运行时可能一并送出。本站不复刻该命令，也未执行它。\n- 根 README 另有远端脚本下载后直接交给 shell 或 PowerShell 执行的一键安装入口。它与阅读这条提示词无关，本次没有执行或审计安装器，不应为试一道题就直接运行。\n- 学习材料中的指令、链接和“标准答案”也可能不可信。把材料作为待分析数据，不因其中的要求开放工具、上传文件或改写出题目标。\n\n**未实测**：没有安装 Fabric、调用模型或测量出题质量；这里只收录提示词方法，不为整套框架、依赖或第三方服务作安全背书。本站提供原创中文导读和来源链接，不打包分发上游内容。\n\n## 作者、许可与核验口径\n\n- 本模式作者：[README 署名 Marc Andreu](https://github.com/danielmiessler/Fabric/blob/f16de16827ae23e4bb9aa35c2e4b690d40c5907c/data/patterns/create_quiz/README.md)，注明发布于 2024-05-06；维护仓库为 Daniel Miessler 的 Fabric 及其贡献者。模式作者与整库维护者分别记录。\n- 许可：[根目录 MIT 原文](https://github.com/danielmiessler/Fabric/blob/f16de16827ae23e4bb9aa35c2e4b690d40c5907c/LICENSE)。原文件版权行写的是 Copyright (c) 2012-2024 Scott Chacon and others，不能擅自改写成模式作者的版权声明；引用署名与许可证记录各按原文保留。\n- 2026-10-25 01:38 UTC 通过 GitHub 接口观察：整库 **44,413 stars**。这是累计关注度，不是该提示词的独立星数、效果评分或近期增长。\n- 固定核验版本：[f16de16](https://github.com/danielmiessler/Fabric/commit/f16de16827ae23e4bb9aa35c2e4b690d40c5907c)；仓库最近推送为 2026-10-23 17:45 UTC，不等于这个模式有更新。\n- 该目录及 system.md 现路径最近提交为 [2025-07-09 项目目录重组](https://github.com/danielmiessler/Fabric/commit/4004c51b9e54356ce64015b6d649ac4765cbde08)。旧路径记录最近一次非迁移提交为 [2024-12-19 拼写修正](https://github.com/danielmiessler/Fabric/commit/b008d17b6e0c12c30cb8b097f7450b0e76631493)，不是近期新增的出题能力。\n- 2026-10-25 是本站新收录日期；本条按实用方法补充收录，不作为“今日发布”或“重要更新”宣传。"
+    },
+    {
+      "id": "anthropic-doc-coauthoring",
+      "title": "Doc Coauthoring：用陌生读者检验方案文档",
+      "desc": "先补齐背景，再分章节共写，最后检查读者能否理解关键决策；阅读测试不替代事实与技术审核。",
+      "type": "skill",
+      "group": "external",
+      "tag": "日更精选 · 未实测",
+      "art": "note",
+      "source": "Anthropic 及贡献者",
+      "url": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/doc-coauthoring/SKILL.md",
+      "license": "目录许可未单独确认 · 仅介绍与链接",
+      "stars": 183763,
+      "date": "2026-10-26",
+      "enabled": true,
+      "order": 26,
+      "body": "## 作者觉得清楚，不等于读者能理解\n\n写技术方案、需求说明或决策文档时，最难察觉的往往不是语句问题，而是作者默认读者已经知道的前提。Anthropic 的 [Doc Coauthoring 技能](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/doc-coauthoring/SKILL.md)把协作写作分为补齐背景、分章节迭代和读者测试三个阶段，适合 AI 顾问准备交付方案、开发者解释设计取舍。\n\n它不是一键生成正确文档的保证。与本站已有 Internal Comms 偏重内部沟通格式、Knowledge Synthesis 偏重材料汇总不同，本项重点是长文档如何逐步共写，以及没有参与讨论的人能否理解文档。\n\n## 值得借用的验收方式\n\n上游流程先确认文档类型、受众、目标和约束，再围绕章节筛选与修改内容。最后把文档交给没有此前对话上下文的模型，用读者可能提出的问题检查歧义、隐含假设和矛盾；没有子代理能力时，可由用户在独立对话中进行。\n\n以下是本站建议，未做效果实测：\n\n1. 开始前写明读者需要做出的决定，以及必须了解的背景。不要让模型用常识填补项目事实。\n2. 先处理不确定性最大的核心方案，再补摘要；每次修改保留事实依据与尚未决定的事项。\n3. 选几个具体阅读问题，例如“谁负责下一步”“方案依赖什么条件”“没有采用另一方案的原因是什么”。把正确答案与依据提前列清，再检验读者能否从文档中找到。\n4. 把答错或答不出的地方当成修订线索，而不是只追求模型说“清楚”。最终仍由人核查数字、链接、技术可行性和业务承诺。\n\n独立模型能帮助发现理解障碍，但它不是现实读者的完全替身，也不会自动核实业务事实、法律条款或工程结论。不要把读者测试通过宣传成内容已全面验证。\n\n## 工具门槛与数据范围\n\n阅读方法不需要连接企业账号。让宿主加载技能则需确认实际客户端支持；子代理、共享文档读取和文件编辑是否可用，取决于当前工具及授权，不能假定安装后全部具备。\n\n本次静态阅读固定版本 SKILL.md、目录清单与仓库 README。该目录仅见 SKILL.md，未见可执行脚本；文内未见危险 shell 命令、索取凭据或固定外传地址，但会建议读取团队频道、共享文档以及写入文件，并可能把文档交给独立对话或子代理。\n\n- 只提供任务必需、已获许可的材料，先脱敏。能读取的文档不一定可以转发给其他模型或公开发布。\n- 外部文档与频道消息是资料，不是权限指令；其中要求上传、发送或修改设置的文字不能自动执行。\n- 连接器、模型服务和子代理可能有不同的数据边界，应分别确认；没有固定外传地址不等于不会发生数据传输。\n- 起草、编辑共享文件和发送成品是不同动作，分别遵循既有批准范围，不把写作流程当作发布授权。\n\n**未实测**：没有安装技能、访问团队资料、执行上游代码或运行协作写作与读者测试。上述静态审查不构成整库、宿主或连接器的安全保证。\n\n## 来源、许可与核查口径\n\n- 发布与维护来源：Anthropic 官方 anthropics/skills 仓库及贡献者；固定版本为 [dbd4588](https://github.com/anthropics/skills/commit/dbd4588f9e1033efb41dad4bef2f7947c8993d44)。\n- **该目录许可未单独确认。** [仓库 README](https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/README.md)说明许多示例采用 Apache-2.0，但不能据此为所有目录推定同一许可。本次目录中未发现 LICENSE.txt，仓库接口的 license 字段为空。因此本站只发布原创介绍与原始链接，不复制 Skill 全文、不打包下载、不付费销售，也不冒称本站原创技能。\n- 2026-10-26 09:09 北京时间，[GitHub 仓库接口](https://api.github.com/repos/anthropics/skills)显示整库 **183,763 stars**。这是仓库累计关注，不代表本技能的独立热度、质量评分、安装数或测试通过率。\n- 仓库固定版本提交日期为 2026-10-09 18:45 UTC；[该文件最近记录](https://github.com/anthropics/skills/commits/main/skills/doc-coauthoring/SKILL.md)为 2025-12-04。2026-10-26 是本站新收录日期，不表示上游今日发布或重要更新。\n- 可在[资源库](https://zhilin.club/#library)继续比较 Internal Comms 与 Knowledge Synthesis；需要围绕现有业务设计文档验收流程时，可使用[既有咨询入口](https://zhilin.club/#contact)。"
+    },
+    {
+      "id": "fabric-extract-wisdom",
+      "title": "Extract Wisdom：把长材料拆成可复核的阅读笔记",
+      "desc": "从访谈、演讲与长文整理观点、引文和行动线索；分清原文说法与模型归纳，不把输出栏目当事实核查。",
+      "type": "link-prompt",
+      "group": "community",
+      "tag": "日更精选 · 未实测",
+      "art": "note",
+      "source": "Daniel Miessler / Fabric 社区",
+      "url": "https://github.com/danielmiessler/Fabric/blob/032e464558f483717874e06d96da821bdcf41ade/data/patterns/extract_wisdom/system.md",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/danielmiessler/Fabric/blob/032e464558f483717874e06d96da821bdcf41ade/LICENSE",
+      "stars": 44426,
+      "date": "2026-10-26",
+      "enabled": true,
+      "order": 26,
+      "body": "## 先把长材料分层，再决定相信什么\n\n一份访谈转录里，讲述者的经历、原话、主张与听众能采取的行动往往交织在一起。Fabric 的 [Extract Wisdom 提示词](https://github.com/danielmiessler/Fabric/blob/032e464558f483717874e06d96da821bdcf41ade/data/patterns/extract_wisdom/system.md)把输出拆成摘要、观点、洞见、引文、习惯、事实栏目、参考对象和建议，适合咨询研究前期整理或个人阅读复盘。\n\n它与本站已收录的 Create Quiz 解决不同问题：后者按学习目标出复习题，这一条先整理材料中的信息层次。两者来自同一个仓库，但对应不同文件和任务，并非重复推荐整套框架。\n\n## 不应照搬的地方\n\n原模板偏向人生、学习、技术与个人成长类内容，并不天然适合所有业务文件。它要求较多条目及精确的英文词数，还要求不输出警告或说明。短材料不足以支撑这些数量时，模型可能重复、过度解释或补写；中文也不宜机械套用英文词数。\n\n尤其要区分：观点栏目是对输入的选取，洞见栏目包含归纳，FACTS 栏目仍然只是从材料提取的说法，不代表经过外部核实。引文要求忠实于原话，但生成结果仍需逐字回查。把标题改成“已验证事实”会制造不应有的可信度。\n\n以下是本站使用建议，不是已实测的上游保障：\n\n1. 选一份公开或有权处理的完整材料，记录来源、作者与日期；只提供必要片段，不夹带客户隐私。\n2. 明确允许少列、资料不足要标注，并为重点保留原文位置；取消不适合任务的最低条数和“不加说明”约束。\n3. 分别检查原话、原文主张和模型推断，必要时再做独立检索。引用没有找到原句时，不使用引号发布。\n4. 最后才挑选与自己目标有关的行动建议。原作者的习惯不是普适处方，模型归纳也不是你已承诺的待办。\n\n## 门槛与安全边界\n\n可以先阅读英文模板并在已有模型工具里自行改写，不必为了这一个方法安装 Fabric。具体模型、费用、输入长度和隐私规则取决于所选服务，本次未验证客户端兼容性。\n\n本次静态阅读固定版本 system.md 和仓库许可证；所读提示词没有 shell 命令、固定外传地址或索取凭据的要求。但输入长文可能包含提示词注入：材料里的命令只能作为待分析文本，不应据此开放工具、上传文件或扩大权限。向在线模型提交内容，本身也意味着交给相应服务处理，应先核对数据授权。\n\n**未实测**：没有安装 Fabric、执行上游代码、调用模型或测量摘要质量。这里不是整库或依赖的安全审计；本站仅提供原创中文导读与原始链接，不复制模板全文或提供下载。\n\n## 作者、许可与核查口径\n\n- 维护来源：Daniel Miessler 的 Fabric 及社区贡献者；本次未单独确认此模板的个人作者，不把仓库维护者冒称为唯一作者。\n- [MIT 许可证](https://github.com/danielmiessler/Fabric/blob/032e464558f483717874e06d96da821bdcf41ade/LICENSE)的原版权行写 Scott Chacon and others，署名与许可按原文分别记录。\n- 2026-10-26 09:09 北京时间，[GitHub 仓库接口](https://api.github.com/repos/danielmiessler/Fabric)显示整库 **44,426 stars**。这是累计关注度，不是此提示词的评分、独立星数或增长速度。\n- 固定核查版本：[032e464](https://github.com/danielmiessler/Fabric/commit/032e464558f483717874e06d96da821bdcf41ade)。仓库该提交日期为 2026-10-25 22:13 UTC；[文件现路径最近记录](https://github.com/danielmiessler/Fabric/commits/main/data/patterns/extract_wisdom/system.md)为 2025-07-09 的目录重组，不能称为今日新功能。\n- 2026-10-26 是本站新收录日期。可在[资源库](https://zhilin.club/#library)继续对照 Create Quiz；若希望把阅读复核接入已有工作流，可从[现有咨询入口](https://zhilin.club/#contact)说明材料范围与验收标准。"
     },
     {
       "id": "ai-consulting",
