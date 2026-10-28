@@ -15,7 +15,7 @@ function deferred() {
 function response(data, status = 200) {
   return { ok: status < 400, status, json: async () => data, blob: async () => new Blob(['test']) };
 }
-function harness({ purchases = [], fetchOrder, available = true, storageFails = false, nonSellableSkus = [] } = {}) {
+function harness({ purchases = [], fetchOrder, available = true, storageFails = false, nonSellableSkus = [], unavailableSkus = [], statusResponse } = {}) {
   const elements = new Map();
   function element(id) {
     if (elements.has(id)) return elements.get(id);
@@ -35,7 +35,7 @@ function harness({ purchases = [], fetchOrder, available = true, storageFails = 
     elements.set(id, el);
     return el;
   }
-  const shop = ['quant-risk', 'trend-leader', 'hot-money', 'countertrend', 'limit-up-pullback', 'research-bundle'].map(sku => ({sku, title:sku, amount:sku === 'research-bundle' ? 3990 : 990, sellable:sku !== 'research-bundle' && !nonSellableSkus.includes(sku)}));
+  const shop = ['quant-risk', 'trend-leader', 'hot-money', 'countertrend', 'limit-up-pullback', 'research-bundle', 'ashare-five-strategies'].map(sku => ({sku, title:sku, amount:sku === 'research-bundle' ? 3990 : 990, sellable:sku !== 'research-bundle' && !nonSellableSkus.includes(sku)}));
   element('shop-catalog').textContent = JSON.stringify(shop);
   const buyButtons = shop.filter(item => item.sellable).map(item => {
     const button = element('buy-' + item.sku); button.dataset.buySku = item.sku; return button;
@@ -58,7 +58,7 @@ function harness({ purchases = [], fetchOrder, available = true, storageFails = 
     setTimeout: () => 1, clearTimeout() {},
     fetch: (url, options) => {
       requests.push({ url, options });
-      if (url === '/api/shop/status') return Promise.resolve(response({ available }));
+      if (url === '/api/shop/status') return Promise.resolve(response(statusResponse ?? { available, available_skus: shop.filter(item => !unavailableSkus.includes(item.sku)).map(item => item.sku) }));
       return fetchOrder(url, options);
     },
   });
@@ -364,4 +364,38 @@ test('non-sellable quant-risk stays recoverable from existing purchase history',
   assert.equal(page.requests.filter(request => request.url === '/api/shop/orders').length, 0);
   assert.ok(page.requests.some(request => request.url === '/api/shop/orders/old-quant-order'));
   assert.equal(page.element('checkoutDownload').hidden, false);
+});
+
+test('missing paid Skill disables only its own checkout button',async()=>{
+  const page=harness({unavailableSkus:['ashare-five-strategies'],fetchOrder:()=>Promise.resolve(response({id:'new',status:'PENDING'}))});
+  await flush();
+  assert.equal(page.window.ZhilinCheckout.availableFor('ashare-five-strategies'),false);
+  assert.equal(page.window.ZhilinCheckout.availableFor('trend-leader'),true);
+  await page.buy('ashare-five-strategies');
+  assert.equal(page.requests.filter(r=>r.url==='/api/shop/orders').length,0);
+  await page.buy('trend-leader');
+  assert.equal(page.requests.filter(r=>r.url==='/api/shop/orders').length,1);
+});
+
+test('old payment service keeps old products available while new Skill and retired SKU stay closed',async()=>{
+  const page=harness({statusResponse:{available:true},fetchOrder:()=>Promise.resolve(response({id:'new',status:'PENDING'}))});
+  await flush();
+  assert.equal(page.window.ZhilinCheckout.availableFor('trend-leader'),true);
+  assert.equal(page.window.ZhilinCheckout.availableFor('ashare-five-strategies'),false);
+  assert.equal(page.window.ZhilinCheckout.availableFor('quant-risk'),false);
+  await page.buy('ashare-five-strategies');
+  assert.equal(page.requests.filter(r=>r.url==='/api/shop/orders').length,0);
+  await page.buy('trend-leader');
+  assert.equal(page.requests.filter(r=>r.url==='/api/shop/orders').length,1);
+});
+
+test('new service empty or invalid SKU list fails closed',async()=>{
+  for (const available_skus of [[],null]) {
+    const page=harness({statusResponse:{available:true,available_skus},fetchOrder:()=>{throw Error('unexpected order')}});
+    await flush();
+    assert.equal(page.window.ZhilinCheckout.availableFor('trend-leader'),false);
+    assert.equal(page.window.ZhilinCheckout.availableFor('ashare-five-strategies'),false);
+    await page.buy('trend-leader');
+    assert.equal(page.requests.filter(r=>r.url==='/api/shop/orders').length,0);
+  }
 });

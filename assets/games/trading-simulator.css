@@ -1,0 +1,36 @@
+.sim-main { width: min(650px, 100%); }
+.sim-main .game-heading h1 { letter-spacing: 0; }
+.sim-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 20px 0; }
+.sim-stats div { padding: 12px; border: 1px solid var(--line); background: var(--panel); }
+.sim-stats span, .sim-stats b { display: block; }
+.sim-stats span { color: var(--muted); font-size: 11px; }
+.sim-stats b { margin-top: 6px; color: var(--ink); font-size: 20px; font-variant-numeric: tabular-nums; }
+.sim-panel { margin-top: 14px; padding: 22px; border: 1px solid var(--line); background: var(--panel); }
+.sim-panel h2, .sim-history h2 { margin: 0 0 10px; font-size: 17px; }
+.sim-panel p, .sim-how p { color: var(--muted); font-size: 13px; line-height: 1.7; }
+.sim-panel .sim-label { margin-top: 0; color: var(--ink); font-weight: 700; }
+.sim-label span { display: block; margin-top: 5px; color: var(--muted); font-weight: 400; }
+.sim-draws { display: flex; flex-wrap: wrap; gap: 9px; }
+.sim-draw { display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid var(--line-bright); color: var(--ink); font-size: 20px; }
+.sim-explain { margin-bottom: 0; }
+.sim-form, .sim-buttons { display: flex; align-items: end; flex-wrap: wrap; gap: 10px; }
+.sim-form label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; }
+.sim-form input { width: 100px; height: 42px; padding: 8px; border: 1px solid var(--line-bright); color: var(--ink); background: var(--board); font-size: 16px; }
+.sim-button { min-height: 42px; padding: 0 16px; border: 1px solid var(--cyan); background: var(--cyan); color: var(--accent-ink); cursor: pointer; font-size: 13px; }
+.sim-secondary { border-color: var(--line-bright); color: var(--ink); background: var(--panel); }
+.sim-panel .sim-error { min-height: 1em; margin-bottom: 0; color: #d65a50; }
+.sim-how, .sim-history { margin-top: 20px; color: var(--ink); }
+.sim-how summary { cursor: pointer; font-size: 13px; }
+.sim-history ul { padding-left: 20px; color: var(--muted); font-size: 12px; line-height: 1.8; }
+[hidden] { display: none !important; }
+@media (max-width: 620px) {
+  .sim-stats { grid-template-columns: repeat(3, 1fr); }
+  .sim-stats div { padding: 9px; }
+  .sim-stats b { font-size: 17px; }
+  .sim-panel { padding: 16px; }
+  .sim-form label { flex: 1 1 85px; }
+  .sim-form input { width: 100%; }
+  .sim-form .sim-button { flex: 1 1 100%; }
+  .sim-buttons button { flex: 1 1 120px; }
+  .play-footer { flex-wrap: wrap; line-height: 1.6; }
+}

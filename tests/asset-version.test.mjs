@@ -61,10 +61,6 @@ function assertLocalAssetsAreVersioned(html, outputRoot, documentPath) {
     if (url.origin !== 'https://site.test' || !/\.(?:css|js)$/i.test(url.pathname)) continue;
     const assetPath = path.join(outputRoot, decodeURIComponent(url.pathname.replace(/^\/+/, '')));
     assert.ok(fs.statSync(assetPath).isFile(), `${reference} must resolve inside the exported site`);
-    if (url.pathname === '/assets/checkout.js') {
-      assert.equal(url.searchParams.has('v'), false, 'checkout stays outside the creative-space cache fix');
-      continue;
-    }
     assert.equal(url.searchParams.get('v'), digest(assetPath), `${reference} must carry the current asset content hash`);
   }
 }
@@ -93,13 +89,17 @@ test('re-export changes asset URLs when the referenced script content changes', 
   const out = path.join(root, 'deployment/site');
   exportSite(root, out);
   const homeBefore = fs.readFileSync(path.join(out, 'index.html'), 'utf8');
-  const before = new URL(versionedReferences(homeBefore).find((url) => url.includes('skin.js')), 'https://site.test/').searchParams.get('v');
+  const getVersion = (html, name) => new URL(versionedReferences(html).find(url => url.includes(name)), 'https://site.test/').searchParams.get('v');
+  const before = getVersion(homeBefore, 'skin.js');
+  const checkoutBefore = getVersion(homeBefore, 'checkout.js');
 
   fs.appendFileSync(path.join(root, 'assets/skin.js'), 'window.skinHotfix = true;\n');
+  fs.appendFileSync(path.join(root, 'assets/checkout.js'), 'window.checkoutHotfix = true;\n');
   exportSite(root, out);
   const homeAfter = fs.readFileSync(path.join(out, 'index.html'), 'utf8');
   const after = new URL(versionedReferences(homeAfter).find((url) => url.includes('skin.js')), 'https://site.test/').searchParams.get('v');
 
   assert.notEqual(after, before, 'changed script content must not reuse the previous asset URL');
+  assert.notEqual(getVersion(homeAfter, 'checkout.js'), checkoutBefore, 'changed checkout must use its new content hash');
   assertLocalAssetsAreVersioned(homeAfter, out, 'index.html');
 });

@@ -367,7 +367,8 @@
               "value": "local-skill"
             }
           ],
-          "default": "skill"
+          "default": "skill",
+          "hint": "ID 为 ashare-local 时必须保持本地定制 Skill。"
         },
         {
           "name": "id",
@@ -386,7 +387,8 @@
         {
           "name": "desc",
           "label": "摘要",
-          "widget": "text"
+          "widget": "text",
+          "hint": "摘要会公开展示，请勿填写付费 Skill 全文。"
         },
         {
           "name": "tag",
@@ -485,7 +487,8 @@
           "name": "body",
           "label": "正文／使用说明（Markdown）",
           "widget": "markdown",
-          "required": false
+          "required": false,
+          "hint": "正文会公开展示，只填写简介或使用说明，不要粘贴付费内容。"
         },
         {
           "name": "version",
@@ -494,8 +497,32 @@
           "required": false
         },
         {
+          "name": "price",
+          "label": "公开价格（付费 Skill 固定 ¥99.0）",
+          "widget": "string",
+          "required": false,
+          "hint": "仅为显示价格；实际金额由支付服务端决定，不能在后台更改。",
+          "pattern": [
+            "^¥99\\.0$",
+            "留空或填写 ¥99.0"
+          ]
+        },
+        {
+          "name": "sku",
+          "label": "支付商品（仅用于 ID 为 ashare-local 的本地定制 Skill）",
+          "widget": "select",
+          "required": false,
+          "options": [
+            {
+              "label": "A 股五策略研究助手 · ¥99",
+              "value": "ashare-five-strategies"
+            }
+          ],
+          "hint": "ashare-local 必须保留此 SKU。付费 ZIP 必须由服务端私有目录交付，不能上传公开附件。"
+        },
+        {
           "name": "attachment",
-          "label": "公开 Skill ZIP（不超过 10 MiB）",
+          "label": "公开 Skill ZIP（付费商品严禁上传；不超过 10 MiB）",
           "widget": "file",
           "required": false,
           "choose_url": false,
@@ -503,7 +530,8 @@
             "config": {
               "max_file_size": 10485760
             }
-          }
+          },
+          "hint": "此处上传的文件进入公开仓库。付费 Skill 包必须通过服务端私有商品目录交付。"
         }
       ]
     }

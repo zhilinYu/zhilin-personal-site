@@ -15,7 +15,6 @@ function assetFileForReference(root, documentPath, reference) {
     ? decoded.replace(/^\/+/, '')
     : path.posix.join(path.posix.dirname(documentPath.replaceAll(path.sep, '/')), decoded));
   if (!relative || relative === '..' || relative.startsWith('../')) throw new Error(`静态资源路径越界：${reference}`);
-  if (relative === 'assets/checkout.js') return null;
 
   const rootReal = fs.realpathSync(root);
   const file = path.resolve(rootReal, ...relative.split('/'));

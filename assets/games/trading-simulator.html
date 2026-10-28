@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#121417"><title>交易决策模拟 · 志林的小游戏</title>
+  <script src="theme.js"></script><link rel="stylesheet" href="../creative-space.css"><link rel="stylesheet" href="games.css"><link rel="stylesheet" href="trading-simulator.css">
+</head>
+<body class="game-page">
+  <main class="play-app">
+    <header class="play-topbar"><a class="play-brand" href="../../index.html#play" data-theme-handoff><span class="brand-mark">志</span><span>AI 投研工作台 <small>/ 小游戏</small></span></a><div class="play-actions"><label class="theme-picker"><span>主题</span><select data-theme-select aria-label="选择网站主题"><option value="tech">科技蓝</option><option value="fresh">小清新</option><option value="paper">暖白纸感</option><option value="graphite">石墨暗色</option></select></label></div></header>
+    <section class="game-main sim-main" aria-labelledby="game-title">
+      <p class="section-kicker">MARKET GAME / 交易决策练习</p><div class="game-heading"><div><h1 id="game-title">交易决策模拟</h1><p>模拟报价、交易和仓位管理。仅供游戏练习。</p></div><button class="play-button" type="button" data-restart>重新开始 ↻</button></div>
+      <div class="sim-stats"><div><span>轮次</span><b data-turn></b></div><div><span>虚拟持仓</span><b data-position></b></div><div><span>虚拟现金</span><b data-cash></b></div><div><span>公开估值</span><b data-fair></b></div><div><span>剩余时间</span><b data-timer></b></div></div>
+      <div class="sim-panel"><p class="sim-label">结算数字 <span>每轮揭晓一个，最终结算价为四个数字之和</span></p><div class="sim-draws" data-draws></div><p class="sim-explain">每个数字随机为 1–20，未揭晓数字按平均值 10.5 估算。</p></div>
+      <div class="sim-panel"><form data-quote><h2>第一步：给出你的报价</h2><p>对手可能以你的买价卖出，或按你的卖价买入。最大价差为 6。</p><div class="sim-form"><label>买价<input type="number" step="any" data-bid required inputmode="decimal" placeholder="买价"></label><label>卖价<input type="number" step="any" data-ask required inputmode="decimal" placeholder="卖价"></label><button class="sim-button" type="submit">提交报价</button></div><p class="sim-error" data-error role="alert"></p></form>
+      <div data-take hidden><h2>第二步：选择交易</h2><p>模拟对手的报价按最优价格排序，格式为价格 × 数量。</p><p>买盘 <b data-bids></b></p><p>卖盘 <b data-asks></b></p><div class="sim-buttons"><button class="sim-button" type="button" data-take-action="buy" data-buy>买入</button><button class="sim-button" type="button" data-take-action="sell" data-sell>卖出</button><button class="sim-button sim-secondary" type="button" data-take-action="pass">跳过本轮</button></div></div>
+      <div data-result hidden aria-live="polite"><h2>四轮结束</h2><p>结算价 <b data-settle></b> · 虚拟盈亏 <b data-pnl></b></p><p>最终盈亏 = 虚拟现金 + 持仓 × 结算价。可点击上方重新开始。</p></div></div>
+      <details class="sim-how"><summary>玩法说明</summary><p>每轮先报买卖价，再从模拟报价中买入、卖出或跳过。四轮结束后，按所有结算数字的总和计算盈亏。每一步限时 45 秒，超时自动跳过；持仓限制为 −10 至 +10 份。所有数字由程序随机生成，不关联真实行情或真实交易。</p></details>
+      <div class="sim-history"><h2>交易记录</h2><ul data-log></ul></div>
+      <footer class="play-footer"><a href="../../index.html#play" data-theme-handoff>← 返回首页</a><span>改编自 <a href="https://github.com/dayaveer1/market-math/tree/b8096b983d6ef000a8ca16c75fd3da102236e396" target="_blank" rel="noopener noreferrer">Market Math Trading Game</a> · <a href="market-math-LICENSE.txt">MIT License</a></span></footer>
+    </section>
+  </main>
+  <script type="module" src="trading-simulator.js"></script>
+</body>
+</html>

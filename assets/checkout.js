@@ -11,7 +11,8 @@
   const storageKey = 'zhilin.purchases.v1';
   const catalog = new Map(JSON.parse(document.getElementById('shop-catalog').textContent).map(item => [item.sku, item]));
   const detail = document.getElementById('detail');
-  const checkoutState = window.ZhilinCheckout = { available: false };
+  const checkoutState = window.ZhilinCheckout = { available: false, availableFor: () => false };
+  let availableSkus = new Set();
   let active = null, timer = 0, qrUrl = '', generation = 0, pollSequence = 0, downloading = false, buying = false;
 
   function purchases() {
@@ -109,7 +110,7 @@
     if (current === generation && sequence === pollSequence && dialog.open) timer = setTimeout(() => poll(current), 5000);
   }
   async function buy(sku) {
-    if (buying || !checkoutState.available || !catalog.get(sku)?.sellable) return;
+    if (buying || !checkoutState.availableFor(sku) || !catalog.get(sku)?.sellable) return;
     buying = true;
     try {
       let order = purchases().reverse().find(x => x.sku === sku && !['REFUNDED','CLOSED','EXPIRED'].includes(x.status) && (!x.id || x.created > Date.now() - 15 * 60 * 1000));
@@ -227,17 +228,21 @@
   document.querySelectorAll('[data-buy-sku]').forEach(button => {
     button.addEventListener('click', () => {
       const sku = button.dataset.buySku;
-      if (!checkoutState.available || !catalog.get(sku)?.sellable || buying) return;
+      if (!checkoutState.availableFor(sku) || !catalog.get(sku)?.sellable || buying) return;
       if (detail.open) detail.close();
       return buy(sku);
     });
   });
   api('status').then(r => r.json()).then(data => {
     if (!data.available) return;
+    const legacySkus = ['trend-leader', 'hot-money', 'countertrend', 'limit-up-pullback', 'research-bundle'];
+    const supported = Object.hasOwn(data, 'available_skus') ? data.available_skus : legacySkus;
+    availableSkus = new Set(Array.isArray(supported) ? supported : []);
     checkoutState.available = true;
+    checkoutState.availableFor = sku => availableSkus.has(sku);
     document.querySelectorAll('[data-buy-sku]').forEach(button => {
       const item = catalog.get(button.dataset.buySku);
-      if (!item?.sellable) return;
+      if (!item?.sellable || !checkoutState.availableFor(item.sku)) return;
       button.disabled = false; button.textContent = '微信扫码购买';
     });
   }).catch(() => {});

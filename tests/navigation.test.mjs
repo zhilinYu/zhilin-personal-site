@@ -44,7 +44,7 @@ test('homepage navigation keeps prompts, Skills, games and services with the bri
 
 test('homepage keeps the short biography without exposing a full-resume entry',()=>{
   const template=fs.readFileSync(path.join(project,'templates/index.html'),'utf8');
-  assert.match(template,/我是志林，独立 AI 顾问，专注 AI 应用开发、实用工具和工作流。/);
+  assert.match(template,/我是志林，分享 AI 投研提示词、研究工具与使用方法。/);
   assert.doesNotMatch(template,/resume\/index\.html|查看完整简历/);
 });
 
@@ -107,4 +107,67 @@ test('standalone games remain reachable and keep their return-home and theme han
   assert.match(theme,/zhilin-site-theme/);
   assert.match(theme,/data-theme-handoff/);
   assert.match(theme,/searchParams\.set\("theme", value\)/);
+});
+
+test('prompt and Skill navigation opens the complete library with the requested category',()=>{
+  const listeners = {};
+  const drawer = {open:false};
+  const cards = ['prompt','skill','prompt'].map(group=>({dataset:{group,search:''},hidden:false}));
+  const filters = ['all','prompt','skill'].map(value=>({dataset:{filterValue:value},setAttribute(name,val){this[name]=val;},addEventListener(){}}));
+  const links = ['prompt','skill'].map(value=>({dataset:{filterLink:value},addEventListener(_type,fn){this.click=fn;}}));
+  const search = {value:'old search',addEventListener(){}};
+  const result = {textContent:''};
+  const location = {href:'https://zhilin.club/',pathname:'/',search:'',hash:''};
+  const document={
+    documentElement:{dataset:{theme:'tech'}},
+    getElementById(id){return ({'site-data':{textContent:'[]'},'library-drawer':drawer,'result-line':result})[id]||null;},
+    querySelector(selector){return selector==='[data-search-input]'?search:null;},
+    querySelectorAll(selector){return ({'[data-page-anchor]':[{id:'library'}],'[data-resource-card]':cards,'[data-filter-value]':filters,'[data-filter-link]':links})[selector]||[];},
+    addEventListener(){}
+  };
+  const context={document,window:{ZhilinNavigation:{resolveHash}},location,history:{replaceState(){}},URL,URLSearchParams,localStorage:{getItem(){return null;}},matchMedia:()=>({matches:true}),addEventListener(type,fn){(listeners[type] ||= []).push(fn);}};
+  vm.runInNewContext(fs.readFileSync(path.join(project,'assets/skin.js'),'utf8'),context);
+  links[0].click();
+  assert.equal(drawer.open,true);assert.equal(search.value,'');
+  assert.deepEqual(cards.map(card=>card.hidden),[false,true,false]);
+  assert.equal(filters[1]['aria-pressed'],'true');assert.equal(result.textContent,'显示 2 项');
+  drawer.open=false;links[1].click();
+  assert.equal(drawer.open,true);assert.deepEqual(cards.map(card=>card.hidden),[true,false,true]);
+  assert.equal(filters[2]['aria-pressed'],'true');assert.equal(result.textContent,'显示 1 项');
+  drawer.open=false;location.hash='#library';listeners.hashchange.forEach(fn=>fn());
+  assert.equal(drawer.open,true,'direct navigation or browser history also opens the index');
+});
+
+test('resource topic and search filters combine, while navigation clears the previous topic',()=>{
+  const cards=[
+    {dataset:{group:'prompt',topic:'stock',search:'趋势龙头'},hidden:false},
+    {dataset:{group:'prompt',topic:'creation',search:'漫剧分镜'},hidden:false},
+    {dataset:{group:'skill',topic:'stock',search:'A 股投研'},hidden:false},
+  ];
+  const makeButton=(key,value)=>({dataset:{[key]:value},setAttribute(name,val){this[name]=val;},addEventListener(_type,fn){this.click=fn;}});
+  const filters=['all','prompt','skill'].map(value=>makeButton('filterValue',value));
+  const topics=['all','stock','creation'].map(value=>makeButton('topicValue',value));
+  const link=makeButton('filterLink','skill');
+  const search={value:'',addEventListener(_type,fn){this.input=fn;}};
+  const result={textContent:''};
+  const document={documentElement:{dataset:{theme:'graphite'}},getElementById(id){return ({'site-data':{textContent:'[]'},'library-drawer':{open:false},'result-line':result})[id]||null;},querySelector(selector){return selector==='[data-search-input]'?search:null;},querySelectorAll(selector){return ({'[data-page-anchor]':[{id:'library'}],'[data-resource-card]':cards,'[data-filter-value]':filters,'[data-topic-value]':topics,'[data-filter-link]':[link]})[selector]||[];},addEventListener(){}};
+  const location={href:'https://zhilin.club/',pathname:'/',search:'',hash:''};
+  vm.runInNewContext(fs.readFileSync(path.join(project,'assets/skin.js'),'utf8'),{document,window:{ZhilinNavigation:{resolveHash}},location,history:{replaceState(){}},URL,URLSearchParams,localStorage:{getItem(){return null;}},matchMedia:()=>({matches:true}),addEventListener(){}});
+  filters[1].click(); topics[1].click();
+  assert.deepEqual(cards.map(card=>card.hidden),[false,true,true]);
+  search.value='不存在';search.input();assert.equal(result.textContent,'显示 0 项');
+  search.value='趋势';search.input();assert.equal(result.textContent,'显示 1 项');
+  link.click();assert.equal(search.value,'');assert.equal(topics[0]['aria-pressed'],'true');
+  assert.deepEqual(cards.map(card=>card.hidden),[true,true,false]);
+});
+
+test('new visitors start in graphite while a saved choice is preserved',()=>{
+  const template=fs.readFileSync(path.join(project,'templates/index.html'),'utf8');
+  assert.match(template,/<html lang="zh-CN" data-theme="graphite">/);
+  const bootstrap=template.match(/<script>([\s\S]*?)<\/script>/)[1];
+  for(const [saved,expected] of [[null,'graphite'],['paper','paper']]){
+    const document={documentElement:{dataset:{theme:'graphite'}}};
+    vm.runInNewContext(bootstrap,{document,location:{search:''},URLSearchParams,localStorage:{getItem(){return saved;}}});
+    assert.equal(document.documentElement.dataset.theme,expected);
+  }
 });
