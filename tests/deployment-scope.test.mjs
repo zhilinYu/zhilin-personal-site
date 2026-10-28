@@ -17,6 +17,8 @@ test('分支与 PR 校验无生产发布操作，正式发布只在 main 并使�
   assert.match(verify, /branches: \['codex\/\*\*'\]/);
   assert.doesNotMatch(verify, /secrets\.|appleboy\/|systemctl|workflow_dispatch|\/usr\/share\/nginx/);
   const deploy = fs.readFileSync(new URL('../.github/workflows/deploy.yml', import.meta.url), 'utf8');
+  assert.match(deploy, /runs-on: ubuntu-24\.04/);
+  assert.match(deploy, /python-version: "3\.9"/);
   assert.match(deploy, /on:\n  push:\n    branches: \[main\]\n    paths:/);
   assert.doesNotMatch(deploy, /pull_request:/);
   assert.match(deploy, /source: "deployment\/site\/\*"/);
