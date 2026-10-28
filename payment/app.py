@@ -31,6 +31,7 @@ CATALOG = {
     "countertrend": ("逆势抗跌", 990),
     "limit-up-pullback": ("涨停回吐", 990),
     "research-bundle": ("全套研究提示词", 3990),
+    "ashare-five-strategies": ("自动匹配策略研究助手", 9900),
 }
 
 
@@ -112,7 +113,7 @@ class WechatPay:
         expiry = datetime.fromtimestamp(order["expires"], timezone.utc).isoformat()
         return self.api("POST", "/v3/pay/transactions/native", {
             "appid": self.appid, "mchid": self.mchid,
-            "description": "致凌工作室-" + CATALOG[order["sku"]][0] + "研究提示词",
+            "description": "致凌工作室-" + CATALOG[order["sku"]][0] + (" Skill" if order["sku"] == "ashare-five-strategies" else "研究提示词"),
             "out_trade_no": order["id"], "time_expire": expiry,
             "notify_url": self.notify_url,
             "amount": {"total": order["amount"], "currency": "CNY"},
@@ -185,9 +186,11 @@ def create_app(config=None, gateway=None):
             app.logger.error("Payment configuration is incomplete; checkout disabled")
 
     def ready():
-        return bool(app.config["SHOP_ENABLED"] and payment and all(
-            (Path(app.config["SHOP_FILES"]) / (sku + ".zip")).is_file() for sku in CATALOG
-        ))
+        return bool(app.config["SHOP_ENABLED"] and payment)
+
+    def available_skus():
+        return [sku for sku in CATALOG if sku != "quant-risk" and
+                (Path(app.config["SHOP_FILES"]) / (sku + ".zip")).is_file()]
 
     def error(message, status):
         return jsonify({"error": message}), status
@@ -336,7 +339,7 @@ def create_app(config=None, gateway=None):
 
     @app.get("/api/shop/status")
     def status():
-        return jsonify({"available": ready(), "method": "wechat_native"})
+        return jsonify({"available": ready(), "available_skus": available_skus() if ready() else [], "method": "wechat_native"})
 
     @app.post("/api/shop/orders")
     def create_order():
@@ -362,6 +365,10 @@ def create_app(config=None, gateway=None):
                 return jsonify({"id": existing["id"], "status": existing["status"],
                                 "error": "订单已到期，请关闭窗口后重新购买"}), 410
             return create_native(existing, reconcile=True)
+        if sku == "quant-risk":
+            return error("该商品已下架，请通过购买记录查询原订单", 410)
+        if sku not in available_skus():
+            return error("该商品暂时不可购买，请稍后再试", 503)
         if limited("create:" + str(request.remote_addr)):
             return error("操作频繁，请一分钟后重试", 429)
         now = int(time.time())

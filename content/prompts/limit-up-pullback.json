@@ -1,7 +1,7 @@
 {
   "id": "limit-up-pullback",
-  "title": "涨停回吐",
-  "desc": "整理涨停后回吐、缩量与二次转强的观察步骤。",
+  "title": "AI选股之顶级游资 × 涨停回吐版",
+  "desc": "围绕涨停后回吐、缩量与二次转强，建立清晰的跟踪与复核步骤。",
   "type": "paid-prompt",
   "group": "stock",
   "tag": "研究提示词",

@@ -38,41 +38,68 @@
   normalizeHash(location.hash, Boolean(location.hash));
   addEventListener("hashchange", () => normalizeHash(location.hash));
 
+  const libraryDrawer = document.getElementById("library-drawer");
+  if (libraryDrawer && location.hash === "#library") {
+    libraryDrawer.open = true;
+    document.getElementById("library")?.scrollIntoView?.({ block: "start", behavior: "instant" });
+  }
+  addEventListener("hashchange", () => {
+    if (libraryDrawer && location.hash === "#library") libraryDrawer.open = true;
+  });
   const filterControls = document.getElementById("library-controls");
   const cards = [...document.querySelectorAll("[data-resource-card]")];
   const search = document.querySelector("[data-search-input]");
   const result = document.getElementById("result-line");
   const filterButtons = [...document.querySelectorAll("[data-filter-value]")];
+  const topicButtons = [...document.querySelectorAll("[data-topic-value]")];
   let selectedGroup = "all";
+  let selectedTopic = "all";
+  function resetTopic() {
+    selectedTopic = "all";
+    topicButtons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.topicValue === "all")));
+  }
   function applyFilter() {
     const query = (search?.value || "").trim().toLocaleLowerCase("zh-CN");
     let visible = 0;
     cards.forEach((card) => {
       const matchesGroup = selectedGroup === "all" || card.dataset.group === selectedGroup;
+      const matchesTopic = selectedTopic === "all" || card.dataset.topic === selectedTopic;
       const matchesSearch = !query || (card.dataset.search || "").includes(query);
-      card.hidden = !(matchesGroup && matchesSearch);
+      card.hidden = !(matchesGroup && matchesTopic && matchesSearch);
       if (!card.hidden) visible += 1;
     });
     if (result) result.textContent = `显示 ${visible} 项`;
   }
   filterButtons.forEach((button) => button.addEventListener("click", () => {
     selectedGroup = button.dataset.filterValue || "all";
+    resetTopic();
     filterButtons.forEach((candidate) => candidate.setAttribute("aria-pressed", String(candidate === button)));
+    applyFilter();
+  }));
+  topicButtons.forEach((button) => button.addEventListener("click", () => {
+    selectedTopic = button.dataset.topicValue || "all";
+    topicButtons.forEach((candidate) => candidate.setAttribute("aria-pressed", String(candidate === button)));
     applyFilter();
   }));
   search?.addEventListener("input", applyFilter);
   document.querySelectorAll("[data-filter-link]").forEach((link) => link.addEventListener("click", () => {
+    if (libraryDrawer) libraryDrawer.open = true;
     selectedGroup = link.dataset.filterLink || "all";
+    resetTopic();
     if (search) search.value = "";
     filterButtons.forEach((candidate) => candidate.setAttribute("aria-pressed", String(candidate.dataset.filterValue === selectedGroup)));
     applyFilter();
   }));
   applyFilter();
+  document.querySelector('a[href="#more-services"]')?.addEventListener("click", () => {
+    const details = document.getElementById("more-services");
+    if (details) details.open = true;
+  });
 
   const allowedThemes = new Set(["tech", "fresh", "paper", "graphite"]);
   const themeKey = "zhilin-site-theme";
   function applyTheme(value, persist = true) {
-    const theme = allowedThemes.has(value) ? value : "tech";
+    const theme = allowedThemes.has(value) ? value : "graphite";
     const themeColors = { tech: "#080e15", fresh: "#f2f8f4", paper: "#f6f0e5", graphite: "#15181c" };
     document.documentElement.dataset.theme = theme;
     const themeColorMeta = document.querySelector('meta[name="theme-color"]');
@@ -93,7 +120,7 @@
   addEventListener("storage", (event) => {
     if (event.key === themeKey && allowedThemes.has(event.newValue)) applyTheme(event.newValue, false);
   });
-  applyTheme(document.documentElement.dataset.theme || "tech", false);
+  applyTheme(document.documentElement.dataset.theme || "graphite", false);
   window.ZhilinTheme = { set: applyTheme, get: () => document.documentElement.dataset.theme };
 
   const dialog = document.getElementById("detail");
@@ -135,7 +162,7 @@
     const buy = dialog.querySelector("#detailBuy");
     buy.hidden = !item.sku;
     buy.dataset.buySku = item.sku || "";
-    buy.disabled = !window.ZhilinCheckout?.available;
+    buy.disabled = !window.ZhilinCheckout?.availableFor?.(item.sku);
     buy.textContent = buy.disabled ? "购买暂未开放" : "微信扫码购买";
     dialog.querySelector(".dialog-status").textContent = "";
     dialog.showModal();

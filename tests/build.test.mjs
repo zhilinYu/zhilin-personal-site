@@ -66,7 +66,7 @@ test('非法来源 URL 和付费全文不能进入公开构建',async t=>{
 });
 test('附件必须是存在的站内 ZIP，禁止目录越界和符号链接',async t=>{
   const {buildSite}=await builder();const root=fixture(t,{attachment:'../private.zip'});assert.throws(()=>buildSite(root),/附件/);
-  const p=path.join(root,'content/prompts/example.json');const x=JSON.parse(fs.readFileSync(p));x.type='skill';x.group='own';x.attachment='assets/uploads/missing.zip';fs.unlinkSync(p);
+  const p=path.join(root,'content/prompts/example.json');const x=JSON.parse(fs.readFileSync(p));x.type='skill';x.group='own';x.tags=['stock'];x.attachment='assets/uploads/missing.zip';fs.unlinkSync(p);
   const skill=path.join(root,'content/skills/skill.json');fs.writeFileSync(skill,JSON.stringify(x));assert.throws(()=>buildSite(root),/附件/);
   fs.writeFileSync(path.join(root,'assets/uploads/real.zip'),Buffer.from('PK\x03\x04example','binary'));x.attachment='assets/uploads/real.zip';fs.writeFileSync(skill,JSON.stringify(x));assert.equal(buildSite(root).items[0].attachment,x.attachment);
   fs.symlinkSync('/etc/passwd',path.join(root,'assets/uploads/link.zip'));x.attachment='assets/uploads/link.zip';fs.writeFileSync(skill,JSON.stringify(x));assert.throws(()=>buildSite(root),/附件/);
@@ -95,6 +95,7 @@ test('原内容迁移样本保持 26 条可编辑和 10 条固定内容，保留
     const kind=entry.type==='article'?'articles':['skill','local-skill'].includes(entry.type)?'skills':entry.type.includes('prompt')?'prompts':null;
     if(!kind){fixed.push(entry);continue;}
     const item={...entry,body:entry.detail||'',enabled:true,order};delete item.detail;
+    if(item.id==='ashare-local')Object.assign(item,{sku:'ashare-five-strategies',price:'¥99.0'});
     fs.writeFileSync(path.join(root,'content',kind,item.id+'.json'),JSON.stringify(item));
     if(item.image)fs.copyFileSync(path.join(project,item.image),path.join(root,item.image));
   }

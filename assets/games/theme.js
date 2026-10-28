@@ -4,17 +4,17 @@
   const key = "zhilin-site-theme";
   const allowed = new Set(["tech", "fresh", "paper", "graphite"]);
   const fromQuery = new URLSearchParams(location.search).get("theme");
-  let theme = "tech";
+  let theme = "graphite";
   try {
     const saved = localStorage.getItem(key);
-    theme = allowed.has(fromQuery) ? fromQuery : (allowed.has(saved) ? saved : "tech");
+    theme = allowed.has(fromQuery) ? fromQuery : (allowed.has(saved) ? saved : "graphite");
     if (allowed.has(fromQuery)) localStorage.setItem(key, fromQuery);
   } catch (_) {
-    theme = allowed.has(fromQuery) ? fromQuery : "tech";
+    theme = allowed.has(fromQuery) ? fromQuery : "graphite";
   }
 
   function applyTheme(next, save = true) {
-    const value = allowed.has(next) ? next : "tech";
+    const value = allowed.has(next) ? next : "graphite";
     theme = value;
     if (document.documentElement.dataset.theme !== value) {
       document.documentElement.classList.add("theme-switching");

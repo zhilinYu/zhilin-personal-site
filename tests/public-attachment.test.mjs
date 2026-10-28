@@ -64,7 +64,8 @@ test('free prompt attachment, export, and direct download behavior',async t=>{
   await t.test('prompt details use a direct file download link and never the order API',()=>{
   const {output}=buildSite(testRoot);
   const data=scriptJson(output,'site-data');
-  const openButton={dataset:{open:'quant-risk'},listeners:{},addEventListener(type,fn){this.listeners[type]=fn;}};
+  const buttonFor=id=>({dataset:{open:id},listeners:{},addEventListener(type,fn){this.listeners[type]=fn;}});
+  const openButton=buttonFor('quant-risk'), skillButton=buttonFor('ashare-local'), paidButton=buttonFor('trend-leader');
   const makeNode=()=>({textContent:'',innerHTML:'',value:'',hidden:false,disabled:false,href:'',dataset:{},listeners:{},classList:{toggle(){}},addEventListener(type,fn){this.listeners[type]=fn;},setAttribute(){},querySelector(){return makeNode();},querySelectorAll(){return [];},contains(){return false},showModal(){this.open=true;},focus(){}});
   const source=makeNode();
   source.querySelector=(selector)=>selector==='span'?makeNode():makeNode();
@@ -79,13 +80,13 @@ test('free prompt attachment, export, and direct download behavior',async t=>{
     getElementById(id){return id==='site-data'?contentNode:id==='detail'?dialog:node(id);},
     documentElement:{dataset:{theme:'tech'}},
     querySelector(){return null;},
-    querySelectorAll(selector){return selector==='[data-open]'?[openButton]:[];},
+    querySelectorAll(selector){return selector==='[data-open]'?[openButton,skillButton,paidButton]:[];},
     addEventListener(){}
   };
   let fetchCalls=0;
   const location={href:'https://zhilin.club/',hash:'',search:'',pathname:'/'};
   const context={
-    document,window:{ZhilinNavigation:{resolveHash:()=>({type:'anchor',id:'top',hash:'#top',replaceHash:false})},ZhilinCheckout:{available:true}},
+    document,window:{ZhilinNavigation:{resolveHash:()=>({type:'anchor',id:'top',hash:'#top',replaceHash:false})},ZhilinCheckout:{available:true,availableFor:sku=>sku==='trend-leader'}},
     location,history:{replaceState(){}},URL,URLSearchParams,localStorage:{getItem(){return 'tech';},setItem(){}},
     matchMedia:()=>({matches:true}),addEventListener(){},fetch(){fetchCalls++;throw new Error('network call unexpected');}
   };
@@ -96,6 +97,12 @@ test('free prompt attachment, export, and direct download behavior',async t=>{
   assert.equal(download.href,`assets/uploads/quant-risk-${expectedZipSha}.zip`);
   assert.equal(download.textContent,'下载提示词 ZIP ↓');
   assert.equal(parts.get('#detailBuy').hidden,true);
+  skillButton.listeners.click();
+  assert.equal(parts.get('#detailBuy').disabled,true);
+  assert.equal(parts.get('#detailBuy').textContent,'购买暂未开放');
+  paidButton.listeners.click();
+  assert.equal(parts.get('#detailBuy').disabled,false);
+  assert.equal(parts.get('#detailBuy').textContent,'微信扫码购买');
   assert.equal(fetchCalls,0);
   assert.match(fs.readFileSync(path.join(testRoot,'templates/index.html'),'utf8'),/<a class="dialog-download" download/);
   });

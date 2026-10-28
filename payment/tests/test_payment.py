@@ -70,7 +70,7 @@ class OrderTests(unittest.TestCase):
     def tearDown(self):
         self.temp.cleanup()
 
-    def order(self, sku="quant-risk", token=None, **extra):
+    def order(self, sku="trend-leader", token=None, **extra):
         return self.client.post("/api/shop/orders", json={"sku": sku, **extra},
                                 headers={"Origin": "https://zhilin.club",
                                          "Idempotency-Key": token or self.token})
@@ -84,6 +84,58 @@ class OrderTests(unittest.TestCase):
         self.assertEqual(self.gateway.created[-1]["amount"], 990)
         self.assertEqual(self.order("research-bundle", token="b" * 64).status_code, 201)
         self.assertEqual(self.gateway.created[-1]["amount"], 3990)
+
+    def test_skill_price_private_delivery_and_refund(self):
+        response = self.order("ashare-five-strategies", amount=1)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(self.gateway.created[-1]["amount"], 9900)
+        order_id = response.json["id"]
+        url = "/api/shop/orders/" + order_id + "/download"
+        self.assertEqual(self.client.get(url, headers=self.auth()).status_code, 403)
+        self.assertEqual(self.client.post("/api/shop/wechat/notify", json=self.gateway.paid(order_id)).status_code, 204)
+        result = self.client.get(url, headers=self.auth())
+        self.assertEqual(result.status_code, 200)
+        with zipfile.ZipFile(io.BytesIO(result.data)) as archive:
+            self.assertEqual(archive.read("test.md"), b"isolated test product")
+        result.close()
+        self.gateway.transactions[order_id]["trade_state"] = "REFUND"
+        self.assertEqual(self.client.get(url, headers=self.auth()).status_code, 403)
+
+    def test_missing_new_skill_file_blocks_new_checkout_but_not_old_order_recovery(self):
+        order_id = self.order().json["id"]
+        self.client.post("/api/shop/wechat/notify", json=self.gateway.paid(order_id))
+        (self.files / "ashare-five-strategies.zip").unlink()
+        status = self.client.get("/api/shop/status").json
+        self.assertTrue(status["available"])
+        self.assertNotIn("ashare-five-strategies", status["available_skus"])
+        self.assertEqual(self.order("ashare-five-strategies", token="b" * 64).status_code, 503)
+        self.assertEqual(self.order("hot-money", token="c" * 64).status_code, 201)
+        prefix = "/api/shop/orders/" + order_id
+        self.assertEqual(self.client.get(prefix, headers=self.auth()).json["status"], "PAID")
+        response = self.client.get(prefix + "/download", headers=self.auth())
+        self.assertEqual(response.status_code, 200)
+        response.close()
+
+    def test_legacy_quant_cannot_create_new_but_prior_order_is_recoverable(self):
+        import hashlib
+        now = int(time.time())
+        order_id = "ZLlegacyquant"
+        with sqlite3.connect(self.app.config["SHOP_DB"]) as conn:
+            conn.execute("INSERT INTO orders(id,sku,amount,token_hash,status,created,expires,transaction_id) VALUES(?,?,?,?,?,?,?,?)",
+                         (order_id, "quant-risk", 990, hashlib.sha256(self.token.encode()).hexdigest(), "PAID", now, now+900, "transaction-"+order_id))
+        self.gateway.transactions[order_id] = {"out_trade_no": order_id, "mchid":self.gateway.mchid, "appid":self.gateway.appid,
+                                               "trade_type":"NATIVE", "trade_state":"SUCCESS", "transaction_id":"transaction-"+order_id,
+                                               "amount":{"total":990,"currency":"CNY"}}
+        self.assertNotIn("quant-risk", self.client.get("/api/shop/status").json["available_skus"])
+        self.assertEqual(self.order("quant-risk", token="b" * 64).status_code, 410)
+        self.assertEqual(self.order("quant-risk").json["id"], order_id)
+        (self.files / "ashare-five-strategies.zip").unlink()
+        self.assertEqual(self.order("quant-risk").json["id"], order_id)
+        prefix = "/api/shop/orders/"+order_id
+        self.assertEqual(self.client.get(prefix, headers=self.auth()).json["amount"], 990)
+        result = self.client.get(prefix+"/download", headers=self.auth())
+        self.assertEqual(result.status_code, 200)
+        result.close()
 
     def test_duplicate_request_does_not_create_another_payment(self):
         first = self.order()
@@ -156,7 +208,7 @@ class OrderTests(unittest.TestCase):
         def retry_in_thread():
             try:
                 with self.app.test_client() as client:
-                    responses.append(client.post("/api/shop/orders", json={"sku": "quant-risk"},
+                    responses.append(client.post("/api/shop/orders", json={"sku": "trend-leader"},
                         headers={"Origin": "https://zhilin.club", "Idempotency-Key": self.token}))
             except BaseException as error:
                 failures.append(error)
@@ -335,9 +387,9 @@ class OrderTests(unittest.TestCase):
             self.assertEqual(conn.execute("SELECT count(*) FROM creation_attempts").fetchone()[0], 0)
 
     def test_origin_and_product_validation(self):
-        self.assertEqual(self.client.post("/api/shop/orders", json={"sku": "quant-risk"}).status_code, 403)
+        self.assertEqual(self.client.post("/api/shop/orders", json={"sku": "trend-leader"}).status_code, 403)
         self.assertEqual(self.order("unknown").status_code, 400)
-        self.assertEqual(self.client.post("/api/shop/orders", json=["quant-risk"],
+        self.assertEqual(self.client.post("/api/shop/orders", json=["trend-leader"],
                                          headers={"Origin": "https://zhilin.club"}).status_code, 400)
 
     def test_no_payment_no_download_and_no_public_order_access(self):
@@ -399,8 +451,11 @@ class OrderTests(unittest.TestCase):
 
     def test_missing_file_disables_checkout(self):
         (self.files / "research-bundle.zip").unlink()
-        self.assertFalse(self.client.get("/api/shop/status").json["available"])
-        self.assertEqual(self.order().status_code, 503)
+        status = self.client.get("/api/shop/status").json
+        self.assertTrue(status["available"])
+        self.assertNotIn("research-bundle", status["available_skus"])
+        self.assertEqual(self.order("research-bundle").status_code, 503)
+        self.assertEqual(self.order("trend-leader", token="b" * 64).status_code, 201)
 
     def test_lost_creation_response_preserves_order_number(self):
         self.gateway.fail_create = True

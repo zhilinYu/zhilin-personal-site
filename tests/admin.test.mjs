@@ -21,3 +21,19 @@ test('本地预览只开放发布文件，拒绝目录越界和源码目录',asy
   for(const url of ['/content/articles/article-0.json','/.env','/node_modules/markdown-it/package.json','/templates/index.html','/assets/..%2f..%2fpackage.json'])assert.equal((await fetch(base+url)).status,404,url);
   assert.equal((await fetch(base+'/',{method:'POST',body:'bad'})).status,405);
 });
+
+test('付费 Skill 后台只列出已授权商品并提示所有公开字段和私有交付',async()=>{
+  const config=JSON.parse(fs.readFileSync(path.join(root,'admin/config.yml')));
+  const fields=config.collections.find(c=>c.name==='skills').fields;
+  const byName=name=>fields.find(f=>f.name===name);
+  assert.deepEqual(byName('sku').options.map(o=>o.value),['ashare-five-strategies']);
+  assert.equal(byName('sku').required,false);assert.equal(byName('price').required,false);
+  assert.ok(new RegExp(byName('price').pattern[0]).test('¥99.0'));
+  assert.equal(new RegExp(byName('price').pattern[0]).test('¥9.9'),false);
+  assert.match(byName('sku').hint,/私有/);assert.match(byName('attachment').hint,/公开仓库/);
+  assert.match(byName('body').hint,/公开展示/);assert.match(byName('desc').hint,/公开展示/);
+  const {validateItem}=await import('../tools/build.mjs');
+  const skill={id:'ashare-local',title:'研究助手',type:'local-skill',group:'local',enabled:true,sku:'ashare-five-strategies',price:'¥99.0'};
+  assert.throws(()=>validateItem(root,{...skill,attachment:'assets/uploads/paid.zip'},'skills'),/付费内容/);
+  assert.throws(()=>validateItem(root,{...skill,price:'¥9.9'},'skills'),/不一致/);
+});

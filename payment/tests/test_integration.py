@@ -27,9 +27,9 @@ class IntegrationTests(unittest.TestCase):
 
     def test_local_origin_is_isolated_from_production_and_wrong_host(self):
         headers = {"Origin": "https://zhilin.club", "Idempotency-Key": "a"*64}
-        self.assertEqual(self.call("POST", "/api/shop/orders", json={"sku": "quant-risk"}, headers=headers).status_code, 403)
+        self.assertEqual(self.call("POST", "/api/shop/orders", json={"sku": "trend-leader"}, headers=headers).status_code, 403)
         headers["Origin"] = self.origin
-        self.assertEqual(self.call("POST", "/api/shop/orders", json={"sku": "quant-risk"}, headers=headers).status_code, 201)
+        self.assertEqual(self.call("POST", "/api/shop/orders", json={"sku": "trend-leader"}, headers=headers).status_code, 201)
         self.assertEqual(self.client.get("/", base_url="http://localhost:8777").status_code, 403)
 
     def test_production_origin_rejects_localhost_and_has_no_test_control_route(self):
@@ -38,7 +38,7 @@ class IntegrationTests(unittest.TestCase):
                                   "SHOP_DB": str(Path(self.temp.name)/"separate-origin.sqlite3"),
                                   "SHOP_FILES": self.app.config["SHOP_FILES"]}, self.gateway)
         with app.test_client() as client:
-            result = client.post("/api/shop/orders", json={"sku": "quant-risk"},
+            result = client.post("/api/shop/orders", json={"sku": "trend-leader"},
                                  headers={"Origin": self.origin, "Idempotency-Key": "c"*64})
             self.assertEqual(result.status_code, 403)
             self.assertEqual(client.post("/__test__/state", json={"action": "paid"}).status_code, 404)
@@ -55,7 +55,7 @@ class IntegrationTests(unittest.TestCase):
 
     def test_mock_success_duplicate_callback_and_refund_revokes_redelivery(self):
         token = "b"*64
-        created = self.call("POST", "/api/shop/orders", json={"sku": "quant-risk"},
+        created = self.call("POST", "/api/shop/orders", json={"sku": "trend-leader"},
                             headers={"Origin": self.origin, "Idempotency-Key": token})
         order_id = created.json["id"]
         auth = {"Authorization": "Bearer " + token}

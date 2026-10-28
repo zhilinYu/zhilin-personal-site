@@ -32,6 +32,7 @@ export function validateItem(root,item,kind) {
   if(!item||typeof item!=='object'||Array.isArray(item))throw Error('内容必须是对象');
   if(!/^[a-z0-9][a-z0-9-]{0,79}$/.test(item.id||''))throw Error('ID 仅允许小写字母、数字和短横线');
   if(!collections[kind].includes(item.type))throw Error(`${item.id} 内容类型与目录不符`);
+  if(item.id==='ashare-local'&&(kind!=='skills'||item.type!=='local-skill'||item.sku!=='ashare-five-strategies'))throw Error('五策略 Skill 必须保持既有类型与支付 SKU');
   if(typeof item.title!=='string'||!item.title.trim())throw Error(`${item.id} 缺少标题`);
   for(const key of textFields)if(item[key]!=null&&(typeof item[key]!=='string'||item[key].length>100000))throw Error(`${item.id} 的 ${key} 无效`);
   if(typeof item.enabled!=='boolean')throw Error(`${item.id} 缺少可见状态`);
@@ -39,7 +40,7 @@ export function validateItem(root,item,kind) {
   if(item.tags!=null&&(!Array.isArray(item.tags)||item.tags.some(x=>typeof x!=='string'||x.length>80)))throw Error(`${item.id} 标签无效`);
   if(kind==='prompts'&&!['stock','community'].includes(item.group))throw Error(`${item.id} 分类无效`);
   if(kind==='skills'&&!['own','local','external'].includes(item.group))throw Error(`${item.id} 分类无效`);
-  if(item.type==='paid-prompt'&&(item.prompt?.trim()||item.attachment))throw Error('付费提示词不能包含公开全文或附件');
+  if((item.type==='paid-prompt'||(item.type==='local-skill'&&item.sku))&&(item.prompt?.trim()||item.attachment))throw Error('付费内容不能包含公开全文或附件');
   paymentSku(item);
   const freeQuantPrompt=item.id==='quant-risk'&&kind==='prompts'&&item.type==='open-prompt';
   if(item.attachment&&kind!=='skills'&&!freeQuantPrompt)throw Error('附件只能用于公开 Skills 或已核验的量化风控免费下载');
@@ -79,6 +80,43 @@ function category(item) {
   if(item.type==='service')return 'service';
   return 'resource';
 }
+const topics = {
+  risk: ['risk', '风险与抗跌'],
+  trend: ['trend', '趋势与龙头'],
+  shortTerm: ['short-term', '短线与情绪'],
+  stock: ['stock', '综合投研'],
+  creation: ['creation', '漫剧与生图'],
+  development: ['development', '开发与测试'],
+  knowledge: ['knowledge', '写作与知识'],
+  efficiency: ['efficiency', '效率工具'],
+  prompt: ['prompt-methods', '提示词方法'],
+  other: ['other', '其他'],
+};
+const topicsById = {
+  'ashare-local':'stock', 'storyboard':'creation', 'character-sheet':'creation', 'gpt-image-library':'creation', 'nano-banana-library':'creation',
+  'ontology-drama':'creation', 'comic-production':'creation', 'drama-skills':'creation',
+  'codex-workflow-handoffs':'development', 'openai-structured-outputs':'development', 'anthropic-webapp-testing':'development',
+  'frontend-design':'development', 'static-check':'development', 'doc-site':'development', 'superpowers':'development',
+  'fabric-create-quiz':'knowledge', 'fabric-extract-wisdom':'knowledge', 'anthropic-doc-coauthoring':'knowledge',
+  'anthropic-internal-comms':'knowledge', 'anthropic-knowledge-synthesis':'knowledge', 'notion-knowledge-capture':'knowledge',
+  'bookmark-manager':'efficiency', 'disk-cleanup':'efficiency',
+  'anthropic-prompt-tutorial':'prompt', 'prompt-engineering-guide':'prompt', 'promptfoo-simple-test':'prompt',
+  'prompts-chat-library':'prompt', 'anthropic-skill-creator':'prompt',
+};
+const investmentTopicById = {
+  'quant-risk':'risk', 'countertrend':'risk', 'trend-leader':'trend',
+  'hot-money':'shortTerm', 'limit-up-pullback':'shortTerm',
+};
+function isStockResource(item) {
+  return item.group==='stock'||topicsById[item.id]==='stock'||(item.tags||[]).some(tag=>['stock','投研与选股','综合投研','risk','风险与抗跌','trend','趋势与龙头','short-term','短线与情绪'].includes(tag));
+}
+function topic(item) {
+  if(isStockResource(item)) {
+    const explicit=(item.tags||[]).map(tag=>[topics.risk,topics.trend,topics.shortTerm,topics.stock].find(([value,label])=>tag===value||tag===label)).find(Boolean);
+    return explicit||topics[investmentTopicById[item.id]||'stock'];
+  }
+  return (item.tags||[]).map(tag=>Object.values(topics).find(([value,label])=>tag===value||tag===label)).find(Boolean)||topics[topicsById[item.id]||'other'];
+}
 function categoryLabel(item) {
   if(item.id==='quant-risk'&&item.type==='open-prompt'&&item.attachment)return '免费提示词';
   const typeLabels={'open-prompt':'开源提示词','paid-prompt':'付费提示词','link-prompt':'提示词资源',skill:'Skill','local-skill':'本地 Skill',product:'项目',service:'服务'};
@@ -88,8 +126,8 @@ function card(item,arts) {
   const kind=item.image?'image':(item.art||'note');
   const art=item.image?`<img src="${escape(item.image.replace(/^\//,''))}" alt="" loading="lazy">`:(arts[kind]||arts.note||'<div class="paper-art"><span>Build.</span><i></i><i></i></div>');
   const source=item.url?`<a class="source-link" href="${escape(item.url)}" target="_blank" rel="noopener noreferrer" aria-label="查看 ${escape(item.title)} 的来源">${escape(item.source||'来源')} ↗</a>`:`<span>${escape(item.source||'志林整理')}</span>`;
-  const searchable=[item.title,item.desc,item.tag,item.group,item.source,item.license].filter(Boolean).join(' ').toLocaleLowerCase('zh-CN');
-  return `<article class="resource-card reveal" data-resource-card data-group="${category(item)}" data-kind="${escape(kind)}" data-search="${escape(searchable)}"><button type="button" class="resource-main" data-open="${escape(item.id)}"><span class="card-top"><span class="card-type">${escape(categoryLabel(item))}</span><span class="card-price">${escape(item.price||item.license||item.version||'')}</span></span><h3>${escape(item.title)}</h3><p>${escape(item.desc)}</p><span class="card-bottom"><span class="card-source">${escape(item.source||'志林整理')}</span><span class="card-open">查看详情 ↗</span></span><span class="card-art" aria-hidden="true">${art}</span></button><footer>${source}</footer></article>`;
+  const searchable=[item.title,item.desc,item.tag,item.group,item.source,item.license,...(item.tags||[]),topic(item)[1]].filter(Boolean).join(' ').toLocaleLowerCase('zh-CN');
+  return `<article class="resource-card reveal" data-resource-card data-group="${category(item)}" data-topic="${topic(item)[0]}" data-kind="${escape(kind)}" data-search="${escape(searchable)}"><button type="button" class="resource-main" data-open="${escape(item.id)}"><span class="card-top"><span class="card-type">${escape(categoryLabel(item))}</span><span class="card-price">${escape(item.price||item.license||item.version||'')}</span></span><h3>${escape(item.title)}</h3><p>${escape(item.desc)}</p><span class="card-bottom"><span class="card-source">${escape(item.source||'志林整理')}</span><span class="card-open">查看详情 ↗</span></span><span class="card-art" aria-hidden="true">${art}</span></button><footer>${source}</footer></article>`;
 }
 function pathCard(title,count,detail,href,filter='') {
   const filterAttribute=filter?` data-filter-link="${filter}"`:'';
@@ -107,13 +145,17 @@ function resourceFilters(items) {
     return `<button class="filter-button" type="button" data-filter-value="${value}" aria-pressed="${value==='all'}">${label}<span class="filter-count">${count}</span></button>`;
   }).join('');
 }
+function topicFilters(items) {
+  const entries=Object.values(topics).filter(([value])=>items.some(item=>topic(item)[0]===value));
+  return [['all','全部主题'],...entries].map(([value,label])=>`<button class="filter-button topic-button" type="button" data-topic-value="${value}" aria-pressed="${value==='all'}">${label}</button>`).join('');
+}
 function resourcePaths(items) {
   const prompts=items.filter(item=>collections.prompts.includes(item.type)).length;
   const skills=items.filter(item=>collections.skills.includes(item.type)).length;
   const projects=items.filter(item=>item.type==='product').length;
   const services=items.filter(item=>item.type==='service').length;
   const definitions=[
-    ['小游戏','2','独立编写 · 可试玩','#play'],
+    ['小游戏','3','轻松练习 · 可试玩','#play'],
     ['提示词',prompts,'从问题到可复用指令','#library','prompt'],
     ['Skills',skills,'工作流与扩展能力','#library','skill'],
     ['项目',projects,'正在介绍的产品','#library','project'],
@@ -131,13 +173,22 @@ function serviceCards(items) {
   if(!items.length)return '<p class="empty-state">服务资料整理中。</p>';
   return items.map(item=>`<article class="service-card"><span class="section-kicker">${escape(item.tag||'SERVICE')}</span><h3>${escape(item.title)}</h3><p>${escape(item.desc||'')}</p><button class="text-link" type="button" data-open="${escape(item.id)}">了解详情 <span>↗</span></button></article>`).join('');
 }
+function featuredPrompts(items) {
+  return ['quant-risk','trend-leader','hot-money','countertrend','limit-up-pullback','v6-lite'].map((id,index)=>({item:items.find(item=>item.id===id),index})).filter(({item})=>item).map(({item,index})=>`<button type="button" class="prompt-cover prompt-cover-${index%3+1}" data-open="${escape(item.id)}"><span class="cover-title">${escape(item.title)}</span><span class="cover-price">${escape(item.price||(item.id==='quant-risk'?'免费下载':item.tag||''))}</span><span class="cover-desc">${escape(item.desc||categoryLabel(item))}</span><span class="circle-arrow" aria-hidden="true">→</span></button>`).join('');
+}
+function featuredSkills(items) {
+  return ['ashare-local'].map((id,index)=>({item:items.find(item=>item.id===id),index})).filter(({item})=>item).map(({item,index})=>`<button type="button" class="skill-highlight" data-open="${escape(item.id)}"><span class="skill-symbol" aria-hidden="true">${['▤','◇','⌘','◉'][index]}<i></i></span><strong>${escape(item.title)}</strong><span>${escape(item.desc||'')}</span><span class="skill-feature-price">${escape(item.price||'')} · 查看详情 →</span></button>`).join('');
+}
+function featuredServices(items) {
+  return ['investment-agent-remote','one-on-one','workflow-building'].map((id,index)=>({item:items.find(item=>item.id===id),index})).filter(({item})=>item).map(({item,index})=>`<article class="service-feature"><button type="button" data-open="${escape(item.id)}"><span class="service-feature-art service-art-${index+1}" aria-hidden="true"></span><span class="service-feature-copy"><strong>${escape(item.title)}</strong><small>${escape(item.tag||'')}</small><span>${escape(item.desc||'')}</span><span class="circle-arrow" aria-hidden="true">→</span></span></button></article>`).join('');
+}
 function atomicWrite(target,data) {
   fs.mkdirSync(path.dirname(target),{recursive:true});const tmp=target+'.tmp';fs.writeFileSync(tmp,data);fs.renameSync(tmp,target);
 }
 export function buildSite(root=ROOT) {
   const raw=loadCatalog(root).filter(x=>x.enabled);const arts=readJSON(path.join(root,'templates/art.json'));
   // Archived sources stay validated; quant-risk is public only with its verified free attachment.
-  const publicRaw=raw.filter(x=>homepageTypes.has(x.type)&&(x.id!=='quant-risk'||(x.type==='open-prompt'&&x.attachment)));
+  const publicRaw=raw.filter(x=>homepageTypes.has(x.type)&&(x.id!=='quant-risk'||(x.type==='open-prompt'&&x.attachment))&&((collections.prompts.includes(x.type)&&x.group==='stock')||(collections.skills.includes(x.type)&&isStockResource(x))||(x.type==='service'&&['investment-agent-remote','one-on-one','workflow-building'].includes(x.id))));
   const items=publicRaw.map(x=>{
     const sku=paymentSku(x);
     return {...x,...(sku?{sku,price:displayPrice(SHOP_CATALOG[sku].amount)}:{}),detail:x.body??x.detail??'',bodyHtml:md.render(x.body??x.detail??'')};
@@ -153,13 +204,17 @@ export function buildSite(root=ROOT) {
     PROMPT_COUNT:String(promptCount),
     SKILL_COUNT:String(skillCount),
     RESOURCE_FILTERS:resourceFilters(resources),
+    TOPIC_FILTERS:topicFilters(resources),
     RESOURCE_CARDS:resources.map(x=>card(x,arts)).join(''),
+    FEATURED_PROMPTS:featuredPrompts(prompts),
+    FEATURED_SKILLS:featuredSkills(skills),
+    FEATURED_SERVICES:featuredServices(items.filter(x=>x.type==='service')),
     SERVICES:serviceCards(items.filter(x=>x.type==='service')),
     DATA:JSON.stringify(items).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029')
   };
   let output=fs.readFileSync(path.join(root,'templates/index.html'),'utf8');
   for(const [key,value] of Object.entries(sections)) {
-    const marker=`<!-- CMS:${key} -->`;if(!output.includes(marker))throw Error(`模板缺少 ${key}`);output=output.split(marker).join(value);
+    const marker=`<!-- CMS:${key} -->`;if(!output.includes(marker)&&!key.startsWith('FEATURED_')&&key!=='TOPIC_FILTERS')throw Error(`模板缺少 ${key}`);output=output.split(marker).join(value);
   }
   output=output.replace('<!-- CMS:SHOP -->',()=>JSON.stringify(shop).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029'));
   output=versionStaticAssets(output,root,'index.html');
