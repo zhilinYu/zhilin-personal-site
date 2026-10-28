@@ -85,6 +85,142 @@ class OrderTests(unittest.TestCase):
         self.assertEqual(self.order("research-bundle", token="b" * 64).status_code, 201)
         self.assertEqual(self.gateway.created[-1]["amount"], 3990)
 
+    def test_service_order_requires_private_contact_and_has_no_download(self):
+        for sku, amount, token in [("investment-agent-remote", 9900, "a" * 64), ("one-on-one", 19900, "b" * 64), ("workflow-building", 19900, "c" * 64)]:
+            (self.files / (sku + ".zip")).unlink()
+            self.assertIn(sku, self.client.get("/api/shop/status").json["available_skus"])
+            self.assertEqual(self.order(sku, token=token).status_code, 400)
+            self.assertEqual(self.order(sku, token=token, phone="not-a-phone").status_code, 400)
+            result = self.order(sku, token=token, phone="13800138000", amount=1)
+            self.assertEqual(result.status_code, 201)
+            order_id = result.json["id"]
+            self.assertEqual(self.gateway.created[-1]["amount"], amount)
+            self.assertNotIn("phone", self.gateway.created[-1])
+            with sqlite3.connect(self.app.config["SHOP_DB"]) as conn:
+                self.assertEqual(conn.execute("SELECT phone FROM service_contacts WHERE order_id=?", (order_id,)).fetchone()[0], "13800138000")
+            retry = self.order(sku, token=token, phone="13900139000")
+            self.assertEqual(retry.status_code, 409)
+            self.assertNotIn("13800138000", retry.get_data(as_text=True))
+            self.assertNotIn("13900139000", retry.get_data(as_text=True))
+            self.assertEqual(self.order(sku, token=token).json["id"], order_id)
+            with sqlite3.connect(self.app.config["SHOP_DB"]) as conn:
+                self.assertEqual(conn.execute("SELECT phone FROM service_contacts WHERE order_id=?", (order_id,)).fetchone()[0], "13800138000")
+            headers = {"Authorization": "Bearer " + token}
+            prefix = "/api/shop/orders/" + order_id
+            self.assertNotIn("13800138000", self.client.get(prefix, headers=headers).get_data(as_text=True))
+            self.assertEqual(self.client.post("/api/shop/wechat/notify", json=self.gateway.paid(order_id)).status_code, 204)
+            self.assertEqual(self.client.get(prefix + "/download", headers=headers).status_code, 404)
+
+    def test_service_retries_keep_order_and_distinct_purchase_gets_new_order(self):
+        sku = "investment-agent-remote"
+        first = self.order(sku, phone="13800138000")
+        self.assertEqual(first.status_code, 201)
+        retry = self.order(sku, phone="13800138000")
+        second = self.order(sku, token="b" * 64, phone="13800138000")
+        self.assertEqual(retry.json["id"], first.json["id"])
+        self.assertNotEqual(second.json["id"], first.json["id"])
+        self.assertEqual(len(self.gateway.created), 2)
+
+    def test_concurrent_service_retry_rejects_different_phone(self):
+        entered, release = threading.Event(), threading.Event()
+        original_create = self.gateway.create
+        responses, failures = [], []
+        def slow_create(order):
+            entered.set()
+            if not release.wait(3):
+                raise AssertionError("test did not release provider")
+            return original_create(order)
+        def create_in_thread():
+            try:
+                with self.app.test_client() as client:
+                    responses.append(client.post("/api/shop/orders", json={"sku": "investment-agent-remote", "phone": "13800138000"},
+                        headers={"Origin": "https://zhilin.club", "Idempotency-Key": self.token}))
+            except BaseException as error:
+                failures.append(error)
+        self.gateway.create = slow_create
+        worker = threading.Thread(target=create_in_thread)
+        worker.start()
+        try:
+            self.assertTrue(entered.wait(2))
+            mismatch = self.order("investment-agent-remote", phone="13900139000")
+            self.assertEqual(mismatch.status_code, 409)
+            self.assertNotIn("13800138000", mismatch.get_data(as_text=True))
+            self.assertNotIn("13900139000", mismatch.get_data(as_text=True))
+        finally:
+            release.set()
+            worker.join(4)
+        self.assertFalse(worker.is_alive())
+        self.assertFalse(failures)
+        self.assertEqual(responses[0].status_code, 201)
+        self.assertEqual(len(self.gateway.created), 1)
+
+    def test_concurrent_first_service_requests_cannot_replace_contact(self):
+        barrier = threading.Barrier(2)
+        local = threading.local()
+        original_connect = sqlite3.connect
+        responses, failures = [], []
+
+        class Connection:
+            def __init__(self, raw):
+                self.raw = raw
+            @property
+            def row_factory(self):
+                return self.raw.row_factory
+            @row_factory.setter
+            def row_factory(self, value):
+                self.raw.row_factory = value
+            def __enter__(self):
+                self.raw.__enter__()
+                return self
+            def __exit__(self, *args):
+                return self.raw.__exit__(*args)
+            def close(self):
+                self.raw.close()
+            def execute(self, query, params=()):
+                cursor = self.raw.execute(query, params)
+                if query == "SELECT * FROM orders WHERE token_hash=?" and not getattr(local, "seen", False):
+                    local.seen = True
+                    class Cursor:
+                        def fetchone(self):
+                            row = cursor.fetchone()
+                            barrier.wait(4)
+                            return row
+                    return Cursor()
+                return cursor
+
+        def request(phone):
+            try:
+                with self.app.test_client() as client:
+                    response = client.post("/api/shop/orders", json={"sku": "investment-agent-remote", "phone": phone},
+                        headers={"Origin": "https://zhilin.club", "Idempotency-Key": self.token})
+                    responses.append((phone, response))
+            except BaseException as error:
+                failures.append(error)
+
+        with patch("app.sqlite3.connect", side_effect=lambda *args, **kwargs: Connection(original_connect(*args, **kwargs))):
+            threads = [threading.Thread(target=request, args=(phone,)) for phone in ("13800138000", "13900139000")]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join(8)
+        self.assertFalse(any(thread.is_alive() for thread in threads))
+        self.assertFalse(failures)
+        self.assertEqual(sorted(response.status_code for _, response in responses), [201, 409])
+        winning_phone = next(phone for phone, response in responses if response.status_code == 201)
+        with sqlite3.connect(self.app.config["SHOP_DB"]) as conn:
+            self.assertEqual(conn.execute("SELECT phone FROM service_contacts").fetchall(), [(winning_phone,)])
+        self.assertEqual(len(self.gateway.created), 1)
+
+    def test_service_table_initialization_preserves_old_order(self):
+        old_path = Path(self.temp.name) / "old.sqlite3"
+        with sqlite3.connect(old_path) as conn:
+            conn.execute("CREATE TABLE orders(id TEXT PRIMARY KEY, sku TEXT, amount INTEGER, token_hash TEXT, status TEXT, code_url TEXT, transaction_id TEXT, created INTEGER, expires INTEGER, last_query INTEGER)")
+            conn.execute("INSERT INTO orders VALUES(?,?,?,?,?,?,?,?,?,?)", ("old", "trend-leader", 990, "old-token", "PAID", None, "old-transaction", 1, 2, 0))
+        create_app({"TESTING": True, "SHOP_ENABLED": True, "SHOP_DB": str(old_path), "SHOP_FILES": str(self.files)}, self.gateway)
+        with sqlite3.connect(old_path) as conn:
+            self.assertEqual(conn.execute("SELECT id,sku,amount,status FROM orders").fetchall(), [("old", "trend-leader", 990, "PAID")])
+            self.assertEqual(conn.execute("SELECT count(*) FROM service_contacts").fetchone()[0], 0)
+
     def test_skill_price_private_delivery_and_refund(self):
         response = self.order("ashare-five-strategies", amount=1)
         self.assertEqual(response.status_code, 201)

@@ -3,7 +3,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 export function requiresPaymentDeployment(paths) {
-  const runtime = new Set(['payment/app.py', 'payment/wsgi.py', 'payment/package_products.py', 'payment/requirements.txt', 'deploy/zhilin-shop.service']);
+  const runtime = new Set(['payment/app.py', 'payment/wsgi.py', 'payment/package_products.py', 'payment/list_service_orders.py', 'payment/requirements.txt', 'deploy/zhilin-shop.service']);
   return paths.some(name => runtime.has(name));
 }
 

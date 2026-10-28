@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script src="../theme.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>像素跳跃 · 志林的小游戏</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="site-nav"><a href="../../../index.html#play" data-theme-handoff>← 返回网站</a><span>方向键 / A、D 移动，空格跳跃</span><a href="https://github.com/stm1978/retro-platformer" target="_blank" rel="noopener noreferrer">开源来源 · MIT / CC0</a></nav>
+  <div id="container">
+    <canvas id="gameCanvas" aria-label="Pixel Hop Twins game canvas"></canvas>
+  </div>
+  <div class="touch-controls" aria-label="触屏游戏控制">
+    <button data-code="ArrowLeft" aria-label="向左">←</button><button data-code="ArrowRight" aria-label="向右">→</button><button data-code="Space" aria-label="跳跃">跳跃</button><button data-code="Enter" aria-label="重新开始">重新开始</button>
+  </div>
+  <script>
+    document.querySelectorAll('[data-code]').forEach(button => {
+      const code = button.dataset.code;
+      const send = type => window.dispatchEvent(new KeyboardEvent(type, { code, bubbles: true }));
+      button.addEventListener('pointerdown', event => { event.preventDefault(); button.setPointerCapture(event.pointerId); send('keydown'); });
+      for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) button.addEventListener(type, () => send('keyup'));
+    });
+  </script>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

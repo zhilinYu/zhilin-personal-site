@@ -24,7 +24,7 @@ test('homepage keeps prompts, Skills, games and services while preserving purcha
   const {items, output} = buildSite(testRoot);
   const data = scriptJson(output, 'site-data');
   const shop = scriptJson(output, 'shop-catalog');
-  const visibleTypes = new Set(['open-prompt', 'paid-prompt', 'link-prompt', 'skill', 'local-skill', 'service']);
+  const visibleTypes = new Set(['open-prompt', 'paid-prompt', 'link-prompt', 'skill', 'local-skill', 'service', 'product']);
 
   assert.ok(items.every(item => visibleTypes.has(item.type)), 'public data must contain only the requested content');
   assert.ok(data.every(item => visibleTypes.has(item.type)));
@@ -43,10 +43,14 @@ test('homepage keeps prompts, Skills, games and services while preserving purcha
   assert.ok(fs.existsSync(quantPath), 'the original quant-risk content source remains in the repository');
   assert.equal(fs.readFileSync(quantPath, 'utf8'), quantBefore, 'the original quant-risk source is not rewritten');
 
-  for (const hiddenId of ['article-0', 'blue-tuanzi', 'zinhua-miniapp']) {
+  for (const hiddenId of ['article-0', 'zinhua-miniapp']) {
     assert.ok(!data.some(item => item.id === hiddenId), `${hiddenId} stays out of public search data`);
     assert.doesNotMatch(output, new RegExp(`data-open="${hiddenId}"`));
   }
+  assert.ok(data.some(item=>item.id==='blue-tuanzi'));
+  assert.match(output,/data-open="blue-tuanzi"/);
+  assert.match(output,/id="agents"/);
+  assert.doesNotMatch(output,/id="more-services"/);
   for (const hiddenAnchor of ['latest', 'mac-tools', 'projects', 'contact']) {
     assert.doesNotMatch(output, new RegExp(`id="${hiddenAnchor}"`), `${hiddenAnchor} is not a visible homepage section`);
     assert.doesNotMatch(output, new RegExp(`href="#${hiddenAnchor}"`), `${hiddenAnchor} has no visible navigation link`);
@@ -55,12 +59,12 @@ test('homepage keeps prompts, Skills, games and services while preserving purcha
   const filterValues = [...output.matchAll(/data-filter-value="([^"]+)"/g)].map(match => match[1]);
   assert.deepEqual(filterValues, ['all', 'prompt', 'skill']);
   assert.match(output,/id="play"/);
-  for (const game of ['2048.html','tetris.html','trading-simulator.html']) assert.ok(output.includes(`assets/games/${game}`), `${game} is reachable from the homepage`);
-  assert.match(output,/market-math-LICENSE\.txt/);
+  for (const game of ['2048.html','tetris.html','tank-battle/index.html','pixel-hop/index.html']) assert.ok(output.includes(`assets/games/${game}`), `${game} is reachable from the homepage`);
+  assert.doesNotMatch(output,/assets\/games\/trading-simulator\.html/);
   assert.match(output,/id="services"/);
   assert.match(output,/data-open="investment-agent-remote"/);
   assert.ok(data.some(item=>item.id==='additional-prompt'),'new prompts can still publish');
-  assert.equal([...output.matchAll(/data-resource-card/g)].length,data.filter(item=>item.type!=='service').length,'the resource index contains all prompts and Skills, including later additions');
+  assert.equal([...output.matchAll(/data-resource-card/g)].length,data.filter(item=>['open-prompt','paid-prompt','link-prompt','skill','local-skill'].includes(item.type)).length,'the resource index contains all prompts and Skills, including later additions');
   const archived=fs.readFileSync(path.join(root,'templates/archive/homepage-full.html'),'utf8');
   assert.match(archived,/id="mac-tools"/);
   assert.match(archived,/id="projects"/);
@@ -85,7 +89,7 @@ test('featured cards use real published items and retain artwork associations wh
   for(const id of ['ashare-local'])assert.match(featured(first.output,'skill-highlights'),new RegExp(`data-open="${id}"`));
   for(const id of ['investment-agent-remote','one-on-one','workflow-building'])assert.match(featured(first.output,'service-feature-grid'),new RegExp(`data-open="${id}"`));
   assert.match(first.output,/<details class="library-drawer" id="library-drawer">[\s\S]*?id="resource-grid"/);
-  assert.equal([...first.output.matchAll(/data-resource-card/g)].length,first.items.filter(item=>item.type!=='service').length);
+  assert.equal([...first.output.matchAll(/data-resource-card/g)].length,first.items.filter(item=>['open-prompt','paid-prompt','link-prompt','skill','local-skill'].includes(item.type)).length);
 
   const fixedPath=path.join(testRoot,'templates/fixed-catalog.json');
   const fixed=JSON.parse(fs.readFileSync(fixedPath,'utf8'));
@@ -97,7 +101,7 @@ test('featured cards use real published items and retain artwork associations wh
   const services=featured(revised,'service-feature-grid');
   assert.doesNotMatch(services,/data-open="investment-agent-remote"/);
   assert.match(services,/data-open="one-on-one"[\s\S]*?service-art-2[\s\S]*?¥199 \/ 小时/);
-  assert.match(services,/data-open="workflow-building"[\s\S]*?service-art-3[\s\S]*?¥199 起/);
+  assert.match(services,/data-open="workflow-building"[\s\S]*?service-art-3[\s\S]*?¥199 定金/);
   assert.match(featured(revised,'prompt-covers'),/prompt-cover-2" data-open="trend-leader"/);
 });
 

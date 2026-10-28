@@ -8,7 +8,7 @@ import {versionStaticAssets} from './asset-versions.mjs';
 export const ROOT=fileURLToPath(new URL('../',import.meta.url));
 const collections={articles:['article'],prompts:['open-prompt','paid-prompt','link-prompt'],skills:['skill','local-skill']};
 const textFields=['title','desc','tag','body','prompt','source','license','price','version','image','url','licenseUrl','attachment','date','sku'];
-const homepageTypes=new Set(['open-prompt','paid-prompt','link-prompt','skill','local-skill','service']);
+const homepageTypes=new Set(['open-prompt','paid-prompt','link-prompt','skill','local-skill','service','product']);
 const md=new MarkdownIt({html:false,linkify:false,breaks:true});
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const readJSON=p=>JSON.parse(fs.readFileSync(p,'utf8'));
@@ -180,7 +180,7 @@ function featuredSkills(items) {
   return ['ashare-local'].map((id,index)=>({item:items.find(item=>item.id===id),index})).filter(({item})=>item).map(({item,index})=>`<button type="button" class="skill-highlight" data-open="${escape(item.id)}"><span class="skill-symbol" aria-hidden="true">${['▤','◇','⌘','◉'][index]}<i></i></span><strong>${escape(item.title)}</strong><span>${escape(item.desc||'')}</span><span class="skill-feature-price">${escape(item.price||'')} · 查看详情 →</span></button>`).join('');
 }
 function featuredServices(items) {
-  return ['investment-agent-remote','one-on-one','workflow-building'].map((id,index)=>({item:items.find(item=>item.id===id),index})).filter(({item})=>item).map(({item,index})=>`<article class="service-feature"><button type="button" data-open="${escape(item.id)}"><span class="service-feature-art service-art-${index+1}" aria-hidden="true"></span><span class="service-feature-copy"><strong>${escape(item.title)}</strong><small>${escape(item.tag||'')}</small><span>${escape(item.desc||'')}</span><span class="circle-arrow" aria-hidden="true">→</span></span></button></article>`).join('');
+  return ['investment-agent-remote','one-on-one','workflow-building'].map((id,index)=>({item:items.find(item=>item.id===id),index})).filter(({item})=>item).map(({item,index})=>`<article class="service-feature"><button class="service-detail" type="button" data-open="${escape(item.id)}"><span class="service-feature-art service-art-${index+1}" aria-hidden="true"></span><span class="service-feature-copy"><strong>${escape(item.title)}</strong><small>${escape(item.tag||'')}</small><span>${escape(item.desc||'')}</span><span class="circle-arrow" aria-hidden="true">→</span></span></button>${item.sku?`<button class="service-buy" type="button" data-buy-sku="${escape(item.sku)}" disabled>购买暂未开放</button>`:''}</article>`).join('');
 }
 function atomicWrite(target,data) {
   fs.mkdirSync(path.dirname(target),{recursive:true});const tmp=target+'.tmp';fs.writeFileSync(tmp,data);fs.renameSync(tmp,target);
@@ -188,14 +188,14 @@ function atomicWrite(target,data) {
 export function buildSite(root=ROOT) {
   const raw=loadCatalog(root).filter(x=>x.enabled);const arts=readJSON(path.join(root,'templates/art.json'));
   // Archived sources stay validated; quant-risk is public only with its verified free attachment.
-  const publicRaw=raw.filter(x=>homepageTypes.has(x.type)&&(x.id!=='quant-risk'||(x.type==='open-prompt'&&x.attachment))&&((collections.prompts.includes(x.type)&&x.group==='stock')||(collections.skills.includes(x.type)&&isStockResource(x))||(x.type==='service'&&['investment-agent-remote','one-on-one','workflow-building'].includes(x.id))));
+  const publicRaw=raw.filter(x=>homepageTypes.has(x.type)&&(x.id!=='quant-risk'||(x.type==='open-prompt'&&x.attachment))&&((collections.prompts.includes(x.type)&&x.group==='stock')||(collections.skills.includes(x.type)&&isStockResource(x))||(x.type==='service'&&['investment-agent-remote','one-on-one','workflow-building'].includes(x.id))||(x.type==='product'&&x.id==='blue-tuanzi')));
   const items=publicRaw.map(x=>{
     const sku=paymentSku(x);
     return {...x,...(sku?{sku,price:displayPrice(SHOP_CATALOG[sku].amount)}:{}),detail:x.body??x.detail??'',bodyHtml:md.render(x.body??x.detail??'')};
   });
   const shop=Object.entries(SHOP_CATALOG).map(([sku,entry])=>({sku,...entry,sellable:items.some(x=>x.sku===sku),title:items.find(x=>x.sku===sku)?.title||entry.name}));
   const prompts=items.filter(x=>collections.prompts.includes(x.type));const skills=items.filter(x=>collections.skills.includes(x.type));
-  const resources=items.filter(x=>x.type!=='service');
+  const resources=items.filter(x=>collections.prompts.includes(x.type)||collections.skills.includes(x.type));
   const promptCount=prompts.length,skillCount=skills.length;
   const latestDate=items.filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x.date||'')).map(x=>x.date).sort().at(-1)||'';
   const sections={
@@ -209,7 +209,6 @@ export function buildSite(root=ROOT) {
     FEATURED_PROMPTS:featuredPrompts(prompts),
     FEATURED_SKILLS:featuredSkills(skills),
     FEATURED_SERVICES:featuredServices(items.filter(x=>x.type==='service')),
-    SERVICES:serviceCards(items.filter(x=>x.type==='service')),
     DATA:JSON.stringify(items).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029')
   };
   let output=fs.readFileSync(path.join(root,'templates/index.html'),'utf8');

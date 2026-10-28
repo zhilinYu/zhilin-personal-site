@@ -35,7 +35,7 @@ function harness({ purchases = [], fetchOrder, available = true, storageFails = 
     elements.set(id, el);
     return el;
   }
-  const shop = ['quant-risk', 'trend-leader', 'hot-money', 'countertrend', 'limit-up-pullback', 'research-bundle', 'ashare-five-strategies'].map(sku => ({sku, title:sku, amount:sku === 'research-bundle' ? 3990 : 990, sellable:sku !== 'research-bundle' && !nonSellableSkus.includes(sku)}));
+  const shop = ['quant-risk', 'trend-leader', 'hot-money', 'countertrend', 'limit-up-pullback', 'research-bundle', 'ashare-five-strategies', 'investment-agent-remote', 'one-on-one', 'workflow-building'].map(sku => ({sku, title:sku, amount:sku === 'research-bundle' ? 3990 : ['one-on-one','workflow-building'].includes(sku) ? 19900 : 990, sellable:sku !== 'research-bundle' && !nonSellableSkus.includes(sku)}));
   element('shop-catalog').textContent = JSON.stringify(shop);
   const buyButtons = shop.filter(item => item.sellable).map(item => {
     const button = element('buy-' + item.sku); button.dataset.buySku = item.sku; return button;
@@ -398,4 +398,41 @@ test('new service empty or invalid SKU list fails closed',async()=>{
     await page.buy('trend-leader');
     assert.equal(page.requests.filter(r=>r.url==='/api/shop/orders').length,0);
   }
+});
+
+
+test('service checkout requires contact, keeps it out of browser storage, and never offers a download', async () => {
+  const page = harness({fetchOrder(url, options) {
+    if (url === '/api/shop/orders') return Promise.resolve(response({id:'service-1',status:'PENDING'}, 201));
+    return Promise.resolve(response({status:'PAID'}));
+  }});
+  await page.buy('investment-agent-remote');
+  assert.equal(page.element('checkoutContact').hidden, false);
+  await page.element('checkoutSubmit').click();
+  assert.equal(page.requests.filter(x=>x.url === '/api/shop/orders').length, 0);
+  page.element('checkoutPhone').value = '13800138000';
+  await page.element('checkoutSubmit').click();
+  await flush();
+  const request = page.requests.find(x=>x.url === '/api/shop/orders');
+  assert.equal(JSON.parse(request.options.body).phone, '13800138000');
+  assert.doesNotMatch(JSON.stringify(page.saved()), /13800138000/);
+  assert.equal(page.element('checkoutDownload').hidden, true);
+  assert.match(page.element('checkoutStatus').textContent, /联系电话/);
+});
+
+
+test('workflow service clearly identifies the charge as a deposit before and after payment', async () => {
+  const page = harness({fetchOrder(url) {
+    if (url === '/api/shop/orders') return Promise.resolve(response({id:'service-deposit',status:'PENDING'}, 201));
+    return Promise.resolve(response({status:'PAID'}));
+  }});
+  await page.buy('workflow-building');
+  assert.match(page.element('checkoutPrice').textContent, /¥199\.0 定金.*补差价/);
+  assert.equal(page.element('checkoutContact').hidden, false);
+  page.element('checkoutPhone').value = '13800138000';
+  await page.element('checkoutSubmit').click();
+  await flush();
+  assert.match(page.element('checkoutStatus').textContent, /定金已确认.*补差价/);
+  assert.equal(page.element('checkoutDownload').hidden, true);
+  assert.doesNotMatch(JSON.stringify(page.saved()), /13800138000/);
 });

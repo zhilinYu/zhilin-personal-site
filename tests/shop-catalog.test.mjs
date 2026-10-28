@@ -26,7 +26,7 @@ test('homepage keeps other paid products and exposes quant-risk as a verified fr
   const paid=items.filter(x=>x.type==='paid-prompt');
   assert.equal(paid.length,4);assert.ok(paid.every(x=>x.sku===x.id&&x.price==='¥9.9'&&!x.prompt&&!x.attachment));
   const shop=JSON.parse(output.match(/<script id="shop-catalog" type="application\/json">([\s\S]*?)<\/script>/)[1]);
-  assert.equal(shop.filter(x=>x.sellable).length,5);
+  assert.equal(shop.filter(x=>x.sellable).length,8);
   const skill=items.find(x=>x.id==='ashare-local');
   assert.equal(skill.sku,'ashare-five-strategies');assert.equal(skill.price,'¥99.0');
   assert.equal(skill.prompt,undefined);assert.equal(skill.attachment,undefined);
@@ -36,6 +36,12 @@ test('homepage keeps other paid products and exposes quant-risk as a verified fr
   assert.equal(quant.title,'量化风控');assert.equal(quant.amount,990);assert.equal(quant.sellable,false);
   assert.equal(shop.find(x=>x.sku==='research-bundle').amount,3990);
   assert.equal(shop.find(x=>x.sku==='research-bundle').sellable,false);
+  assert.equal(shop.find(x=>x.sku==='investment-agent-remote').amount,9900);
+  assert.equal(shop.find(x=>x.sku==='one-on-one').amount,19900);
+  assert.ok(shop.find(x=>x.sku==='investment-agent-remote').sellable);
+  assert.ok(shop.find(x=>x.sku==='one-on-one').sellable);
+  assert.equal(shop.find(x=>x.sku==='workflow-building').amount,19900);
+  assert.ok(shop.find(x=>x.sku==='workflow-building').sellable);
   assert.match(output,/id="myPurchases"/);assert.match(output,/id="detailBuy"/);
 });
 

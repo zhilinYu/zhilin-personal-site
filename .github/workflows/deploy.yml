@@ -88,7 +88,7 @@ jobs:
           host: 106.75.250.138
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "payment/app.py,payment/wsgi.py,payment/package_products.py,payment/requirements.txt,deploy/zhilin-shop.service"
+          source: "payment/app.py,payment/wsgi.py,payment/package_products.py,payment/list_service_orders.py,payment/requirements.txt,deploy/zhilin-shop.service"
           target: "/opt/zhilin-shop/"
           strip_components: 0
 

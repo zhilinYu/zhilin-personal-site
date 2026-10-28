@@ -8,6 +8,10 @@
   const download = document.getElementById('checkoutDownload');
   const refresh = document.getElementById('checkoutRefresh');
   const historyList = document.getElementById('purchaseList');
+  const contact = document.getElementById('checkoutContact');
+  const phone = document.getElementById('checkoutPhone');
+  const submit = document.getElementById('checkoutSubmit');
+  const serviceSkus = new Set(['investment-agent-remote', 'one-on-one', 'workflow-building']);
   const storageKey = 'zhilin.purchases.v1';
   const catalog = new Map(JSON.parse(document.getElementById('shop-catalog').textContent).map(item => [item.sku, item]));
   const detail = document.getElementById('detail');
@@ -56,9 +60,10 @@
     active = order;
     const item = catalog.get(order.sku);
     title.textContent = item ? item.title : '我的购买';
-    price.textContent = item ? '¥' + (item.amount / 100).toFixed(1) : '';
+    price.textContent = item ? '¥' + (item.amount / 100).toFixed(1) + (order.sku === 'workflow-building' ? ' 定金 · 需求确认后沟通补差价' : '') : '';
     orderNumber.textContent = order.id ? '订单号：' + order.id : '';
     historyList.hidden = true;
+    contact.hidden = true; phone.value = '';
     download.hidden = true;
     refresh.hidden = true; refresh.disabled = false;
     refresh.textContent = '查询付款状态';
@@ -83,14 +88,15 @@
       try { remember(order); } catch { /* Existing order remains usable in this open window. */ }
       orderNumber.textContent = '订单号：' + order.id;
       showRefresh(order, data);
-      download.hidden = data.status !== 'PAID';
+      const service = serviceSkus.has(order.sku);
+      download.hidden = data.status !== 'PAID' || service;
       if (data.status === 'PAID') {
         clearQr();
-        showStatus('付款已确认。现在可以下载完整文档。');
+        showStatus(order.sku === 'workflow-building' ? '定金已确认。我们会通过您留下的联系电话沟通需求、总价及补差价安排。' : service ? '付款已确认。我们会通过您留下的联系电话与您沟通服务安排。' : '付款已确认。现在可以下载完整文档。');
         return;
       }
       if (data.status === 'REFUNDED') {
-        clearQr(); showStatus('此订单已退款，下载权限已关闭。'); return;
+        clearQr(); showStatus(service ? '此服务订单已退款。' : '此订单已退款，下载权限已关闭。'); return;
       }
       if (['EXPIRED', 'CLOSED'].includes(data.status)) {
         clearQr(); showStatus('订单已到期或关闭，请关闭窗口后重新购买。'); return;
@@ -113,7 +119,7 @@
     if (buying || !checkoutState.availableFor(sku) || !catalog.get(sku)?.sellable) return;
     buying = true;
     try {
-      let order = purchases().reverse().find(x => x.sku === sku && !['REFUNDED','CLOSED','EXPIRED'].includes(x.status) && (!x.id || x.created > Date.now() - 15 * 60 * 1000));
+      let order = purchases().reverse().find(x => x.sku === sku && !(serviceSkus.has(sku) && x.status === 'PAID') && !['REFUNDED','CLOSED','EXPIRED'].includes(x.status) && (!x.id || x.created > Date.now() - 15 * 60 * 1000));
       if (!order) {
         const bytes = crypto.getRandomValues(new Uint8Array(32));
         order = { sku, token: [...bytes].map(b => b.toString(16).padStart(2, '0')).join(''), created: Date.now() };
@@ -126,17 +132,18 @@
       }
       open(order);
       const current = generation;
+      if (!order.id && serviceSkus.has(order.sku)) { contact.hidden = false; showStatus('请先留下联系电话，用于购买后安排服务。'); phone.focus(); return; }
       if (!order.id && !await prepareOrder(order, current)) return;
       if (current === generation) poll(current);
     } finally { buying = false; }
   }
-  async function prepareOrder(order, current) {
+  async function prepareOrder(order, current, contactPhone) {
     showStatus(order.id ? '正在重新获取付款二维码…' : '正在创建付款订单…');
     refresh.disabled = true;
     try {
       const data = await (await api('orders', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': order.token },
-        body: JSON.stringify({ sku: order.sku }),
+        body: JSON.stringify({ sku: order.sku, ...(contactPhone ? { phone: contactPhone } : {}) }),
       })).json();
       order.id = data.id;
       order.status = data.status;
@@ -161,7 +168,7 @@
   }
   document.getElementById('checkoutClose').addEventListener('click', () => dialog.close());
   dialog.addEventListener('close', () => {
-    stop(); active = null;
+    stop(); active = null; phone.value = ''; contact.hidden = true;
     document.getElementById('myPurchases').focus({ preventScroll: true });
   });
   // Invalidate requests before browser return navigation or page teardown.
@@ -171,10 +178,25 @@
     if (refresh.disabled) return;
     if (active && (!active.id || active.retryable)) {
       const order = active;
+      if (!order.id && serviceSkus.has(order.sku)) { contact.hidden = false; phone.focus(); return; }
       open(order); // Invalidate older polls before retrying this exact token.
       const current = generation;
       if (await prepareOrder(order, current) && current === generation) poll(current);
     } else poll();
+  });
+  submit.addEventListener('click', async () => {
+    if (!active || !serviceSkus.has(active.sku) || submit.disabled) return;
+    const value = phone.value.trim();
+    if (!/^\+?[0-9][0-9 -]{5,23}$/.test(value) || (value.match(/[0-9]/g) || []).length < 6 || (value.match(/[0-9]/g) || []).length > 20) {
+      showStatus('请填写有效的联系电话。'); phone.focus(); return;
+    }
+    const order = active, current = generation;
+    submit.disabled = true;
+    try {
+      if (await prepareOrder(order, current, value) && current === generation) {
+        contact.hidden = true; phone.value = ''; poll(current);
+      }
+    } finally { submit.disabled = false; }
   });
   download.addEventListener('click', async () => {
     if (!active || downloading) return;
@@ -203,7 +225,7 @@
   document.getElementById('myPurchases').addEventListener('click', () => {
     stop(); active = null;
     title.textContent = '我的购买'; price.textContent = '';
-    orderNumber.textContent = '';
+    orderNumber.textContent = ''; contact.hidden = true; phone.value = '';
     clearQr(); download.hidden = true; refresh.hidden = true;
     document.getElementById('checkoutHelp').hidden = true;
     historyList.replaceChildren(); historyList.hidden = false;
@@ -222,6 +244,7 @@
   async function buyExisting(order) {
     open(order);
     const current = generation;
+    if (!order.id && serviceSkus.has(order.sku)) { contact.hidden = false; showStatus('请先留下联系电话，用于购买后安排服务。'); phone.focus(); return; }
     if (!order.id && !await prepareOrder(order, current)) return;
     if (current === generation) poll(current);
   }
