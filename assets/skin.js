@@ -91,11 +91,6 @@
     applyFilter();
   }));
   applyFilter();
-  document.querySelector('a[href="#more-services"]')?.addEventListener("click", () => {
-    const details = document.getElementById("more-services");
-    if (details) details.open = true;
-  });
-
   const allowedThemes = new Set(["tech", "fresh", "paper", "graphite"]);
   const themeKey = "zhilin-site-theme";
   function applyTheme(value, persist = true) {

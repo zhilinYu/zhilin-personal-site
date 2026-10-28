@@ -1,0 +1,57 @@
+/* ============================================================
+   Pixel Hop Twins – global styles
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: #07080F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#container {
+  position: relative;
+  display: inline-block;
+  /* Scale the canvas to fill the viewport while keeping aspect ratio */
+  max-width: 100vw;
+  max-height: 100vh;
+}
+
+#gameCanvas {
+  display: block;
+  /*
+   * Render canvas at native resolution; CSS scales it up.
+   * image-rendering: pixelated keeps crisp pixel edges at any zoom level.
+   */
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+
+  /* Scale to fit viewport, preserving aspect ratio */
+  max-width: 100vw;
+  max-height: 100vh;
+  width: auto;
+  height: auto;
+
+  /* Subtle outer glow for retro CRT feel */
+  box-shadow:
+    0 0 0 2px #1A1A3D,
+    0 0 24px 4px rgba(80, 96, 200, 0.4);
+}
+
+html, body { min-height: 100dvh; height: auto; overflow: auto; flex-direction: column; gap: 12px; padding: 12px; }
+.site-nav { width: min(100%, 960px); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; color: #b9c0d5; font: 14px system-ui, sans-serif; }
+.site-nav a { color: #bbcbff; }
+#container { max-width: 100%; }
+#gameCanvas { max-width: 100%; max-height: calc(100dvh - 150px); }
+.touch-controls { display: none; gap: 8px; justify-content: center; }
+.touch-controls button { min-width: 62px; min-height: 48px; padding: 8px; border: 1px solid #727db3; border-radius: 8px; color: white; background: #272c56; font: 16px system-ui, sans-serif; touch-action: none; }
+@media (max-width: 700px), (pointer: coarse) { .touch-controls { display: flex; flex-wrap: wrap; } .site-nav span { display: none; } #gameCanvas { max-height: calc(100dvh - 180px); } }

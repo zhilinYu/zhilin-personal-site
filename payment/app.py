@@ -32,7 +32,13 @@ CATALOG = {
     "limit-up-pullback": ("涨停回吐", 990),
     "research-bundle": ("全套研究提示词", 3990),
     "ashare-five-strategies": ("自动匹配策略研究助手", 9900),
+    "investment-agent-remote": ("远程协助搭建 AI 投研智能体", 9900),
+    "one-on-one": ("一对一 AI 投研咨询", 19900),
+    "workflow-building": ("AI 投研工作流定制定金", 19900),
 }
+
+
+SERVICE_SKUS = {"investment-agent-remote", "one-on-one", "workflow-building"}
 
 
 class PaymentError(Exception):
@@ -113,7 +119,7 @@ class WechatPay:
         expiry = datetime.fromtimestamp(order["expires"], timezone.utc).isoformat()
         return self.api("POST", "/v3/pay/transactions/native", {
             "appid": self.appid, "mchid": self.mchid,
-            "description": "致凌工作室-" + CATALOG[order["sku"]][0] + (" Skill" if order["sku"] == "ashare-five-strategies" else "研究提示词"),
+            "description": "致凌工作室-" + CATALOG[order["sku"]][0] + (" Skill" if order["sku"] == "ashare-five-strategies" else "" if order["sku"] in SERVICE_SKUS else "研究提示词"),
             "out_trade_no": order["id"], "time_expire": expiry,
             "notify_url": self.notify_url,
             "amount": {"total": order["amount"], "currency": "CNY"},
@@ -173,6 +179,8 @@ def create_app(config=None, gateway=None):
                 token_hash TEXT UNIQUE NOT NULL, status TEXT NOT NULL DEFAULT 'CREATING',
                 code_url TEXT, transaction_id TEXT UNIQUE, created INTEGER NOT NULL,
                 expires INTEGER NOT NULL, last_query INTEGER NOT NULL DEFAULT 0);
+            CREATE TABLE IF NOT EXISTS service_contacts(
+                order_id TEXT PRIMARY KEY, phone TEXT NOT NULL);
             CREATE TABLE IF NOT EXISTS limits(
                 bucket TEXT PRIMARY KEY, count INTEGER NOT NULL, expires INTEGER NOT NULL);
             CREATE TABLE IF NOT EXISTS creation_attempts(
@@ -190,7 +198,7 @@ def create_app(config=None, gateway=None):
 
     def available_skus():
         return [sku for sku in CATALOG if sku != "quant-risk" and
-                (Path(app.config["SHOP_FILES"]) / (sku + ".zip")).is_file()]
+                (sku in SERVICE_SKUS or (Path(app.config["SHOP_FILES"]) / (sku + ".zip")).is_file())]
 
     def error(message, status):
         return jsonify({"error": message}), status
@@ -341,6 +349,13 @@ def create_app(config=None, gateway=None):
     def status():
         return jsonify({"available": ready(), "available_skus": available_skus() if ready() else [], "method": "wechat_native"})
 
+    def service_contact_conflict(order, body):
+        if order["sku"] not in SERVICE_SKUS:
+            return False
+        with db() as conn:
+            contact = conn.execute("SELECT phone FROM service_contacts WHERE order_id=?", (order["id"],)).fetchone()
+        return not contact or ("phone" in body and body["phone"] != contact["phone"])
+
     @app.post("/api/shop/orders")
     def create_order():
         if request.headers.get("Origin") != app.config["SHOP_ORIGIN"]:
@@ -360,11 +375,16 @@ def create_app(config=None, gateway=None):
         if existing:
             if existing["sku"] != sku:
                 return error("订单商品不一致", 409)
+            if service_contact_conflict(existing, body):
+                return error("联系电话与原订单不一致，请使用原号码重试或联系售后", 409)
             if existing["expires"] <= time.time() and existing["status"] != "PAID":
                 # Preserve recovery after a lost create response, even after expiry.
                 return jsonify({"id": existing["id"], "status": existing["status"],
                                 "error": "订单已到期，请关闭窗口后重新购买"}), 410
             return create_native(existing, reconcile=True)
+        phone = body.get("phone")
+        if sku in SERVICE_SKUS and (not isinstance(phone, str) or not re.fullmatch(r"\+?[0-9][0-9 -]{5,23}", phone) or not 6 <= sum(c.isdigit() for c in phone) <= 20):
+            return error("请填写有效的联系电话", 400)
         if sku == "quant-risk":
             return error("该商品已下架，请通过购买记录查询原订单", 410)
         if sku not in available_skus():
@@ -379,12 +399,16 @@ def create_app(config=None, gateway=None):
                     "INSERT INTO orders(id,sku,amount,token_hash,created,expires) VALUES(?,?,?,?,?,?)",
                     (order_id, sku, CATALOG[sku][1], key, now, now + 900),
                 )
+                if sku in SERVICE_SKUS:
+                    conn.execute("INSERT INTO service_contacts(order_id,phone) VALUES(?,?)", (order_id, phone))
                 order = conn.execute("SELECT * FROM orders WHERE id=?", (order_id,)).fetchone()
         except sqlite3.IntegrityError:
             with db() as conn:
                 order = conn.execute("SELECT * FROM orders WHERE token_hash=?", (key,)).fetchone()
             if not order or order["sku"] != sku:
                 return error("订单冲突", 409)
+            if service_contact_conflict(order, body):
+                return error("联系电话与原订单不一致，请使用原号码重试或联系售后", 409)
             return create_native(order, reconcile=True)
         return create_native(order, success_status=201)
 
@@ -438,6 +462,8 @@ def create_app(config=None, gateway=None):
         order = owned(order_id)
         if not order:
             return error("订单不存在或无权访问", 404)
+        if order["sku"] in SERVICE_SKUS:
+            return error("此订单为服务，无下载文件", 404)
         # Re-query before each delivery to catch refunds performed in the merchant dashboard.
         if limited("download:" + order_id, count=5):
             return error("下载过于频繁，请稍后重试", 429)
