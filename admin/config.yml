@@ -534,6 +534,70 @@
           "hint": "此处上传的文件进入公开仓库。付费 Skill 包必须通过服务端私有商品目录交付。"
         }
       ]
+    },
+    {
+      "name": "settings",
+      "label": "站点设置",
+      "delete": false,
+      "editor": {
+        "preview": false
+      },
+      "files": [
+        {
+          "name": "market",
+          "label": "实时行情",
+          "file": "content/settings/market.json",
+          "format": "json",
+          "fields": [
+            {
+              "name": "enabled",
+              "label": "在首页显示实时行情",
+              "widget": "boolean",
+              "default": true
+            },
+            {
+              "name": "quotes",
+              "label": "自选列表",
+              "widget": "list",
+              "summary": "{{fields.name}} · {{fields.code}}",
+              "max": 30,
+              "hint": "代码加交易所前缀：上交所 sh、深交所 sz、北交所 bj，例如 sh600519、sz000858、sh000001（上证指数）。卡片最多 8 只。",
+              "fields": [
+                {
+                  "name": "code",
+                  "label": "代码",
+                  "widget": "string",
+                  "pattern": [
+                    "^(sh|sz|bj)\\d{6}$",
+                    "形如 sh600519"
+                  ]
+                },
+                {
+                  "name": "name",
+                  "label": "显示名称",
+                  "widget": "string",
+                  "pattern": [
+                    "^.{1,12}$",
+                    "1–12 个字"
+                  ]
+                },
+                {
+                  "name": "card",
+                  "label": "显示在首屏卡片",
+                  "widget": "boolean",
+                  "default": true
+                },
+                {
+                  "name": "ticker",
+                  "label": "显示在滚动条",
+                  "widget": "boolean",
+                  "default": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }

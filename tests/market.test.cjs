@@ -6,7 +6,7 @@ const vm = require('node:vm');
 
 const sandbox = {module: {exports: {}}};
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../assets/market.js'), 'utf8'), sandbox);
-const {parseQuotes, isMarketOpen, formatPrice, formatPercent} = sandbox.module.exports;
+const {parseQuotes, parseMinutes, isMarketOpen, sparklinePoints, formatPrice, formatPercent} = sandbox.module.exports;
 
 const line = (code, price, prevClose, change, percent) => {
   const fields = Array(50).fill('');
@@ -35,4 +35,21 @@ test('trading hours follow Beijing time on weekdays', () => {
   assert.equal(isMarketOpen(new Date('2026-10-28T04:30:00Z')), false); // lunch break
   assert.equal(isMarketOpen(new Date('2026-10-28T07:30:00Z')), false); // after close
   assert.equal(isMarketOpen(new Date('2026-10-31T02:00:00Z')), false); // Saturday
+});
+
+test('reads intraday prices from the minute endpoint and ignores bad payloads', () => {
+  const json = {data: {sh000001: {data: {data: ['0930 3650.12 100 1.00', '0931 3651.50 120 1.00', '0932 bad 1 1']}}}};
+  assert.deepEqual([...parseMinutes(json, 'sh000001')], [3650.12, 3651.5]);
+  assert.equal(parseMinutes({}, 'sh000001').length, 0);
+  assert.equal(parseMinutes(null, 'sh000001').length, 0);
+});
+
+test('sparkline spans the box and keeps the previous close inside it', () => {
+  const shape = sparklinePoints([10, 12, 11], 9, 64, 24, 2);
+  const points = shape.points.split(' ').map(point => point.split(',').map(Number));
+  assert.equal(points[0][0], 2);
+  assert.equal(points.at(-1)[0], 62);
+  assert.equal(points[1][1], 2, 'the high touches the top padding');
+  assert.equal(shape.baseline, 22, 'previous close below the range sits on the bottom padding');
+  assert.equal(sparklinePoints([10], 9), null);
 });

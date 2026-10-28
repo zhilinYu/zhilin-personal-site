@@ -182,6 +182,24 @@ function featuredSkills(items) {
 function featuredServices(items) {
   return ['investment-agent-remote','one-on-one','workflow-building'].map((id,index)=>({item:items.find(item=>item.id===id),index})).filter(({item})=>item).map(({item,index})=>`<article class="service-feature"><button class="service-detail" type="button" data-open="${escape(item.id)}"><span class="service-feature-art service-art-${index+1}" aria-hidden="true"></span><span class="service-feature-copy"><strong>${escape(item.title)}</strong><small>${escape(item.tag||'')}</small><span>${escape(item.desc||'')}</span><span class="circle-arrow" aria-hidden="true">→</span></span></button>${item.sku?`<button class="service-buy" type="button" data-buy-sku="${escape(item.sku)}" disabled>购买暂未开放</button>`:''}</article>`).join('');
 }
+// 首页行情卡片与滚动条的自选列表，后台“站点设置 → 实时行情”可编辑。
+export function loadMarket(root=ROOT) {
+  const target=path.join(root,'content/settings/market.json');
+  if(!fs.existsSync(target))return {enabled:false,quotes:[]};
+  if(fs.lstatSync(target).isSymbolicLink())throw Error('内容文件不能是符号链接');
+  const config=readJSON(target);
+  if(!config||typeof config!=='object'||typeof config.enabled!=='boolean'||!Array.isArray(config.quotes))throw Error('行情设置格式无效');
+  if(config.quotes.length>30)throw Error('行情最多 30 只');
+  const codes=new Set();
+  const quotes=config.quotes.map(quote=>{
+    if(!quote||typeof quote!=='object'||!/^(?:sh|sz|bj)\d{6}$/.test(quote.code||''))throw Error(`行情代码无效：${quote?.code??''}，需形如 sh600519`);
+    if(codes.has(quote.code))throw Error(`行情代码重复：${quote.code}`);codes.add(quote.code);
+    if(typeof quote.name!=='string'||!quote.name.trim()||quote.name.length>12)throw Error(`${quote.code} 名称需为 1–12 个字`);
+    return {code:quote.code,name:quote.name.trim(),card:quote.card!==false,ticker:quote.ticker!==false};
+  });
+  if(quotes.filter(x=>x.card).length>8)throw Error('行情卡片最多显示 8 只');
+  return {enabled:config.enabled,quotes};
+}
 function atomicWrite(target,data) {
   fs.mkdirSync(path.dirname(target),{recursive:true});const tmp=target+'.tmp';fs.writeFileSync(tmp,data);fs.renameSync(tmp,target);
 }
@@ -209,11 +227,12 @@ export function buildSite(root=ROOT) {
     FEATURED_PROMPTS:featuredPrompts(prompts),
     FEATURED_SKILLS:featuredSkills(skills),
     FEATURED_SERVICES:featuredServices(items.filter(x=>x.type==='service')),
+    MARKET:JSON.stringify(loadMarket(root)).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026'),
     DATA:JSON.stringify(items).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029')
   };
   let output=fs.readFileSync(path.join(root,'templates/index.html'),'utf8');
   for(const [key,value] of Object.entries(sections)) {
-    const marker=`<!-- CMS:${key} -->`;if(!output.includes(marker)&&!key.startsWith('FEATURED_')&&key!=='TOPIC_FILTERS')throw Error(`模板缺少 ${key}`);output=output.split(marker).join(value);
+    const marker=`<!-- CMS:${key} -->`;if(!output.includes(marker)&&!key.startsWith('FEATURED_')&&key!=='TOPIC_FILTERS'&&key!=='MARKET')throw Error(`模板缺少 ${key}`);output=output.split(marker).join(value);
   }
   output=output.replace('<!-- CMS:SHOP -->',()=>JSON.stringify(shop).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029'));
   output=versionStaticAssets(output,root,'index.html');

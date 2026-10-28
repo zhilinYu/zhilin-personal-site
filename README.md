@@ -29,6 +29,7 @@ npm run preview:payment
 ## 源码和发布
 
 - `content/`：后台编辑的公开 JSON，收费条目仅含介绍；`templates/`：页面与固定栏目。首页按提示词与 Skills 两类筛选和搜索，保留科技蓝、小清新、暖白纸感、石墨四套主题。
+- `content/settings/market.json`：首页实时行情的自选列表（后台“站点设置 → 实时行情”可编辑），控制首屏行情卡片和导航下方滚动条显示哪些代码。`assets/market.js` 在浏览器中直接请求腾讯行情公开接口，开盘每 5 秒刷新报价、每分钟刷新分时走势；接口不可用时卡片显示“暂不可用”，不影响页面其他功能。
 - `tools/build.mjs`：按当前内容生成根目录 `index.html`，资源索引只筛选提示词和 Skills，小游戏和服务单独展示；文章、项目和 Mac 工具的源文件保留。`tools/export.mjs`：导出 `deployment/site/`，生成包不提交 Git。静态资源继续使用内容哈希版本 URL。
 - `payment/`、`deploy/`：沿用既有支付、私有交付和发布备份门禁；私有配置、订单库和其他收费商品 ZIP 均不进入 Git 或静态发布包。按原文件 SHA-256 命名的量化风控 ZIP 是用户提供并明确要求公开的静态附件，内容与来源保持原样。
 - `.github/workflows/verify-site.yml`：分支和 PR 仅测试构建，不接触服务器或部署凭据。
