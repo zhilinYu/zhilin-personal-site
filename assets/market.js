@@ -13,6 +13,7 @@
   const OPEN_INTERVAL = 5000;
   const CLOSED_INTERVAL = 60000;
   const MINUTE_INTERVAL = 60000;
+  const REQUEST_TIMEOUT = 10000;
   const SVG_NS = 'http://www.w3.org/2000/svg';
 
   // 解析 v_sh000001="1~上证指数~000001~现价~昨收~今开~...~时间(30)~涨跌(31)~涨跌幅(32)~..."; 格式。
@@ -25,26 +26,50 @@
       if (!Number.isFinite(price) || price <= 0) continue;
       const change = fields[31] !== '' && Number.isFinite(Number(fields[31])) ? Number(fields[31]) : price - prevClose;
       const percent = fields[32] !== '' && Number.isFinite(Number(fields[32])) ? Number(fields[32]) : (prevClose ? change / prevClose * 100 : 0);
-      const stamp = /^\d{14}$/.test(fields[30] || '') ? fields[30] : '';
-      result[match[1]] = {price, prevClose: prevClose > 0 ? prevClose : price - change, change, percent, time: stamp ? `${stamp.slice(8, 10)}:${stamp.slice(10, 12)}:${stamp.slice(12, 14)}` : ''};
+      const stamp = fields[30] || '';
+      const timestamp = parseBeijingTimestamp(stamp);
+      result[match[1]] = {price, prevClose: prevClose > 0 ? prevClose : price - change, change, percent, stamp: timestamp === null ? '' : stamp, timestamp};
     }
     return result;
   }
 
-  // 解析分时接口：data[code].data.data 为 "0930 3245.12 成交量 成交额" 形式的字符串数组。
-  function parseMinutes(json, code) {
-    const lines = json?.data?.[code]?.data?.data;
-    if (!Array.isArray(lines)) return [];
-    return lines.map(line => Number(String(line).split(' ')[1])).filter(value => Number.isFinite(value) && value > 0);
+  function parseBeijingTimestamp(stamp) {
+    if (!/^\d{14}$/.test(stamp)) return null;
+    const parts = [stamp.slice(0, 4), stamp.slice(4, 6), stamp.slice(6, 8), stamp.slice(8, 10), stamp.slice(10, 12), stamp.slice(12, 14)].map(Number);
+    const [year, month, day, hour, minute, second] = parts;
+    const timestamp = Date.UTC(year, month - 1, day, hour - 8, minute, second);
+    const check = new Date(timestamp + 8 * 3600000);
+    return check.getUTCFullYear() === year && check.getUTCMonth() === month - 1 && check.getUTCDate() === day && hour < 24 && minute < 60 && second < 60 ? timestamp : null;
   }
 
-  // A 股交易时段按北京时间判断：工作日 9:30–11:30、13:00–15:00。
+  function beijingDate(now) {
+    return new Date(now.getTime() + 8 * 3600000).toISOString().slice(0, 10).replaceAll('-', '');
+  }
+
   function isMarketOpen(now = new Date()) {
-    const beijing = new Date(now.getTime() + (now.getTimezoneOffset() + 480) * 60000);
-    const day = beijing.getDay();
+    const bj = new Date(now.getTime() + 8 * 3600000);
+    const day = bj.getUTCDay();
     if (day === 0 || day === 6) return false;
-    const minutes = beijing.getHours() * 60 + beijing.getMinutes();
-    return (minutes >= 570 && minutes <= 690) || (minutes >= 780 && minutes <= 900);
+    const minutes = bj.getUTCHours() * 60 + bj.getUTCMinutes();
+    return (minutes >= 570 && minutes < 690) || (minutes >= 780 && minutes < 900);
+  }
+
+  function quoteState(quotes, codes, now = new Date()) {
+    if (codes.some(code => !quotes[code] || quotes[code].timestamp === null)) return 'partial';
+    const fresh = codes.every(code => {
+      const age = now.getTime() - quotes[code].timestamp;
+      return age >= -5000 && age <= 60000 && quotes[code].stamp.slice(0, 8) === beijingDate(now);
+    });
+    if (!fresh) return 'delayed';
+    return isMarketOpen(now) ? 'live' : 'closed';
+  }
+
+  // 仅使用有明确日期的分时数据。
+  function parseMinutes(json, code) {
+    const data = json?.data?.[code]?.data;
+    if (!/^\d{8}$/.test(data?.date || '') || !Array.isArray(data?.data)) return null;
+    const points = data.data.map(line => String(line).split(' ')).filter(parts => /^\d{4}$/.test(parts[0]) && Number.isFinite(Number(parts[1])) && Number(parts[1]) > 0);
+    return {date: data.date, time: points.at(-1)?.[0] || '', values: points.map(parts => Number(parts[1]))};
   }
 
   // 把价格序列映射为 SVG 折线坐标，并给出昨收基准线的纵坐标。
@@ -66,7 +91,7 @@
   const formatPercent = value => `${value > 0 ? '+' : ''}${value.toFixed(2)}%`;
   const directionOf = change => change > 0 ? 'up' : change < 0 ? 'down' : 'flat';
 
-  if (typeof module === 'object' && module.exports) module.exports = {parseQuotes, parseMinutes, isMarketOpen, sparklinePoints, formatPrice, formatPercent};
+  if (typeof module === 'object' && module.exports) module.exports = {parseQuotes, parseMinutes, parseBeijingTimestamp, beijingDate, isMarketOpen, quoteState, sparklinePoints, formatPrice, formatPercent};
   if (typeof document === 'undefined') return;
 
   const card = document.querySelector('[data-market-card]');
@@ -116,6 +141,7 @@
       for (const {code, name} of tickerQuotes) {
         const item = document.createElement('li');
         item.className = 'market-ticker-item';
+        item.dataset.name = name;
         item.innerHTML = '<span class="market-ticker-name"></span><span class="market-ticker-price">--</span><span class="market-ticker-change"></span>';
         item.querySelector('.market-ticker-name').textContent = name;
         group.append(item);
@@ -133,14 +159,23 @@
 
   const statusLabel = card?.querySelector('[data-market-status]');
   const clock = card?.querySelector('[data-market-time]');
+  if (card) {
+    card.setAttribute('aria-label', 'A 股行情参考');
+    const label = card.querySelector('.market-status > span');
+    if (label) label.textContent = '行情参考';
+  }
   const quoteCodes = [...new Set([...rows.keys(), ...tickerItems.keys()])];
 
   function drawSpark(code) {
     const row = rows.get(code);
     const quote = latestQuotes[code];
-    if (!row || !quote) return;
-    const values = series.get(code)?.values || [];
-    const shape = sparklinePoints(values, quote.prevClose);
+    if (!row) return;
+    const entry = series.get(code);
+    const now = new Date();
+    const minuteStamp = entry && parseBeijingTimestamp(`${entry.date}${entry.time}00`);
+    const age = now.getTime() - minuteStamp;
+    const values = quote && entry && quoteState(latestQuotes, quoteCodes, now) === 'live' && entry.date === quote.stamp.slice(0, 8) && minuteStamp !== null && age >= -5000 && age <= 180000 ? entry.values : [];
+    const shape = sparklinePoints(values, quote?.prevClose);
     const svg = row.querySelector('.market-spark');
     svg.classList.toggle('is-empty', !shape);
     if (!shape) return;
@@ -151,11 +186,27 @@
   }
 
   function render(quotes) {
-    latestQuotes = {...latestQuotes, ...quotes};
+    latestQuotes = quotes;
     let latest = '';
     for (const code of quoteCodes) {
       const quote = quotes[code];
-      if (!quote) continue;
+      if (!quote || quote.timestamp === null) {
+        const row = rows.get(code);
+        if (row) {
+          row.querySelector('.market-price').textContent = '--';
+          row.querySelector('.market-change').textContent = '--';
+          delete row.dataset.direction;
+          drawSpark(code);
+        }
+        for (const item of tickerItems.get(code) || []) {
+          item.querySelector('.market-ticker-name').textContent = item.dataset.name;
+          item.querySelector('.market-ticker-price').textContent = '--';
+          item.querySelector('.market-ticker-change').textContent = '';
+          delete item.dataset.direction;
+        }
+        previous.delete(code);
+        continue;
+      }
       const direction = directionOf(quote.change);
       const row = rows.get(code);
       if (row) {
@@ -168,48 +219,65 @@
           void row.offsetWidth;
           row.classList.add(quote.price > last ? 'is-flash-up' : 'is-flash-down');
         }
-        // 分时接口不可用时，用本次浏览期间轮询到的价格拼出走势。
-        const entry = series.get(code) || {source: 'session', values: []};
-        if (entry.source === 'session' && entry.values.at(-1) !== quote.price) entry.values = [...entry.values, quote.price].slice(-120);
-        else if (entry.source === 'minute' && entry.values.length) entry.values[entry.values.length - 1] = quote.price;
-        series.set(code, entry);
         drawSpark(code);
       }
       for (const item of tickerItems.get(code) || []) {
         item.dataset.direction = direction;
+        item.querySelector('.market-ticker-name').textContent = `${item.dataset.name} ${quote.stamp.slice(0, 4)}-${quote.stamp.slice(4, 6)}-${quote.stamp.slice(6, 8)} ${quote.stamp.slice(8, 10)}:${quote.stamp.slice(10, 12)}`;
         item.querySelector('.market-ticker-price').textContent = formatPrice(quote.price);
         item.querySelector('.market-ticker-change').textContent = formatPercent(quote.percent);
       }
       previous.set(code, quote.price);
-      if (quote.time > latest) latest = quote.time;
+      if (!latest || quote.stamp < latest) latest = quote.stamp;
     }
-    if (latest && clock) clock.textContent = latest;
+    if (clock) clock.textContent = latest ? `最早 ${latest.slice(0, 4)}-${latest.slice(4, 6)}-${latest.slice(6, 8)} ${latest.slice(8, 10)}:${latest.slice(10, 12)}:${latest.slice(12, 14)} 北京时间` : '--';
   }
 
   function setStatus(state) {
     if (!card) return;
     card.dataset.state = state;
-    statusLabel.textContent = {live: 'LIVE', closed: '已收盘', error: '暂不可用'}[state];
+    statusLabel.textContent = {live: '行情更新中', closed: '非交易时段', delayed: '数据延迟', partial: '部分不可用', error: '暂不可用'}[state];
   }
 
   let quoteTimer = 0;
   let minuteTimer = 0;
   let failures = 0;
 
+  async function fetchData(url, format) {
+    const controller = new AbortController();
+    let timeout;
+    try {
+      return await Promise.race([
+        (async () => {
+          const response = await fetch(url, {cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer', signal: controller.signal});
+          if (!response.ok) throw Error(String(response.status));
+          return response[format]();
+        })(),
+        new Promise((_, reject) => {
+          timeout = setTimeout(() => {
+            controller.abort();
+            reject(Error('timeout'));
+          }, REQUEST_TIMEOUT);
+        })
+      ]);
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
   async function refreshQuotes() {
     clearTimeout(quoteTimer);
     const open = isMarketOpen();
     try {
-      const response = await fetch(`${QUOTE_ENDPOINT}${quoteCodes.join(',')}&_=${Date.now()}`, {cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer'});
-      if (!response.ok) throw Error(String(response.status));
-      const quotes = parseQuotes(await response.text());
+      const quotes = parseQuotes(await fetchData(`${QUOTE_ENDPOINT}${quoteCodes.join(',')}&_=${Date.now()}`, 'text'));
       if (!Object.keys(quotes).length) throw Error('empty');
       render(quotes);
       failures = 0;
-      setStatus(open ? 'live' : 'closed');
+      setStatus(quoteState(quotes, quoteCodes));
     } catch {
       failures += 1;
-      if (!previous.size || failures > 2) setStatus('error');
+      render({});
+      setStatus('error');
     }
     if (!document.hidden) quoteTimer = setTimeout(refreshQuotes, open ? OPEN_INTERVAL * Math.min(failures + 1, 6) : CLOSED_INTERVAL);
   }
@@ -218,16 +286,13 @@
     clearTimeout(minuteTimer);
     await Promise.all([...rows.keys()].map(async code => {
       try {
-        const response = await fetch(`${MINUTE_ENDPOINT}${code}`, {cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer'});
-        if (!response.ok) return;
-        const values = parseMinutes(await response.json(), code);
-        if (values.length >= 2) {
-          series.set(code, {source: 'minute', values});
-          drawSpark(code);
-        }
-      } catch {}
+        const entry = parseMinutes(await fetchData(`${MINUTE_ENDPOINT}${code}`, 'json'), code);
+        if (entry && entry.date === beijingDate(new Date()) && entry.values.length >= 2) series.set(code, entry);
+        else series.delete(code);
+      } catch { series.delete(code); }
+      drawSpark(code);
     }));
-    if (!document.hidden && isMarketOpen()) minuteTimer = setTimeout(refreshMinutes, MINUTE_INTERVAL);
+    if (!document.hidden) minuteTimer = setTimeout(refreshMinutes, MINUTE_INTERVAL);
   }
 
   document.addEventListener('visibilitychange', () => {
