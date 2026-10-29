@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "quotes": [
+    {"code": "sh000001", "name": "上证指数", "card": true, "ticker": true},
+    {"code": "sz399001", "name": "深证成指", "card": true, "ticker": true},
+    {"code": "sz399006", "name": "创业板指", "card": true, "ticker": true},
+    {"code": "sh000688", "name": "科创50", "card": false, "ticker": true},
+    {"code": "sh000300", "name": "沪深300", "card": false, "ticker": true},
+    {"code": "sh000905", "name": "中证500", "card": false, "ticker": true},
+    {"code": "sh600519", "name": "贵州茅台", "card": true, "ticker": true},
+    {"code": "sz000858", "name": "五粮液", "card": true, "ticker": true},
+    {"code": "sh601318", "name": "中国平安", "card": true, "ticker": true},
+    {"code": "sz300750", "name": "宁德时代", "card": false, "ticker": true},
+    {"code": "sz002594", "name": "比亚迪", "card": false, "ticker": true},
+    {"code": "sh600036", "name": "招商银行", "card": false, "ticker": true}
+  ]
+}

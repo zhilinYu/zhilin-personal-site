@@ -6,7 +6,8 @@ import {fileURLToPath} from 'node:url';
 const root=fileURLToPath(new URL('../',import.meta.url));
 test('后台三类集合使用真实 JSON 文件，公开上传有限制',()=>{
   const filename=path.join(root,'admin/config.yml');assert.ok(fs.existsSync(filename),'后台配置必须存在');
-  const config=JSON.parse(fs.readFileSync(filename));assert.deepEqual(config.collections.map(x=>x.name),['articles','prompts','skills']);
+  const config=JSON.parse(fs.readFileSync(filename));assert.deepEqual(config.collections.map(x=>x.name),['articles','prompts','skills','settings']);
+  const settings=config.collections.pop();assert.deepEqual(settings.files.map(x=>x.file),['content/settings/market.json']);assert.equal(settings.delete,false);
   assert.equal(config.backend.name,'github');assert.equal(config.backend.repo,'zhilinYu/zhilin-personal-site');assert.equal(config.publish_mode,'editorial_workflow');
   assert.equal(config.backend.auth_scope,'public_repo');
   for(const collection of config.collections){assert.equal(collection.format,'json');assert.equal(collection.identifier_field,'id');assert.equal(collection.folder,'content/'+collection.name);assert.ok(collection.fields.some(x=>x.name==='enabled'&&x.default===false));}
