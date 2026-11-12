@@ -40,6 +40,14 @@ CATALOG = {
 
 SERVICE_SKUS = {"investment-agent-remote", "one-on-one", "workflow-building"}
 
+# Keep the historic catalogue names intact for existing orders. These labels
+# apply only to descriptions sent to WeChat for newly created service orders.
+SERVICE_PAYMENT_DESCRIPTIONS = {
+    "investment-agent-remote": "远程协助配置 AI 研究工具",
+    "one-on-one": "一对一 AI 工具使用咨询",
+    "workflow-building": "AI 研究工具工作流定制定金",
+}
+
 
 class PaymentError(Exception):
     pass
@@ -117,9 +125,10 @@ class WechatPay:
 
     def create(self, order):
         expiry = datetime.fromtimestamp(order["expires"], timezone.utc).isoformat()
+        name = SERVICE_PAYMENT_DESCRIPTIONS.get(order["sku"], CATALOG[order["sku"]][0])
         return self.api("POST", "/v3/pay/transactions/native", {
             "appid": self.appid, "mchid": self.mchid,
-            "description": "致凌工作室-" + CATALOG[order["sku"]][0] + (" Skill" if order["sku"] == "ashare-five-strategies" else "" if order["sku"] in SERVICE_SKUS else "研究提示词"),
+            "description": "致凌工作室-" + name + (" Skill" if order["sku"] == "ashare-five-strategies" else "" if order["sku"] in SERVICE_SKUS else "研究提示词"),
             "out_trade_no": order["id"], "time_expire": expiry,
             "notify_url": self.notify_url,
             "amount": {"total": order["amount"], "currency": "CNY"},

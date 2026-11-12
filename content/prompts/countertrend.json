@@ -1,14 +1,14 @@
 {
   "id": "countertrend",
-  "title": "AI选股之顶级游资 × 逆势抗跌版",
-  "desc": "在市场分歧期对照相对强度、板块生命力与资金承接，寻找值得跟踪的线索。",
+  "title": "A 股研究提示词｜逆势抗跌",
+  "desc": "整理市场波动时的相对强度、板块表现和成交变化。",
   "type": "paid-prompt",
   "group": "stock",
   "tag": "研究提示词",
   "price": "¥9.9",
   "image": "assets/countertrend.webp",
   "source": "志林整理",
-  "body": "内容包括筛选规则、观察步骤与风险边界。请使用可靠数据核验结论；数据不足时停止生成具体价位。",
+  "body": "内容包含历史研究模板、观察步骤与风险边界。请核实资料和数据来源；分析结果可能有误，不保证投资收益。",
   "enabled": true,
   "order": 3,
   "sku": "countertrend"

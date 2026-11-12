@@ -1,14 +1,14 @@
 {
   "id": "limit-up-pullback",
-  "title": "AI选股之顶级游资 × 涨停回吐版",
-  "desc": "围绕涨停后回吐、缩量与二次转强，建立清晰的跟踪与复核步骤。",
+  "title": "A 股研究提示词｜涨停回吐",
+  "desc": "整理涨停后价格、成交和波动情况的复盘维度。",
   "type": "paid-prompt",
   "group": "stock",
   "tag": "研究提示词",
   "price": "¥9.9",
   "image": "assets/limit-up-pullback.webp",
   "source": "志林整理",
-  "body": "内容包括筛选规则、观察步骤与风险边界。请使用可靠数据核验结论；数据不足时停止生成具体价位。",
+  "body": "内容包含历史研究模板、观察步骤与风险边界。请核实资料和数据来源；分析结果可能有误，不保证投资收益。",
   "enabled": true,
   "order": 4,
   "sku": "limit-up-pullback"
