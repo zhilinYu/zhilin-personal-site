@@ -1,14 +1,14 @@
 {
   "id": "trend-leader",
-  "title": "AI选股之顶级游资 × 趋势龙头版",
-  "desc": "从市场主线、趋势结构到龙头分级，逐步梳理值得跟踪的研究线索。",
+  "title": "A 股研究提示词｜趋势与龙头",
+  "desc": "整理市场方向、趋势结构和板块观察的研究资料。",
   "type": "paid-prompt",
   "group": "stock",
   "tag": "研究提示词",
   "price": "¥9.9",
   "image": "assets/trend-leader.webp",
   "source": "志林整理",
-  "body": "内容包括筛选规则、观察步骤与风险边界。请使用可靠数据核验结论；数据不足时停止生成具体价位。",
+  "body": "内容包含历史研究模板、观察步骤与风险边界。请核实资料和数据来源；分析结果可能有误，不保证投资收益。",
   "enabled": true,
   "order": 1,
   "sku": "trend-leader"

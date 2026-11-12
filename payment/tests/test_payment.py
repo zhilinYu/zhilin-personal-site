@@ -605,6 +605,30 @@ class OrderTests(unittest.TestCase):
                                         headers=self.auth()).json["status"], "PAID")
 
 
+class PaymentDescriptionTests(unittest.TestCase):
+    def test_new_service_descriptions_leave_historic_catalogue_and_prices_unchanged(self):
+        gateway = WechatPay.__new__(WechatPay)
+        gateway.appid = "test-app"
+        gateway.mchid = "test-merchant"
+        gateway.notify_url = "https://example.test/notify"
+        examples = {
+            "investment-agent-remote": ("远程协助配置 AI 研究工具", "远程协助搭建 AI 投研智能体", 9900),
+            "one-on-one": ("一对一 AI 工具使用咨询", "一对一 AI 投研咨询", 19900),
+            "workflow-building": ("AI 研究工具工作流定制定金", "AI 投研工作流定制定金", 19900),
+        }
+        with patch.object(gateway, "api", return_value={}) as api:
+            for sku, (description, historic_name, amount) in examples.items():
+                with self.subTest(sku=sku):
+                    self.assertEqual(CATALOG[sku], (historic_name, amount))
+                    gateway.create({"sku": sku, "id": "local-test-order", "amount": amount, "expires": 2000000000})
+                    method, path, payload = api.call_args.args
+                    self.assertEqual((method, path), ("POST", "/v3/pay/transactions/native"))
+                    self.assertEqual(payload["description"], "致凌工作室-" + description)
+                    self.assertEqual(payload["amount"], {"total": amount, "currency": "CNY"})
+            gateway.create({"sku": "trend-leader", "id": "local-test-order", "amount": 990, "expires": 2000000000})
+            self.assertEqual(api.call_args.args[2]["description"], "致凌工作室-趋势龙头研究提示词")
+
+
 class SignatureTests(unittest.TestCase):
     def setUp(self):
         self.private = rsa.generate_private_key(public_exponent=65537, key_size=2048)
